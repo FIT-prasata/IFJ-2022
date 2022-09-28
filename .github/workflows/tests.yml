@@ -5,8 +5,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@master
-      - name: Connect to Eva
-        run: ssh ${{ secrets.EVA_USER }}@${{ secrets.EVA_HOST }} | echo ${{ secrets.EVA_PASSWORD }}
-      - name: create something
-        run: mkdir ~/ifj/tmp/from_github
+      - name: Copy src to Eva
+        run: |
+          sshpass -p ${{ secrets.EVA_PASSWORD }} scp -r src ${{ EVA_USER }}@${{ EVA_HOST }}
 
