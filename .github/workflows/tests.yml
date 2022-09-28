@@ -4,7 +4,7 @@ jobs:
   connect_and_run:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@master
+      - uses: actions/checkout@develop
       - name: Copy src to Eva
         run: |
           sshpass -p ${{ secrets.EVA_PASSWORD }} scp -r src ${{ secrets.EVA_USER }}@${{ secrets.EVA_HOST }}
