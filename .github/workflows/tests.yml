@@ -1,13 +1,16 @@
 name: Run tests on Eva server
-'on': [commit, workflow_dispatch]
+'on': workflow_dispatch
 jobs:
   connect_and_run:
     runs-on: ubuntu-latest
     steps:
-      - name: Connect to Eva server
-        run: ssh xproch0o@eva.fit.vutbr.cz | echo ${{ secrets.EVA_PSWD }}
-      - name: Run tests
-        run: ./.github/scripts/run_eva.sh
-        shell: bash
-      - name: Disconnect from Eva server
-        run: exit
+      - name: Pump source code to Eva
+          - uses: actions/checkout@master
+          - name: copy file via ssh password
+            uses: appleboy/scp-action@master
+            with:
+              host: ${{ secrets.EVA_HOST }}
+              username: ${{ secrets.EVA_USER }}
+              password: ${{ secrets.EVA_PASSWORD }}
+              source: "src/*"
+              target: "~/ifj/tmp"
