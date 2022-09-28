@@ -1,0 +1,13 @@
+name: Run tests on Eva server
+'on': [commit, workflow_dispatch]
+jobs:
+  connect_and_run:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Connect to Eva server
+        run: ssh xproch0o@eva.fit.vutbr.cz | echo ${{ secrets.EVA_PSWD }}
+      - name: Run tests
+        run: ./.github/scripts/run_eva.sh
+        shell: bash
+      - name: Disconnect from Eva server
+        run: exit
