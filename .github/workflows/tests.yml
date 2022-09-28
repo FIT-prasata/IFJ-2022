@@ -7,5 +7,5 @@ jobs:
       - uses: actions/checkout@master
       - name: Copy src to Eva
         run: |
-          sshpass -p ${{ secrets.EVA_PASSWORD }} scp -r src ${{ EVA_USER }}@${{ EVA_HOST }}
+          sshpass -p ${{ secrets.EVA_PASSWORD }} scp -r src ${{ secrets.EVA_USER }}@${{ secrets.EVA_HOST }}
 
