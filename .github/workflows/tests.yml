@@ -5,11 +5,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@master
-      - name: Pump up code to Eva
-        uses: appleboy/scp-action@master
-        with:
-          host: ${{ secrets.EVA_HOST }}
-          username: ${{ secrets.EVA_USER }}
-          password: ${{ secrets.EVA_PASSWORD }}
-          source: "src/*"
-          target: "~/ifj/tmp"
+      - name: Connect to Eva
+        run: ssh ${{ secrets.EVA_USER }}@${{ secrets.EVA_HOST }} | echo ${{ secrets.EVA_PASSWORD }}
+      - name: create something
+        run: mkdir ~/ifj/tmp/from_github
+
