@@ -9,5 +9,5 @@ jobs:
           ref: develop
       - name: Copy src to Eva
         run: |
-          sshpass -p ${{ secrets.EVA_PASSWORD }} scp -r src ${{ secrets.EVA_USER }}@${{ secrets.EVA_HOST }}:~/ifj/tmp
+          sshpass -p ${{ secrets.EVA_PASSWORD }} scp StrictHostKeyChecking=no -r src ${{ secrets.EVA_USER }}@${{ secrets.EVA_HOST }}:~/ifj/tmp
 
