@@ -4,13 +4,12 @@ jobs:
   connect_and_run:
     runs-on: ubuntu-latest
     steps:
-      - name: Pump source code to Eva
-          - uses: actions/checkout@master
-          - name: copy file via ssh password
-            uses: appleboy/scp-action@master
-            with:
-              host: ${{ secrets.EVA_HOST }}
-              username: ${{ secrets.EVA_USER }}
-              password: ${{ secrets.EVA_PASSWORD }}
-              source: "src/*"
-              target: "~/ifj/tmp"
+      - uses: actions/checkout@master
+      - name: Pump up code to Eva
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.EVA_HOST }}
+          username: ${{ secrets.EVA_USER }}
+          password: ${{ secrets.EVA_PASSWORD }}
+          source: "src/*"
+          target: "~/ifj/tmp"
