@@ -1,5 +1,5 @@
 # Filename: Makefile
-# IFJ 2021/2022 project
+# IFJ 2022/2023 project
 # TRP variant
 #
 # Makefile for project compilation
