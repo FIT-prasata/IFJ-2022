@@ -1,3 +1,5 @@
+#pragma once
+
 // Filename: stack.h
 // IFJ 2022/2023 project
 // TRP variant
@@ -8,8 +10,6 @@
 // Author: <xproch0o> - Marek Procházka
 // Author: <xzavad20> - Lukáš Zavadil
 // Author: <xsvetl07> - Adam Světlík
-
-#pragma once
 
 // EXTERNAL INCLUDES
 #include <limits.h> // temporary import for INT_MIN constant

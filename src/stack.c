@@ -9,6 +9,7 @@
 // Author: <xzavad20> - Lukáš Zavadil
 // Author: <xsvetl07> - Adam Světlík
 
+// LOCAL INCLUDES
 #include "stack.h"
 
 // Initializes stack
