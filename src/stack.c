@@ -24,9 +24,9 @@ Token_t stack_get_head(Stack_t *stack) {
 }
 
 // Pushes token into the stack
-int stack_push(Stack_t *stack, Token_t token) {
+void stack_push(Stack_t *stack, Token_t token) {
     Stack_t *tmp = (Stack_t *)malloc(sizeof(Stack_t));
-    if (tmp == NULL) return NULL;
+    if (tmp == NULL) return;
     tmp->head = stack->head;
     tmp->next = stack->next;
     stack->head = token;
@@ -36,32 +36,15 @@ int stack_push(Stack_t *stack, Token_t token) {
 // Pops token from the stack
 int stack_pop(Stack_t *stack) {
     if (stack == NULL || stack->head.type == NO_TYPE) return EMPTY_STACK;
+    int result = stack->head.type;
     Stack_t *tmp = stack->next;
     stack->head = stack->next->head;
     stack->next = stack->next->next;
     free(tmp);
+    return result;
 }
 
 // Clears whole stack
 void stack_clear(Stack_t *stack) {
     while (stack_pop(stack) != EMPTY_STACK);
-}
-
-// Testing
-int main(void) {
-    Stack_t stack;
-    Token_t token1, token2, result;
-    token1.type = 20;
-    token2.type = 40;
-    stack_init(&stack);
-    stack_push(&stack, token1);
-    result = stack_get_head(&stack);
-    printf("Token: %d\n", result.type);
-    stack_push(&stack, token2);
-    result = stack_get_head(&stack);
-    printf("Token: %d\n", result.type);
-    stack_clear(&stack);
-    result = stack_get_head(&stack);
-    printf("Token: %d\n", result.type);
-    return 0;
 }

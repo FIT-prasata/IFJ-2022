@@ -12,7 +12,10 @@
 // Author: <xsvetl07> - Adam Světlík
 
 // EXTERNAL INCLUDES
-#include <stdio.h>
+#include <stdlib.h>
+
+// LOCAL INCLUDES
+#include "scanner.h"
 
 // Specification defined erros
 

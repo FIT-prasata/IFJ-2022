@@ -20,7 +20,7 @@ all: main
 # generating executable file
 
 main: main.o $(MODULES)
-	$(CC) $(CFLAGS) $< -o $@
+	$(CC) $(CFLAGS) $^ -o $@
 
 
 # generating .o files
