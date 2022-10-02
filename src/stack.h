@@ -14,7 +14,6 @@
 // EXTERNAL INCLUDES
 #include <limits.h> // temporary import for INT_MIN constant
 #include <stdlib.h>
-#include <stdio.h>
 
 // LOCAL INCLUDES
 #include "scanner.h" // for accessing token struct later on
@@ -25,12 +24,6 @@
 
 typedef struct Stack Stack_t;
 
-// !!! DUMMY STRUCT -> REPLACE WITH PROPER TOKEN STRUCT DEFINED IN SCANNER !!!
-typedef struct Token {
-    int type;
-    int value;
-} Token_t;
-
 typedef struct Stack {
     Token_t head;   // last pushed token (top of stack)
     Stack_t *next;  // pointer to next token
@@ -38,6 +31,6 @@ typedef struct Stack {
 
 void stack_init(Stack_t *stack);
 Token_t stack_get_head(Stack_t *stack);
-int stack_push(Stack_t *stack, Token_t token);
+void stack_push(Stack_t *stack, Token_t token);
 int stack_pop(Stack_t *stack);
 void stack_clear(Stack_t *stack);
