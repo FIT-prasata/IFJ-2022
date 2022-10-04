@@ -25,24 +25,28 @@ main: main.o $(MODULES)
 
 # generating .o files
 
-error.o: error.c
+error.o: src/error.c
 	$(CC) $(CFLAGS) $< -c -o $@
 
-main.o: main.c
+main.o: src/main.c
 	$(CC) $(CFLAGS) $< -c -o $@
 
-parser.o: parser.c
+parser.o: src/parser.c
 	$(CC) $(CFLAGS) $< -c -o $@
 
-scanner.o: scanner.c
+scanner.o: src/scanner.c
 	$(CC) $(CFLAGS) $< -c -o $@
 
-stack.o: stack.c
+stack.o: src/stack.c
 	$(CC) $(CFLAGS) $< -c -o $@
 
-symtable.o: symtable.c
+symtable.o: src/symtable.c
 	$(CC) $(CFLAGS) $< -c -o $@
 
+
+# Execution
+win-compile-and-run :
+	make & make win-clean & main.exe
 
 # Cleaning
 
@@ -57,3 +61,5 @@ win-delete:
 
 delete:
 	rm main
+
+
