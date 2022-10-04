@@ -18,7 +18,7 @@
 #include "scanner.h"
 
 // Specification defined erros
-
+#define OK 0
 #define LEX_ERR 1         // Lexical analysis error
 #define SYNTAX_ERR 2      // Syntax analysis error
 #define UNDEF_FUNC_ERR 3  // Undefined function / redefinition
@@ -32,5 +32,11 @@
 // Custom errors
 
 // TODO
+
+typedef struct Status {
+    int type;
+    int line_num;
+} Status_t;
+
 
 void error_display(int type, int line_num);
