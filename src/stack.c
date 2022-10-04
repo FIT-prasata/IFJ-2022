@@ -19,9 +19,7 @@ void stack_init(Stack_t *stack) {
 }
 
 // Returns token that is currently on top of the stack
-Token_t stack_get_head(Stack_t *stack) {
-    return stack->head;
-}
+Token_t stack_get_head(Stack_t *stack) { return stack->head; }
 
 // Pushes token into the stack
 void stack_push(Stack_t *stack, Token_t token) {
@@ -46,5 +44,6 @@ int stack_pop(Stack_t *stack) {
 
 // Clears whole stack
 void stack_clear(Stack_t *stack) {
-    while (stack_pop(stack) != EMPTY_STACK);
+    while (stack_pop(stack) != EMPTY_STACK)
+        ;
 }
