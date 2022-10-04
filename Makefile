@@ -11,7 +11,7 @@
 
 CC=gcc
 CFLAGS=-g -std=c11 -pedantic -Wall -Wextra
-MODULES=error.o parser.o scanner.o stack.o symtable.o
+MODULES=error.o parser.o scanner.o stack.o symtable.o dynamic_string.o
 
 
 all: main
@@ -41,6 +41,9 @@ stack.o: src/stack.c
 	$(CC) $(CFLAGS) $< -c -o $@
 
 symtable.o: src/symtable.c
+	$(CC) $(CFLAGS) $< -c -o $@
+
+dynamic_string.o: src/dynamic_string.c
 	$(CC) $(CFLAGS) $< -c -o $@
 
 
