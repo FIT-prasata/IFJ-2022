@@ -22,3 +22,8 @@ typedef struct Token {
     int type;
     int value;
 } Token_t;
+
+// Defines
+
+// get next token from file pointer
+Token_t get_token(FILE *file_ptr);

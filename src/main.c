@@ -13,6 +13,8 @@
 #include "stack.h"
 
 int main(void) {
+    FILE *file_ptr = stdin;
+
     // Testing makefile
     Stack_t stack;
     Token_t token1, token2, result;
