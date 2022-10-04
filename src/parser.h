@@ -12,8 +12,8 @@
 // Author: <xsvetl07> - Adam Světlík
 
 // EXTERNAL INCLUDES
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <stdbool.h>
 
 // LOCAL INCLUDES

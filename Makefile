@@ -44,9 +44,9 @@ symtable.o: src/symtable.c
 	$(CC) $(CFLAGS) $< -c -o $@
 
 
-# Execution
-win-compile-and-run :
-	make & make win-clean & main.exe
+# Formatting
+lint:
+	clang-format -i src/*.c & clang-format -i src/*.h
 
 # Cleaning
 
@@ -62,4 +62,6 @@ win-delete:
 delete:
 	rm main
 
-
+# Execution
+win-compile-and-run :
+	make lint & make & make win-clean & main.exe
