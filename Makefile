@@ -68,3 +68,6 @@ delete:
 # Execution
 win-compile-and-run :
 	make lint & make & make win-clean & main.exe
+
+win-compile-and-run-clion :
+	make lint & make & make win-clean
