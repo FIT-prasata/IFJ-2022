@@ -18,7 +18,7 @@
 #include "scanner.h"
 
 // Specification defined erros
-
+#define OK 0
 #define LEX_ERR 1         // Lexical analysis error
 #define SYNTAX_ERR 2      // Syntax analysis error
 #define UNDEF_FUNC_ERR 3  // Undefined function / redefinition
@@ -30,7 +30,16 @@
 #define INTERNAL_ERR 99   // Internal compiler error (memory allocation)
 
 // Custom errors
+#define NOT_IMPLEMENTED 100
 
 // TODO
 
+typedef struct Status {
+    int type;
+    int line_num;
+} Status_t;
+
 void error_display(int type, int line_num);
+// save function return with potential error handling
+// TODO just an idea if we want to use it name should be changed
+void fr(int code);

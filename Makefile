@@ -11,7 +11,7 @@
 
 CC=gcc
 CFLAGS=-g -std=c11 -pedantic -Wall -Wextra
-MODULES=error.o parser.o scanner.o stack.o symtable.o
+MODULES=error.o parser.o scanner.o stack.o symtable.o dynamic_string.o
 
 
 all: main
@@ -43,6 +43,9 @@ stack.o: src/stack.c
 symtable.o: src/symtable.c
 	$(CC) $(CFLAGS) $< -c -o $@
 
+dynamic_string.o: src/dynamic_string.c
+	$(CC) $(CFLAGS) $< -c -o $@
+
 
 # Formatting
 lint:
@@ -65,3 +68,6 @@ delete:
 # Execution
 win-compile-and-run :
 	make lint & make & make win-clean & main.exe
+
+win-compile-and-run-clion :
+	make lint & make & make win-clean
