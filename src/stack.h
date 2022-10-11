@@ -12,11 +12,11 @@
 // Author: <xsvetl07> - Adam Světlík
 
 // EXTERNAL INCLUDES
-#include <limits.h> // temporary import for INT_MIN constant
+#include <limits.h>  // temporary import for INT_MIN constant
 #include <stdlib.h>
 
 // LOCAL INCLUDES
-#include "scanner.h" // for accessing token struct later on
+#include "scanner.h"  // for accessing token struct later on
 
 // DEFINES
 #define EMPTY_STACK INT_MIN
