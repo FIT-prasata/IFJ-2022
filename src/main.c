@@ -13,6 +13,7 @@
 #include "dynamic_string.h"
 #include "error.h"
 #include "stack.h"
+#include "symtable.h"
 
 int main(void) {
     // Testing dynamic strings
