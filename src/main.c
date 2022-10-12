@@ -11,6 +11,7 @@
 
 // LOCAL INCLUDES
 #include "stack.h"
+#include "symtable.h"
 
 int main(void) {
     // Testing makefile
@@ -27,6 +28,10 @@ int main(void) {
     printf("Token: %d\n", result.type);
     stack_clear(&stack);
     result = stack_get_head(&stack);
-    printf("Token: %d", result.type);
+    printf("Token: %d\n", result.type);
+
+    htab_t *table = htab_init(10);
+    printf("array size: %d\nsize: %d\n", table->arr_size, table->size);
+
     return 0;
 }
