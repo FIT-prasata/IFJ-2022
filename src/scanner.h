@@ -60,7 +60,7 @@ typedef enum {
     // OTHERS
     T_ID,    // identifier
     T_EOF,   // end of file
-    T_E OL,  // end of line
+    T_EOL,   // end of line
     T_UNDEF  // undefined type
 
 } T_type_t;
