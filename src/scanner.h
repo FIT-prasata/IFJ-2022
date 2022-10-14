@@ -12,21 +12,21 @@
 // Author: <xsvetl07> - Adam Světlík
 
 // EXTERNAL INCLUDES
-#include <stdio.h>
 #include <stdbool.h>
+#include <stdio.h>
 
 // LOCAL INCLUDES
 #include "error.h"
 
-// Token types 
+// Token types
 typedef enum {
     // OPERATORS, ordered from highest precedence to lowest
-    T_LT,   // <
-    T_GT,   // >
-    T_LE,   // <=
-    T_GE,   // >=
-    T_EQ,   // ===
-    T_NE,   // !==
+    T_LT,  // <
+    T_GT,  // >
+    T_LE,  // <=
+    T_GE,  // >=
+    T_EQ,  // ===
+    T_NE,  // !==
 
     // KEYWORDS
     K_ELSE,  // else
@@ -41,21 +41,21 @@ typedef enum {
     K_WHILE, // while
 
     // PUNCTUATORS
-    T_LCBR,   // {
-    T_RCBR,   // }
-    T_LBR,    // (
-    T_RBR,    // )
-    T_SEMCOL, // ;
-    T_COL,    // :
-    T_CONCAT, // .
+    T_LCBR,    // {
+    T_RCBR,    // }
+    T_LBR,     // (
+    T_RBR,     // )
+    T_SEMCOL,  // ;
+    T_COL,     // :
+    T_CONCAT,  // .
 
     // EXPRESSIONS
-    T_MUL,    // *
-    T_DIV,    // /
-    T_ADD,    // +
-    T_SUB,    // -
-    T_ASSIGN, // =
-    T_NEG,    // !
+    T_MUL,     // *
+    T_DIV,     // /
+    T_ADD,     // +
+    T_SUB,     // -
+    T_ASSIGN,  // =
+    T_NEG,     // !
 
     // TYPES
     T_INT,    // integer type
@@ -100,7 +100,7 @@ typedef enum {
     S_SUB,
     S_ASSIGN,
     S_NEG,
-    
+
     // COMMENTS STATES
     S_BC_START,
     S_POSS_BC_END,
@@ -141,11 +141,10 @@ typedef union {
     double dec_value;
 } T_attr_t;
 
-
 // Token struct
 typedef struct {
-    T_type_t type;      // type of token, one of T_type constants
-    T_attr_t attribute; // attribute of token
+    T_type_t type;       // type of token, one of T_type constants
+    T_attr_t attribute;  // attribute of token
 } Token_t;
 
 int is_keyword(Token_t *token, char *curr);
