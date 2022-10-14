@@ -29,16 +29,16 @@ typedef enum {
     T_NE,  // !==
 
     // KEYWORDS
-    T_ELSE,   // else
-    T_FLOAT,  // float
-    T_FUNC,   // function
-    T_IF,     // if
-    T_INT,    // int
-    T_NULL,   // null
-    T_RET,    // return
-    T_STR,    // string
-    T_VOID,   // void
-    T_WHILE,  // while
+    K_ELSE,  // else
+    K_FLOAT, // float
+    K_FUNC,  // function
+    K_IF,    // if
+    K_INT,   // int
+    K_NULL,  // null
+    K_RET,   // return
+    K_STR,   // string
+    K_VOID,  // void
+    K_WHILE, // while
 
     // PUNCTUATORS
     T_LCBR,    // {
@@ -57,11 +57,18 @@ typedef enum {
     T_ASSIGN,  // =
     T_NEG,     // !
 
+    // TYPES
+    T_INT,    // integer type
+    T_FLOAT,  // float type
+    T_STRING, // string type
+
     // OTHERS
-    T_ID,    // identifier
-    T_EOF,   // end of file
-    T_EOL,   // end of line
-    T_UNDEF  // undefined type
+    T_ID,      // variable identifier
+    T_FUNC_ID, // function identifier
+    T_EOF,     // end of file
+    T_EOL,     // end of line
+    T_UNDEF,   // undefined type
+    T_SEM      // semicolon
 
 } T_type_t;
 
@@ -120,6 +127,7 @@ typedef enum {
     S_SPACE,
     S_ID1,
     S_ID2,
+    S_FUNC_ID,
     S_EOF,
     S_START,
     S_ERR
@@ -139,6 +147,8 @@ typedef struct {
     T_attr_t attribute;  // attribute of token
 } Token_t;
 
-bool matches_keyword(Token_t token);
-
-bool scan(Token_t token, FILE *stream);
+int is_keyword(Token_t *token, char *curr);
+int num_handler(Token_t *token, char *curr);
+int string_handler(Token_t *token);
+int id_handler(Token_t *token);
+int scan(Token_t *token);

@@ -31,8 +31,12 @@
 
 // Custom errors
 #define NOT_IMPLEMENTED 100
-
-// TODO
+#define LC_EOF_ERR 11
+#define BC_EOF_ERR 12
+#define NUM_ERR 13
+#define STR_ERR 14
+#define EQ_ERR 15
+#define NE_ERR 16
 
 typedef struct Status {
     int type;
