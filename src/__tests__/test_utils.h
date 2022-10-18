@@ -21,7 +21,7 @@ typedef enum { PASSED, FAILED } TestResult_t;
         printf(GREEN("[PASSED] %s \n"), t_name);                        \
         return 0;                                                       \
     } else {                                                            \
-        fprintf(stderr, RED("[FAILED] %s -> failed on: %s \n"), t_name, \
+        printf(RED("[FAILED] %s -> failed on: %s \n"), t_name, \
                 e_msg);                                                 \
         return 1;                                                       \
     }                                                                   \
