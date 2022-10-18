@@ -89,9 +89,9 @@ int d_string_add_str(DString_t *d_string, const char *c_str) {
 
 // Appends dynamic string by another dynamic string
 int d_string_add_d_string(DString_t *d_string, DString_t *d_string_to_add) {
-    printf("d_string_add_d_string");
-    printf("d_string_to_add->str: %s", d_string_to_add->str);
-    printf("d_string->str: %s", d_string->str);
+    if (d_string == NULL || d_string_to_add == NULL) {
+        return INTERNAL_ERR;
+    }
     return NOT_IMPLEMENTED;
 }
 

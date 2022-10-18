@@ -55,7 +55,7 @@ int d_string_add_str(DString_t *d_string, const char *c_str);
 // @param d_string - pointer to dynamic string
 // @param str - string to be added
 // @return - status code
-int d_string_add_d_str(DString_t *d_string, const DString_t *d_str);
+int d_string_add_d_string(DString_t *d_string, DString_t *d_string_to_add);
 
 // Compares dynamic string with constant string
 // @param d_string - pointer to dynamic string
