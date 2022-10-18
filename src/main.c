@@ -16,7 +16,9 @@
 #include "symtable.h"
 
 int main(void) {
-    htab_t* table = htab_init(10);
+    htab_t* table = NULL;
+    htab_init(10, table);
+    printf("tadztu\n");
 
     Token_t* token = malloc(sizeof(Token_t));
     token->type = T_ID;
@@ -29,8 +31,6 @@ int main(void) {
     token2->type = T_ID;
     token2->attribute.string = "prdelkaaa";
 
-
-
     htab_item_t* item = htab_find(table, "prdelkaaa");
     if (item != NULL)
         printf("%s\n", item->token->attribute.string);
@@ -42,7 +42,6 @@ int main(void) {
 
     htab_insert_item(table, token);
     print_table(table);
-
 
     htab_clear(table);
     print_table(table);

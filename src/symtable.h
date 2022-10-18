@@ -44,8 +44,7 @@ struct htab {
     htab_item_t **arr_ptr;
 };
 
-htab_t *htab_init(size_t n);
-// htab_item_t *htab_item_init(htab_key_t key);
+int htab_init(size_t n, htab_t *htab_table);
 size_t htab_hash_function(const char *str);
 bool htab_insert_item(htab_t *t, Token_t *token);
 void print_table(htab_t *t);
