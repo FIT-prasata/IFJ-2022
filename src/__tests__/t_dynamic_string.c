@@ -45,7 +45,7 @@ ENDTEST
 TEST(T_d_string_add_str, "test d_string_add_str")
 D_INIT
 ASSERT_TRUE(d_string_add_str(&d_string, "Ahoj mami") == OK);
-ASSERT_TRUE(strcmp(d_string.str, "Ahoj mami") == 0);
+ASSERT_TRUE(strcmp(d_string.str, "Ahoj mamiiii") == 0);
 D_FREE
 ENDTEST
 
@@ -101,16 +101,18 @@ ASSERT_TRUE(get_d_string_value_to_double(&d_string, &value) == INTERNAL_ERR);
 D_FREE
 ENDTEST
 
-void run_d_string_tests() {
+int run_d_string_tests() {
+    int errors = 0;
     printf("Running dynamic string tests...\n");
-    T_d_string_init();
-    T_d_string_free_and_clear();
-    T_d_string_add_char();
-    T_d_string_clear();
-    T_d_string_add_str();
-    T_d_string_add_d_string();
-    T_d_string_cmp();
-    T_d_string_copy();
-    T_get_d_string_value_to_integer();
-    T_get_d_string_value_to_double();
+    errors += T_d_string_init();
+    errors += T_d_string_free_and_clear();
+    errors += T_d_string_add_char();
+    errors += T_d_string_clear();
+    errors += T_d_string_add_str();
+    errors += T_d_string_add_d_string();
+    errors += T_d_string_cmp();
+    errors += T_d_string_copy();
+    errors += T_get_d_string_value_to_integer();
+    errors += T_get_d_string_value_to_double();
+    return errors;
 }

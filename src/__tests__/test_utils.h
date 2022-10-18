@@ -11,18 +11,20 @@ typedef enum { PASSED, FAILED } TestResult_t;
 #define GREEN(str) "\x1b[32m" str "\x1b[0m"
 
 #define TEST(NAME, DESCRIPTION)       \
-    void NAME() {                     \
+    int NAME() {                      \
         TestResult_t result = PASSED; \
         char* t_name = #NAME;         \
         char* t_desc = #DESCRIPTION;  \
         char* e_msg = "no error";
-#define ENDTEST                                                              \
-    if (result == PASSED) {                                                  \
-        printf(GREEN("[PASSED] %s"), t_name);                                \
-    } else {                                                                 \
-        fprintf(stderr, RED("[FAILED] %s -> failed on: %s"), t_name, e_msg); \
-    }                                                                        \
-    printf("\n");                                                            \
+#define ENDTEST                                                         \
+    if (result == PASSED) {                                             \
+        printf(GREEN("[PASSED] %s \n"), t_name);                        \
+        return 0;                                                       \
+    } else {                                                            \
+        fprintf(stderr, RED("[FAILED] %s -> failed on: %s \n"), t_name, \
+                e_msg);                                                 \
+        return 1;                                                       \
+    }                                                                   \
     }
 
 #define ASSERT_TRUE(CONDITION) \
