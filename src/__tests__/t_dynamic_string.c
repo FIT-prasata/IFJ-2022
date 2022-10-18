@@ -29,7 +29,7 @@ D_INIT
 ASSERT_TRUE(d_string_add_char(&d_string, 'a') == OK);
 ASSERT_TRUE(strcmp(d_string.str, "a") == 0);
 ASSERT_TRUE(d_string_add_char(&d_string, 'b') == OK);
-ASSERT_TRUE(strcmp(d_string.str, "abcd") == 0);
+ASSERT_TRUE(strcmp(d_string.str, "ab") == 0);
 D_FREE
 ENDTEST
 
@@ -45,7 +45,7 @@ ENDTEST
 TEST(T_d_string_add_str, "test d_string_add_str")
 D_INIT
 ASSERT_TRUE(d_string_add_str(&d_string, "Ahoj mami") == OK);
-ASSERT_TRUE(strcmp(d_string.str, "Ahoj mamiiii") == 0);
+ASSERT_TRUE(strcmp(d_string.str, "Ahoj mami") == 0);
 D_FREE
 ENDTEST
 
