@@ -12,13 +12,13 @@
 // Author: <xsvetl07> - Adam Světlík
 
 // EXTERNAL INCLUDES
+#include <ctype.h>
 #include <stdbool.h>
 #include <stdio.h>
-#include <ctype.h>
 
 // LOCAL INCLUDES
-#include "error.h"
 #include "dynamic_string.h"
+#include "error.h"
 
 // Token types
 typedef enum {
@@ -31,16 +31,16 @@ typedef enum {
     T_NE,  // !==
 
     // KEYWORDS
-    K_ELSE,  // else
-    K_FLOAT, // float
-    K_FUNC,  // function
-    K_IF,    // if
-    K_INT,   // int
-    K_NULL,  // null
-    K_RET,   // return
-    K_STR,   // string
-    K_VOID,  // void
-    K_WHILE, // while
+    K_ELSE,   // else
+    K_FLOAT,  // float
+    K_FUNC,   // function
+    K_IF,     // if
+    K_INT,    // int
+    K_NULL,   // null
+    K_RET,    // return
+    K_STR,    // string
+    K_VOID,   // void
+    K_WHILE,  // while
 
     // PUNCTUATORS
     T_LCBR,    // {
@@ -60,17 +60,17 @@ typedef enum {
     T_NEG,     // !
 
     // TYPES
-    T_INT,    // integer type
-    T_FLOAT,  // float type
-    T_STRING, // string type
+    T_INT,     // integer type
+    T_FLOAT,   // float type
+    T_STRING,  // string type
 
     // OTHERS
-    T_ID,      // variable identifier
-    T_FUNC_ID, // function identifier
-    T_EOF,     // end of file
-    T_EOL,     // end of line
-    T_UNDEF,   // undefined type
-    T_SEM      // semicolon
+    T_ID,       // variable identifier
+    T_FUNC_ID,  // function identifier
+    T_EOF,      // end of file
+    T_EOL,      // end of line
+    T_UNDEF,    // undefined type
+    T_SEM       // semicolon
 
 } T_type_t;
 

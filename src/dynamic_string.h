@@ -74,7 +74,6 @@ int d_string_copy(DString_t *src, DString_t *dest);
 // @param value - pointer to int variable
 int get_d_string_value_to_integer(DString_t *d_string, int *value);
 
-
 // If dynamic string is double, sets its value to double variable
 // otherwise returns error and sets value to 0
 // @param d_string - pointer to dynamic string
