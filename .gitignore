@@ -3,3 +3,5 @@
 *.o
 .vscode/*
 src/.vscode/*
+tests
+main

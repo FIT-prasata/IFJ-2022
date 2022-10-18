@@ -83,3 +83,6 @@ tests: tests.o $(MODULES_TEST)
 
 run-tests-win:
 	make lint && make tests && make win-clean && tests.exe
+
+run-tests:
+	make tests && make clean && ./tests
