@@ -61,8 +61,9 @@ int keyword_handler(Token_t *token, char *curr) {
         // TODO
         // Compare dString and keywords[i], if matches free allocated dString
         // and call set_type
-        set_type(token,
-                 keywords[i]);  // This needs better approach -> Future Luke :{
+        //        set_type(token,
+        //                 keywords[i]);  // This needs better approach ->
+        //                 Future Luke :{
     }
     set_type(token, T_FUNC_ID);
     strcpy(token->attribute.string, dString.str);

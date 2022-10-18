@@ -11,6 +11,7 @@
 // Author: <xzavad20> - Lukáš Zavadil
 // Author: <xsvetl07> - Adam Světlík
 
+#include "errno.h"
 #include "error.h"
 #include "string.h"
 
