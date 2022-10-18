@@ -12,7 +12,6 @@
 // LOCAL INCLUDES
 #include "scanner.h"
 
-// TODO error handle wrapper to all d_string related function once it's created
 
 char get_non_white() {
     char tmp = getchar();
@@ -419,3 +418,4 @@ int scan(Token_t *token) {
         }
     }
 }
+// TODO semicolon state

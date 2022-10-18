@@ -74,67 +74,6 @@ typedef enum {
 
 } T_type_t;
 
-// FSM states
-typedef enum {
-    // OPERATORS STATES
-    S_LT,
-    S_GT,
-    S_LE,
-    S_GE,
-    S_POSS_EQ,
-    S_EQ,
-    S_POSS_NE,
-    S_NE,
-
-    // PUNCTUATORS STATES
-    S_LCBR,
-    S_RCBR,
-    S_LBR,
-    S_RBR,
-    S_SEMCOL,
-    S_COL,
-    S_CONCAT,
-
-    // EXPRESSIONS STATES
-    S_MUL,
-    S_DIV,
-    S_ADD,
-    S_SUB,
-    S_ASSIGN,
-    S_NEG,
-
-    // COMMENTS STATES
-    S_BC_START,
-    S_POSS_BC_END,
-    S_BC_END,
-    S_LC,
-
-    // CONSTANTS STATES
-    S_ZERO,
-    S_INT,
-    S_FLOAT,
-    S_POSS_EXP,
-    S_EXP_SIGN,
-    S_EXP,
-    S_STR_START,
-    S_STR_ESC,
-    S_STR_OCT1,
-    S_STR_OCT2,
-    S_STR_HEX1,
-    S_STR_HEX2,
-    S_STR_SPEC,
-    S_STR_END,
-
-    // OTHER STATES
-    S_SPACE,
-    S_ID1,
-    S_ID2,
-    S_FUNC_ID,
-    S_EOF,
-    S_START,
-    S_ERR
-
-} State_t;
 
 // Token attribute
 typedef union {
