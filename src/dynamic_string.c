@@ -116,3 +116,31 @@ int d_string_copy(DString_t *src, DString_t *dest) {
     }
     return OK;
 }
+
+int get_d_string_value_to_integer(DString_t *d_string, int *value) {
+    if (d_string == NULL || value == NULL) {
+        return INTERNAL_ERR;
+    }
+    char *e;
+    *value = strtol(d_string->str, &e, 10);
+    // Check if conversion was successful
+    if (e == d_string->str || *e != '\0' || errno == ERANGE) {
+        *value = 0;
+        return INTERNAL_ERR;
+    }
+    return OK;
+}
+
+int get_d_string_value_to_double(DString_t *d_string, double *value) {
+    if (d_string == NULL || value == NULL) {
+        return INTERNAL_ERR;
+    }
+    char *e;
+    *value = strtod(d_string->str, &e);
+    // Check if conversion was successful
+    if (e == d_string->str || *e != '\0' || errno == ERANGE) {
+        *value = 0;
+        return INTERNAL_ERR;
+    }
+    return OK;
+}

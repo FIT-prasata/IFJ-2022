@@ -14,9 +14,11 @@
 // EXTERNAL INCLUDES
 #include <stdbool.h>
 #include <stdio.h>
+#include <ctype.h>
 
 // LOCAL INCLUDES
 #include "error.h"
+#include "dynamic_string.h"
 
 // Token types
 typedef enum {
@@ -147,8 +149,37 @@ typedef struct {
     T_attr_t attribute;  // attribute of token
 } Token_t;
 
-int is_keyword(Token_t *token, char *curr);
+// Gets first non-space character from input file
+char get_non_white(void);
+
+// Sets token type
+// @param token - token to be set
+// @param type - type to be set
+void set_type(Token_t *token, T_type_t type);
+
+// TODO: Why does lc returns char in bc int?
+// Skips line comment
+char skip_lc(void);
+
+// Skips block comment
+int skip_bc(void);
+
+// Sets token value to either specific keyword or function name
+// @param token - token to be set
+// @param *curr - pointer to current character
+int keyword_handler(Token_t *token, char *curr);
+
+// Sets token value to number
+// @param token - token to be set
+// @param *curr - pointer to current character
 int num_handler(Token_t *token, char *curr);
+
+// Sets token value to string
+// @param token - token to be set
 int string_handler(Token_t *token);
+
+// TODO
 int id_handler(Token_t *token);
+
+// TODO
 int scan(Token_t *token);
