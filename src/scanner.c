@@ -21,8 +21,16 @@ char get_non_white() {
 void set_type(Token_t *token, T_type_t type) { token->type = type; }
 
 char skip_lc() {
-    char tmp = getchar();
-    return (tmp != '\n' && tmp != EOF) ? skip_lc() : tmp;
+    char curr;
+    while (true) {
+        curr = getchar();
+        if (curr == EOF) {
+            return LC_EOF_ERR;
+        }
+        if (curr == '\n') {
+            return OK;
+        }
+    }
 }
 
 int skip_bc() {
@@ -133,7 +141,6 @@ int string_handler(Token_t *token) {
             curr = getchar();
             switch (curr) {
                 case 'n':
-                    // Add curr to string
                     d_string_add_char(&dString, curr);
                     break;
                 case 't':
@@ -185,8 +192,7 @@ int scan(Token_t *token) {
 
     if (last == EOF) {
         set_type(token, T_EOF);
-        return NOT_IMPLEMENTED;  // Ultra edge case for calling scan after
-                                 // receiving EOF somehow
+        return NOT_IMPLEMENTED;
     }
     if (use_last) {
         curr = last;
@@ -198,11 +204,18 @@ int scan(Token_t *token) {
     while (true) {
         switch (curr) {
             case '/':
-                // TODO: handle if is lc or bc
                 curr = getchar();
                 if (curr == '*') {
                     if (skip_bc()) {
                         return BC_EOF_ERR;
+                    } else {
+                        curr = get_non_white();
+                        break;
+                    }
+                } 
+                else if (curr == '/') {
+                    if (skip_lc()) {
+                        return LC_EOF_ERR;
                     } else {
                         curr = get_non_white();
                         break;
@@ -221,8 +234,7 @@ int scan(Token_t *token) {
                 last = '\n';
                 set_type(token, T_EOL);
 
-            case '_':  // 'a' ... 'z' might work for gcc, but too tired to look
-                       // into it, sorry for this mess...
+            case '_':  // 'a' ... 'z' might work for gcc, but too tired
             case 'a':
             case 'b':
             case 'c':
@@ -280,8 +292,7 @@ int scan(Token_t *token) {
                     use_last = true;
                     return OK;
                 } else {
-                    return INTERNAL_ERR;  // I guess that nothing else could go
-                                          // wrong here
+                    return INTERNAL_ERR;
                 }
             case '0':
             case '1':
@@ -418,4 +429,3 @@ int scan(Token_t *token) {
         }
     }
 }
-// TODO semicolon state
