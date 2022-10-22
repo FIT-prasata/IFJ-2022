@@ -10,11 +10,10 @@ typedef enum { PASSED, FAILED } TestResult_t;
 #define RED(str) "\x1b[31m" str "\x1b[0m"
 #define GREEN(str) "\x1b[32m" str "\x1b[0m"
 
-#define TEST(NAME, DESCRIPTION)       \
+#define TEST(NAME)                    \
     int NAME() {                      \
         TestResult_t result = PASSED; \
         char* t_name = #NAME;         \
-        char* t_desc = #DESCRIPTION;  \
         char* e_msg = "no error";
 #define ENDTEST                                                         \
     if (result == PASSED) {                                             \

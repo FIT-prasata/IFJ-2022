@@ -13,18 +13,40 @@
 
 #define D2_FREE d_string_free_and_clear(&d_string2);
 
-TEST(T_d_string_init, "test d_string_init")
+// Test - dynamic string basic init
+// Expected result - OK
+TEST(T_d_string_init)
 DString_t d_string;
 ASSERT_TRUE(d_string_init(&d_string) == OK);
 D_FREE
 ENDTEST
 
-TEST(T_d_string_free_and_clear, "test d_string_free_and_clear")
+// Test - dynamic string init with pointer set to NULL
+// Expected result - INTERNAL_ERR 
+TEST(T_d_string_init_NULL)
+DString_t *d_string = NULL;
+ASSERT_TRUE(d_string_init(d_string) == INTERNAL_ERR);
+ENDTEST
+
+// Test - dynamic string init, check if allocated string is terminated with \0
+// Expected result - OK
+TEST(T_d_string_init_string_termination)
+DString_t d_string;
+ASSERT_TRUE(d_string_init(&d_string) == OK);
+ASSERT_TRUE(d_string.str[d_string.length] == '\0');
+D_FREE
+ENDTEST
+
+// Test - dynamic string free and clear
+// Expected result - OK
+TEST(T_d_string_free_and_clear)
 D_INIT
 ASSERT_TRUE(d_string_free_and_clear(&d_string) == OK);
 ENDTEST
 
-TEST(T_d_string_add_char, "test d_string_add_char")
+// Test - dynamic string add char
+// Expected result - OK
+TEST(T_d_string_add_char)
 D_INIT
 ASSERT_TRUE(d_string_add_char(&d_string, 'a') == OK);
 ASSERT_TRUE(strcmp(d_string.str, "a") == 0);
@@ -33,7 +55,9 @@ ASSERT_TRUE(strcmp(d_string.str, "ab") == 0);
 D_FREE
 ENDTEST
 
-TEST(T_d_string_clear, "test d_string_clear")
+// Test - dynamic string add single char
+// Expected result - OK
+TEST(T_d_string_clear)
 D_INIT
 d_string_add_char(&d_string, 'a');
 d_string_add_char(&d_string, 'b');
@@ -42,14 +66,18 @@ ASSERT_TRUE(strcmp(d_string.str, "") == 0);
 D_FREE
 ENDTEST
 
-TEST(T_d_string_add_str, "test d_string_add_str")
+// Test - dynamic string add string
+// Expected result - OK
+TEST(T_d_string_add_str)
 D_INIT
 ASSERT_TRUE(d_string_add_str(&d_string, "Ahoj mami") == OK);
 ASSERT_TRUE(strcmp(d_string.str, "Ahoj mami") == 0);
 D_FREE
 ENDTEST
 
-TEST(T_d_string_add_d_string, "test d_string_add_d_string")
+// Test - dynamic string add dynamic string
+// Expected result - OK
+TEST(T_d_string_add_d_string)
 D_INIT
 D2_INIT
 d_string_add_str(&d_string2, "Ignac Voprsal");
@@ -58,7 +86,9 @@ D_FREE
 D2_FREE
 ENDTEST
 
-TEST(T_d_string_cmp, "test d_string_cmp")
+// Test - dynamic string compare with string
+// Expected result - OK
+TEST(T_d_string_cmp)
 D_INIT
 const char* c_str = "pepicek a eliska";
 d_string_add_str(&d_string, c_str);
@@ -66,7 +96,9 @@ ASSERT_TRUE(d_string_cmp(&d_string, c_str) == 0);
 D_FREE
 ENDTEST
 
-TEST(T_d_string_copy, "test d_string_copy")
+// Test - copy string into dynamic string
+// Expected result - OK
+TEST(T_d_string_copy)
 D_INIT
 D2_INIT
 d_string_add_str(&d_string, "Ahoj mami");
@@ -76,7 +108,9 @@ D_FREE
 D2_FREE
 ENDTEST
 
-TEST(T_get_d_string_value_to_integer, "test get_d_string_value_to_integer")
+// Test - convert dynamic string to integer
+// Expected result - OK
+TEST(T_get_d_string_value_to_integer)
 D_INIT
 int value;
 d_string_add_str(&d_string, "123");
@@ -87,7 +121,9 @@ ASSERT_TRUE(get_d_string_value_to_integer(&d_string, &value) == INTERNAL_ERR);
 D_FREE
 ENDTEST
 
-TEST(T_get_d_string_value_to_double, "test get_d_string_value_to_double")
+// Test - convert dynamic string to double
+// Expected result - OK
+TEST(T_get_d_string_value_to_double)
 D_INIT
 double value;
 d_string_add_str(&d_string, "123");
@@ -103,8 +139,10 @@ ENDTEST
 
 int run_d_string_tests() {
     int errors = 0;
-    printf("Running dynamic string tests...\n");
+    printf("\nRunning dynamic string tests...\n");
     errors += T_d_string_init();
+    errors += T_d_string_init_NULL();
+    errors += T_d_string_init_string_termination();
     errors += T_d_string_free_and_clear();
     errors += T_d_string_add_char();
     errors += T_d_string_clear();

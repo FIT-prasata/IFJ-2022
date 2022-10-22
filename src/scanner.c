@@ -12,7 +12,6 @@
 // LOCAL INCLUDES
 #include "scanner.h"
 
-
 char get_non_white() {
     char tmp = getchar();
     return (isspace(tmp)) ? get_non_white() : tmp;
@@ -212,8 +211,7 @@ int scan(Token_t *token) {
                         curr = get_non_white();
                         break;
                     }
-                } 
-                else if (curr == '/') {
+                } else if (curr == '/') {
                     if (skip_lc()) {
                         return LC_EOF_ERR;
                     } else {

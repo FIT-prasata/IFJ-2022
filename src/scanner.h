@@ -74,7 +74,6 @@ typedef enum {
 
 } T_type_t;
 
-
 // Token attribute
 typedef union {
     char *string;
