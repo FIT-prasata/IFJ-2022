@@ -47,9 +47,43 @@ int skip_bc() {
     }
 }
 
+int type_handler(Token_t *token) {
+    char *id_types[] = {"int", "float", "string"};
+    char *types[] = {K_INT, K_FLOAT, K_STR};
+    int types_array_size = sizeof(types) / sizeof(types[0]);
+
+    DString_t dString;
+    d_string_init(&dString);
+    char curr = getchar();
+
+    do {
+        if ((curr >= 'A' && curr <= 'Z') || (curr >= 'a' && curr <= 'z') ||
+            (curr >= '0' && curr <= '9') || (curr == '_')) {
+            curr = getchar();
+            d_string_add_char(&dString, curr);
+        } else {
+            break;
+        }
+    } while (true);
+
+    for (int i = 0; i < types_array_size; i++) {
+        if (strcmp(id_types[i], &dString) == 0) {
+            set_type(token, types[i]);
+            d_string_free_and_clear(&dString);
+            return OK;
+        }
+    }
+    strcpy(token->attribute.string, dString.str);
+    d_string_free_and_clear(&dString);
+    return TYPE_ERR;
+}
+
 int keyword_handler(Token_t *token, char *curr) {
     char *keywords[] = {"else", "float",  "function", "if",   "int",
-                        "null", "return", "dString",  "void", "while"};
+                        "null", "return", "string",  "void", "while"};
+    char *keyword_types[] = {K_ELSE, K_FLOAT, K_FUNC, K_IF, K_INT, 
+                            K_NULL, K_RET, K_STR, K_VOID, K_WHILE};
+    int keywords_array_size = sizeof(keywords) / sizeof(keywords[0]);
 
     DString_t dString;
     d_string_init(&dString);
@@ -64,13 +98,12 @@ int keyword_handler(Token_t *token, char *curr) {
         }
     } while (true);
 
-    for (int i = 0; i < 10; i++) {
-        // TODO
-        // Compare dString and keywords[i], if matches free allocated dString
-        // and call set_type
-        //        set_type(token,
-        //                 keywords[i]);  // This needs better approach ->
-        //                 Future Luke :{
+    for (int i = 0; i < keywords_array_size; i++) {
+        if (strcmp(keywords[i], &dString) == 0) {
+            set_type(token, keyword_types[i]);
+            d_string_free_and_clear(&dString);
+            return T_KEYWORD;
+        }
     }
     set_type(token, T_FUNC_ID);
     strcpy(token->attribute.string, dString.str);
@@ -181,7 +214,30 @@ int string_handler(Token_t *token) {
 }
 
 int id_handler(Token_t *token) {
-    // TODO
+    DString_t dString;
+    d_string_init(&dString);
+    char curr = getchar();
+
+    if ((curr >= 'A' && curr <= 'Z') || (curr >= 'a' && curr <= 'z') || (curr == '_')) {
+        do {
+            if ((curr >= 'A' && curr <= 'Z') || (curr >= 'a' && curr <= 'z') ||
+                (curr >= '0' && curr <= '9') || (curr == '_')) {
+                curr = getchar();
+                d_string_add_char(&dString, curr);
+            } else {
+                break;
+            }
+        } while (true);
+        
+        set_type(token, T_ID);
+        strcpy(token->attribute.string, dString.str);
+        d_string_free_and_clear(&dString);
+        return OK;
+    }
+    else {
+        d_string_free_and_clear(&dString);
+        return ID_ERR;
+    }
 }
 
 int scan(Token_t *token) {
@@ -384,6 +440,16 @@ int scan(Token_t *token) {
                 last = curr;
                 set_type(token, T_SEM);
                 return OK;
+            case '?':
+                if (type_handler(token) == OK) {
+                    return OK;
+                }
+                else if (type_handler(token) == TYPE_ERR) {
+                    return TYPE_ERR;
+                }
+                else {
+                    return INTERNAL_ERR;
+                }
             case '=':
                 curr = getchar();
                 if (curr == '=') {

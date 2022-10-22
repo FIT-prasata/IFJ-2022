@@ -70,7 +70,8 @@ typedef enum {
     T_EOF,      // end of file
     T_EOL,      // end of line
     T_UNDEF,    // undefined type
-    T_SEM       // semicolon
+    T_SEM,      // semicolon
+    T_KEYWORD
 
 } T_type_t;
 
