@@ -54,7 +54,7 @@ void error_display(int type, int line_num) {
     }
 }
 void fr(int code) {
-    if (code != 0) {
+    if (code != OK) {
         error_display(code, 12);  // TODO we need line num!!
     }
 }

@@ -11,6 +11,7 @@
 // Author: <xzavad20> - Lukáš Zavadil
 // Author: <xsvetl07> - Adam Světlík
 
+#include "errno.h"
 #include "error.h"
 #include "string.h"
 
@@ -54,7 +55,7 @@ int d_string_add_str(DString_t *d_string, const char *c_str);
 // @param d_string - pointer to dynamic string
 // @param str - string to be added
 // @return - status code
-int d_string_add_d_str(DString_t *d_string, const DString_t *d_str);
+int d_string_add_d_string(DString_t *d_string, DString_t *d_string_to_add);
 
 // Compares dynamic string with constant string
 // @param d_string - pointer to dynamic string
@@ -67,3 +68,15 @@ int d_string_cmp(DString_t *d_string, const char *c_str);
 // @param dest - pointer to dynamic string to be copied to
 // @return - status code
 int d_string_copy(DString_t *src, DString_t *dest);
+
+// If dynamic string is integer, sets its value to int variable
+// otherwise returns error and sets value to 0
+// @param d_string - pointer to dynamic string
+// @param value - pointer to int variable
+int get_d_string_value_to_integer(DString_t *d_string, int *value);
+
+// If dynamic string is double, sets its value to double variable
+// otherwise returns error and sets value to 0
+// @param d_string - pointer to dynamic string
+// @param value - pointer to double variable
+int get_d_string_value_to_double(DString_t *d_string, double *value);

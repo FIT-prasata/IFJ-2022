@@ -71,3 +71,18 @@ win-compile-and-run :
 
 win-compile-and-run-clion :
 	make lint & make & make win-clean
+
+# tests
+MODULES_TEST=error.o parser.o scanner.o stack.o symtable.o dynamic_string.o
+tests.o: src/__tests__/tests.c
+	$(CC) $(CFLAGS) $< -c -o $@
+
+
+tests: tests.o $(MODULES_TEST)
+	$(CC) $(CFLAGS) $^ -o $@
+
+run-tests-win:
+	make lint && make tests && make win-clean && tests.exe
+
+run-tests:
+	make tests && make clean && ./tests

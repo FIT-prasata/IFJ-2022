@@ -12,6 +12,7 @@
 // LOCAL INCLUDES
 #include "scanner.h"
 
+
 char get_non_white() {
     char tmp = getchar();
     return (isspace(tmp)) ? get_non_white() : tmp;
@@ -20,48 +21,93 @@ char get_non_white() {
 void set_type(Token_t *token, T_type_t type) { token->type = type; }
 
 char skip_lc() {
-    char tmp = getchar();
-    return (tmp != '\n' && tmp != EOF) ? skip_lc() : tmp;
+    char curr;
+    while (true) {
+        curr = getchar();
+        if (curr == EOF) {
+            return LC_EOF_ERR;
+        }
+        if (curr == '\n') {
+            return OK;
+        }
+    }
 }
 
 int skip_bc() {
-    char last, curr;
+    char prev, curr;
     while (true) {
         curr = getchar();
         if (curr == EOF) {
             return BC_EOF_ERR;
         }
-        if (last == '*' && curr == '/') {
+        if (prev == '*' && curr == '/') {
             return OK;
         }
-        last = curr;
+        prev = curr;
     }
 }
 
-int is_keyword(Token_t *token, char *curr) {
-    char *keywords[] = {"else", "float",  "function", "if",   "int",
-                        "null", "return", "string",   "void", "while"};
+int type_handler(Token_t *token) {
+    char *id_types[] = {"int", "float", "string"};
+    char *types[] = {K_INT, K_FLOAT, K_STR};
+    int types_array_size = sizeof(types) / sizeof(types[0]);
 
-    // String init
+    DString_t dString;
+    d_string_init(&dString);
+    char curr = getchar();
 
     do {
-        if ((*curr >= 'A' && *curr <= 'Z') || (*curr >= 'a' && *curr <= 'z') ||
-            (*curr >= '0' && *curr <= '9') || (*curr == '_')) {
-            // Add curr to string
-            *curr = getchar();
+        if ((curr >= 'A' && curr <= 'Z') || (curr >= 'a' && curr <= 'z') ||
+            (curr >= '0' && curr <= '9') || (curr == '_')) {
+            curr = getchar();
+            d_string_add_char(&dString, curr);
         } else {
             break;
         }
     } while (true);
 
-    for (int i = 0; i < 10; i++) {
-        // Compare string and keywords[i], if matches free allocated string and
-        // call set_type
-        set_type(token,
-                 keywords[i]);  // This needs better approach -> Future Luke :{
+    for (int i = 0; i < types_array_size; i++) {
+        if (strcmp(id_types[i], &dString) == 0) {
+            set_type(token, types[i]);
+            d_string_free_and_clear(&dString);
+            return OK;
+        }
+    }
+    strcpy(token->attribute.string, dString.str);
+    d_string_free_and_clear(&dString);
+    return TYPE_ERR;
+}
+
+int keyword_handler(Token_t *token, char *curr) {
+    char *keywords[] = {"else", "float",  "function", "if",   "int",
+                        "null", "return", "string",  "void", "while"};
+    char *keyword_types[] = {K_ELSE, K_FLOAT, K_FUNC, K_IF, K_INT, 
+                            K_NULL, K_RET, K_STR, K_VOID, K_WHILE};
+    int keywords_array_size = sizeof(keywords) / sizeof(keywords[0]);
+
+    DString_t dString;
+    d_string_init(&dString);
+
+    do {
+        if ((*curr >= 'A' && *curr <= 'Z') || (*curr >= 'a' && *curr <= 'z') ||
+            (*curr >= '0' && *curr <= '9') || (*curr == '_')) {
+            *curr = getchar();
+            d_string_add_char(&dString, *curr);
+        } else {
+            break;
+        }
+    } while (true);
+
+    for (int i = 0; i < keywords_array_size; i++) {
+        if (strcmp(keywords[i], &dString) == 0) {
+            set_type(token, keyword_types[i]);
+            d_string_free_and_clear(&dString);
+            return T_KEYWORD;
+        }
     }
     set_type(token, T_FUNC_ID);
-    // Copy allocated string to token->attribute->string and free it
+    strcpy(token->attribute.string, dString.str);
+    d_string_free_and_clear(&dString);
     return OK;
 }
 
@@ -69,27 +115,28 @@ int num_handler(Token_t *token, char *curr) {
     bool dec_pt = false, exp = false;
     char last;
 
-    // String init
-    // Add curr to string
+    DString_t dString;
+    d_string_init(&dString);
+    d_string_add_char(&dString, *curr);
     last = *curr;
     set_type(token, T_INT);
 
     while (true) {
         *curr = getchar();
         if (*curr >= '0' && *curr <= '9') {
-            // Add curr to string
+            d_string_add_char(&dString, *curr);
         } else if (*curr == '.' && (dec_pt == false) && (exp == false)) {
-            // Add curr to string
+            d_string_add_char(&dString, *curr);
             dec_pt = true;
             set_type(token, T_FLOAT);
         } else if ((*curr == 'e' || *curr == 'E') && (exp == false) &&
                    (last >= '0') && (last <= '9')) {
-            // Add curr to string
+            d_string_add_char(&dString, *curr);
             exp = true;
             set_type(token, T_FLOAT);
         } else if ((*curr == '+' || *curr == '-') &&
                    (last == 'e' || last == 'E')) {
-            // Add curr to string
+            d_string_add_char(&dString, *curr);
         } else {
             if (last >= '0' && last <= '9') {
                 break;
@@ -100,18 +147,19 @@ int num_handler(Token_t *token, char *curr) {
         last = *curr;
     }
     if (token->type == T_INT) {
-        // Convert string to int
+        get_d_string_value_to_integer(&dString, &(token->attribute.value));
     } else {
-        // Convert string to float
+        get_d_string_value_to_double(&dString, &(token->attribute.dec_value));
     }
-    // Free allocated string
-    return 0;
+    d_string_free_and_clear(&dString);
+    return OK;
 }
 
 int string_handler(Token_t *token) {
     char curr, last = '0';
 
-    // String init
+    DString_t dString;
+    d_string_init(&dString);
     set_type(token, T_STRING);
 
     while (true) {
@@ -126,16 +174,16 @@ int string_handler(Token_t *token) {
             curr = getchar();
             switch (curr) {
                 case 'n':
-                    // Add curr to string
+                    d_string_add_char(&dString, curr);
                     break;
                 case 't':
-                    // Add curr to string
+                    d_string_add_char(&dString, curr);
                     break;
                 case '\"':
-                    // Add curr to string
+                    d_string_add_char(&dString, curr);
                     break;
                 case '\\':
-                    // Add curr to string
+                    d_string_add_char(&dString, curr);
                     break;
                 case '0':
                 case '1':
@@ -147,6 +195,7 @@ int string_handler(Token_t *token) {
                 case '7':
                 case '8':
                 case '9':
+                    // TODO
                     // Future Luke -> function to convert escaped nums
                     // If correct -> convert if not -> just add the whole thing
                     // to string
@@ -155,16 +204,40 @@ int string_handler(Token_t *token) {
                     return STR_ERR;
             }
         } else {
-            // Add curr to string
+            d_string_add_char(&dString, curr);
         }
         last = curr;
     }
-    // Copy allocated string to token->attribute->string and free it
+    strcpy(token->attribute.string, dString.str);
+    d_string_free_and_clear(&dString);
     return 0;
 }
 
 int id_handler(Token_t *token) {
-    // TODO
+    DString_t dString;
+    d_string_init(&dString);
+    char curr = getchar();
+
+    if ((curr >= 'A' && curr <= 'Z') || (curr >= 'a' && curr <= 'z') || (curr == '_')) {
+        do {
+            if ((curr >= 'A' && curr <= 'Z') || (curr >= 'a' && curr <= 'z') ||
+                (curr >= '0' && curr <= '9') || (curr == '_')) {
+                curr = getchar();
+                d_string_add_char(&dString, curr);
+            } else {
+                break;
+            }
+        } while (true);
+        
+        set_type(token, T_ID);
+        strcpy(token->attribute.string, dString.str);
+        d_string_free_and_clear(&dString);
+        return OK;
+    }
+    else {
+        d_string_free_and_clear(&dString);
+        return ID_ERR;
+    }
 }
 
 int scan(Token_t *token) {
@@ -175,8 +248,7 @@ int scan(Token_t *token) {
 
     if (last == EOF) {
         set_type(token, T_EOF);
-        return NOT_IMPLEMENTED;  // Ultra edge case for calling scan after
-                                 // receiving EOF somehow
+        return NOT_IMPLEMENTED;
     }
     if (use_last) {
         curr = last;
@@ -187,14 +259,19 @@ int scan(Token_t *token) {
 
     while (true) {
         switch (curr) {
-            case '\'':
-                curr = skip_lc();
-                break;
             case '/':
                 curr = getchar();
                 if (curr == '*') {
                     if (skip_bc()) {
                         return BC_EOF_ERR;
+                    } else {
+                        curr = get_non_white();
+                        break;
+                    }
+                } 
+                else if (curr == '/') {
+                    if (skip_lc()) {
+                        return LC_EOF_ERR;
                     } else {
                         curr = get_non_white();
                         break;
@@ -213,8 +290,7 @@ int scan(Token_t *token) {
                 last = '\n';
                 set_type(token, T_EOL);
 
-            case '_':  // 'a' ... 'z' might work for gcc, but too tired to look
-                       // into it, sorry for this mess...
+            case '_':  // 'a' ... 'z' might work for gcc, but too tired
             case 'a':
             case 'b':
             case 'c':
@@ -267,13 +343,12 @@ int scan(Token_t *token) {
             case 'X':
             case 'Y':
             case 'Z':
-                if (is_keyword == OK) {
+                if (keyword_handler(token, curr) == OK) {
                     last = isspace(curr) ? get_non_white() : curr;
                     use_last = true;
                     return OK;
                 } else {
-                    return INTERNAL_ERR;  // I guess that nothing else could go
-                                          // wrong here
+                    return INTERNAL_ERR;
                 }
             case '0':
             case '1':
@@ -365,6 +440,16 @@ int scan(Token_t *token) {
                 last = curr;
                 set_type(token, T_SEM);
                 return OK;
+            case '?':
+                if (type_handler(token) == OK) {
+                    return OK;
+                }
+                else if (type_handler(token) == TYPE_ERR) {
+                    return TYPE_ERR;
+                }
+                else {
+                    return INTERNAL_ERR;
+                }
             case '=':
                 curr = getchar();
                 if (curr == '=') {

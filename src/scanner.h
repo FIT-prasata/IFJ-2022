@@ -12,10 +12,12 @@
 // Author: <xsvetl07> - Adam Světlík
 
 // EXTERNAL INCLUDES
+#include <ctype.h>
 #include <stdbool.h>
 #include <stdio.h>
 
 // LOCAL INCLUDES
+#include "dynamic_string.h"
 #include "error.h"
 
 // Token types
@@ -68,71 +70,11 @@ typedef enum {
     T_EOF,      // end of file
     T_EOL,      // end of line
     T_UNDEF,    // undefined type
-    T_SEM       // semicolon
+    T_SEM,      // semicolon
+    T_KEYWORD
 
 } T_type_t;
 
-// FSM states
-typedef enum {
-    // OPERATORS STATES
-    S_LT,
-    S_GT,
-    S_LE,
-    S_GE,
-    S_POSS_EQ,
-    S_EQ,
-    S_POSS_NE,
-    S_NE,
-
-    // PUNCTUATORS STATES
-    S_LCBR,
-    S_RCBR,
-    S_LBR,
-    S_RBR,
-    S_SEMCOL,
-    S_COL,
-    S_CONCAT,
-
-    // EXPRESSIONS STATES
-    S_MUL,
-    S_DIV,
-    S_ADD,
-    S_SUB,
-    S_ASSIGN,
-    S_NEG,
-
-    // COMMENTS STATES
-    S_BC_START,
-    S_POSS_BC_END,
-    S_BC_END,
-    S_LC,
-
-    // CONSTANTS STATES
-    S_ZERO,
-    S_INT,
-    S_FLOAT,
-    S_POSS_EXP,
-    S_EXP_SIGN,
-    S_EXP,
-    S_STR_START,
-    S_STR_ESC,
-    S_STR_OCT1,
-    S_STR_OCT2,
-    S_STR_HEX1,
-    S_STR_HEX2,
-    S_STR_SPEC,
-    S_STR_END,
-
-    // OTHER STATES
-    S_SPACE,
-    S_ID1,
-    S_ID2,
-    S_FUNC_ID,
-    S_EOF,
-    S_START,
-    S_ERR
-
-} State_t;
 
 // Token attribute
 typedef union {
@@ -147,8 +89,37 @@ typedef struct {
     T_attr_t attribute;  // attribute of token
 } Token_t;
 
-int is_keyword(Token_t *token, char *curr);
+// Gets first non-space character from input file
+char get_non_white(void);
+
+// Sets token type
+// @param token - token to be set
+// @param type - type to be set
+void set_type(Token_t *token, T_type_t type);
+
+// TODO: Why does lc returns char in bc int?
+// Skips line comment
+char skip_lc(void);
+
+// Skips block comment
+int skip_bc(void);
+
+// Sets token value to either specific keyword or function name
+// @param token - token to be set
+// @param *curr - pointer to current character
+int keyword_handler(Token_t *token, char *curr);
+
+// Sets token value to number
+// @param token - token to be set
+// @param *curr - pointer to current character
 int num_handler(Token_t *token, char *curr);
+
+// Sets token value to string
+// @param token - token to be set
 int string_handler(Token_t *token);
+
+// TODO
 int id_handler(Token_t *token);
+
+// TODO
 int scan(Token_t *token);
