@@ -1,16 +1,20 @@
 #include "test_utils.h"
 
+#include "../scanner.h"
+
+
 FILE *f;
 // mocked getchar
-int getchar() { return fgetc(f); }
+int getchar() { 
+    return fgetc(f); 
+    }
 
-#include "../scanner.h"
 
 #define TEST__CODE_DEFAULT \
     "./src/__tests__/t_lex_analyzer_test_cases/test_default/test_default.code"
 #define TEST_CODE_WHITESPACES                                          \
-    "./src/__tests__/t_lex_analyzer_test_cases/test_code_whitespaces/" \
-    "test_code_whitespaces.code"
+    "./src/__tests__/t_lex_analyzer_test_cases/test_whitespaces/" \
+    "test_whitespaces.code"
 
 #define SET_FILE(filepath) f = fopen(filepath, "r");
 
@@ -64,14 +68,14 @@ ENDTEST
 TEST(t_get_non_white)
 SET_FILE(TEST_CODE_WHITESPACES)
 ASSERT_TRUE(get_non_white() == '<')
-char c;
-ASSERT_TRUE( c = get_non_white() == '?')
+ASSERT_TRUE(get_non_white() == '?')
+ASSERT_TRUE(get_non_white() == '?')
 ENDTEST
 
 int run_lex_analyzer_tests() {
     int errors = 0;
     printf("\nRunning Lex analyzer complex tests...\n");
-    errors += t_mock_getchar();
+    //errors += t_mock_getchar();
     errors += t_get_non_white();
     return errors;
 }
