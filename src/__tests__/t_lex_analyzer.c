@@ -1,7 +1,8 @@
 #include "../scanner.h"
 #include "test_utils.h"
 
-#define DEFAULT_PATH "./src/__tests__/t_lex_analyzer_test_cases/"[60]
+#define TEST1_REF "./src/__tests__/t_lex_analyzer_test_cases/test1/test1_ref.out"
+#define TEST1 "./src/__tests__/t_lex_analyzer_test_cases/test1/test1.out"
 
 int compareFile(char * path1_ref, char * path2, int * line)
 {
@@ -44,18 +45,17 @@ int compareFile(char * path1_ref, char * path2, int * line)
         return 0;
 }
 
-
-// Test - tokenize basic program
-TEST(T_test1_string) //TODO: asi cyklus pres get_token, jeho vystup nasmerovat do test1.out, zaroven upravit ASSERT_TRUE tak aby v pripade problemu vracel cislo radku
 int line;
-ASSERT_TRUE(compareFile(strcat(DEFAULT_PATH, "test1/test1_ref.out"), strcat(DEFAULT_PATH, "test1/test1.out"), &line)) //musim nejak pres makro, potrebuju vetsi string do DEFAULT_PATH
-ENDTEST
+// Test - tokenize basic program
+TEST(T1_string) //TODO: zjistit jak funguje spousteni .exe, jeho vystup nasmerovat do test1.out
+ASSERT_TRUE(compareFile(TEST1_REF, TEST1, &line))
+ENDTEST_FILE
 
 
 
 int run_lex_analyzer_tests() {
     int errors = 0;
     printf("\nRunning Lex analyzer complex tests...\n");
-    errors += T_test1_string();
+    errors += T1_string();
     return errors;
 }

@@ -28,6 +28,17 @@ typedef enum { PASSED, FAILED } TestResult_t;
     }                                                                   \
     }
 
+#define ENDTEST_FILE                                              \
+    if (result == PASSED) {                                             \
+        printf(GREEN("[PASSED] %s \n"), t_name);                        \
+        return 0;                                                       \
+    } else {                                                            \
+        printf(RED("[FAILED] %s -> failed on: %s, line: %d \n"), t_name, \
+                e_msg, line);                                                 \
+        return 1;                                                       \
+    }                                                                   \
+    }
+
 #define ASSERT_TRUE(CONDITION) \
     if (!(CONDITION)) {        \
         result = FAILED;       \
