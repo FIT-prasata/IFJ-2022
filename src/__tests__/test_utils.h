@@ -28,7 +28,7 @@ typedef enum { PASSED, FAILED } TestResult_t;
     }                                                                   \
     }
 
-#define ENDTEST_FILE                                              \
+#define ENDTEST_LEX                                              \
     if (result == PASSED) {                                             \
         printf(GREEN("[PASSED] %s \n"), t_name);                        \
         return 0;                                                       \
@@ -44,3 +44,6 @@ typedef enum { PASSED, FAILED } TestResult_t;
         result = FAILED;       \
         e_msg = #CONDITION;    \
     }
+
+// mock redefinition of getchar of testing purposes
+int getchar();

@@ -1,6 +1,7 @@
 .idea/
 *.exe
 *.o
+*.out
 .vscode/*
 src/.vscode/*
 tests

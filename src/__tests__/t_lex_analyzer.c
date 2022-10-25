@@ -1,5 +1,5 @@
-#include "../scanner.h"
 #include "test_utils.h"
+#include "../scanner.h"
 
 #define TEST1_REF "./src/__tests__/t_lex_analyzer_test_cases/test1/test1_ref.out"
 #define TEST1 "./src/__tests__/t_lex_analyzer_test_cases/test1/test1.out"
@@ -49,7 +49,7 @@ int line;
 // Test - tokenize basic program
 TEST(T1_string) //TODO: zjistit jak funguje spousteni .exe, jeho vystup nasmerovat do test1.out
 ASSERT_TRUE(compareFile(TEST1_REF, TEST1, &line))
-ENDTEST_FILE
+ENDTEST_LEX
 
 
 
