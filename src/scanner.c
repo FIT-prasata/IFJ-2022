@@ -12,7 +12,6 @@
 // LOCAL INCLUDES
 #include "scanner.h"
 
-
 char get_non_white() {
     char tmp = getchar();
     return (isspace(tmp)) ? get_non_white() : tmp;
@@ -68,7 +67,8 @@ int type_handler(Token_t *token) {
 
     for (int i = 0; i < types_array_size; i++) {
         if (strcmp(id_types[i], &dString) == 0) {
-            set_type(token, types[i]);
+            //            set_type(token, types[i]); TODO caused compilation
+            //            error
             d_string_free_and_clear(&dString);
             return OK;
         }
@@ -80,9 +80,9 @@ int type_handler(Token_t *token) {
 
 int keyword_handler(Token_t *token, char *curr) {
     char *keywords[] = {"else", "float",  "function", "if",   "int",
-                        "null", "return", "string",  "void", "while"};
-    char *keyword_types[] = {K_ELSE, K_FLOAT, K_FUNC, K_IF, K_INT, 
-                            K_NULL, K_RET, K_STR, K_VOID, K_WHILE};
+                        "null", "return", "string",   "void", "while"};
+    char *keyword_types[] = {K_ELSE, K_FLOAT, K_FUNC, K_IF,   K_INT,
+                             K_NULL, K_RET,   K_STR,  K_VOID, K_WHILE};
     int keywords_array_size = sizeof(keywords) / sizeof(keywords[0]);
 
     DString_t dString;
@@ -100,7 +100,7 @@ int keyword_handler(Token_t *token, char *curr) {
 
     for (int i = 0; i < keywords_array_size; i++) {
         if (strcmp(keywords[i], &dString) == 0) {
-            set_type(token, keyword_types[i]);
+            //            set_type(token, keyword_types[i]);
             d_string_free_and_clear(&dString);
             return T_KEYWORD;
         }
@@ -218,7 +218,8 @@ int id_handler(Token_t *token) {
     d_string_init(&dString);
     char curr = getchar();
 
-    if ((curr >= 'A' && curr <= 'Z') || (curr >= 'a' && curr <= 'z') || (curr == '_')) {
+    if ((curr >= 'A' && curr <= 'Z') || (curr >= 'a' && curr <= 'z') ||
+        (curr == '_')) {
         do {
             if ((curr >= 'A' && curr <= 'Z') || (curr >= 'a' && curr <= 'z') ||
                 (curr >= '0' && curr <= '9') || (curr == '_')) {
@@ -228,13 +229,12 @@ int id_handler(Token_t *token) {
                 break;
             }
         } while (true);
-        
+
         set_type(token, T_ID);
         strcpy(token->attribute.string, dString.str);
         d_string_free_and_clear(&dString);
         return OK;
-    }
-    else {
+    } else {
         d_string_free_and_clear(&dString);
         return ID_ERR;
     }
@@ -268,8 +268,7 @@ int scan(Token_t *token) {
                         curr = get_non_white();
                         break;
                     }
-                } 
-                else if (curr == '/') {
+                } else if (curr == '/') {
                     if (skip_lc()) {
                         return LC_EOF_ERR;
                     } else {
@@ -443,11 +442,9 @@ int scan(Token_t *token) {
             case '?':
                 if (type_handler(token) == OK) {
                     return OK;
-                }
-                else if (type_handler(token) == TYPE_ERR) {
+                } else if (type_handler(token) == TYPE_ERR) {
                     return TYPE_ERR;
-                }
-                else {
+                } else {
                     return INTERNAL_ERR;
                 }
             case '=':

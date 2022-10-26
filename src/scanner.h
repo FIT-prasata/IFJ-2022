@@ -16,13 +16,15 @@
 #include <stdbool.h>
 #include <stdio.h>
 
+#include "ctype.h"
+
 // LOCAL INCLUDES
 #include "dynamic_string.h"
 #include "error.h"
 
 // Token types
 typedef enum {
-    // OPERATORS, ordered from highest precedence to lowest
+    // OPERATORS, ordered from the highest precedence to lowest
     T_LT,  // <
     T_GT,  // >
     T_LE,  // <=
@@ -74,7 +76,6 @@ typedef enum {
     T_KEYWORD
 
 } T_type_t;
-
 
 // Token attribute
 typedef union {
