@@ -16,6 +16,13 @@
 #include "symtable.h"
 
 int main(void) {
+    int keyword_types[] = {K_ELSE, K_FLOAT, K_FUNC, K_IF, K_INT, K_NULL, K_RET, K_STR, K_VOID, K_WHILE};
+    Token_t *token = malloc(sizeof(Token_t));
+    string_handler(token);
+    printf("hee\n");
+    printf("atribut: %s\n", token->attribute.string);
+    printf("%c\n", getchar());
+    /* adamovy srandy
     htab_t* table = htab_init(10);
 
     Token_t* token = malloc(sizeof(Token_t));
@@ -44,6 +51,6 @@ int main(void) {
     htab_clear(table);
     print_table(table);
     htab_free(table);
-
+    */
     return 0;
 }

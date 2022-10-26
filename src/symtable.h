@@ -19,7 +19,7 @@
 #define AVG_LEN_MIN 2
 
 // Tabulka:
-struct htab;  // neúplná deklarace struktury - uživatel nevidí obsah
+struct htab;                 // neúplná deklarace struktury - uživatel nevidí obsah
 typedef struct htab htab_t;  // typedef podle zadání
 
 typedef const char *htab_key_t;

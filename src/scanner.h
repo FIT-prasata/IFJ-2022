@@ -21,7 +21,7 @@
 #include "error.h"
 
 // Token types
-typedef enum {
+typedef enum T_type {
     // OPERATORS, ordered from highest precedence to lowest
     T_LT,  // <
     T_GT,  // >
@@ -74,7 +74,6 @@ typedef enum {
     T_KEYWORD
 
 } T_type_t;
-
 
 // Token attribute
 typedef union {

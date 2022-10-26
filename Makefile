@@ -65,6 +65,13 @@ win-delete:
 delete:
 	rm main
 
+# For Skleny :)
+win-compile :
+	make & make win-clean
+
+compile :
+	make && make clean
+
 # Execution
 win-compile-and-run :
 	make lint & make & make win-clean & main.exe

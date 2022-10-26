@@ -178,8 +178,7 @@ void htab_clear(htab_t *t) {
             htab_erase(t, item->token->attribute.string);
             item = item->next;
         }
-        if (size !=
-            t->arr_size)  // Provedl se resize - je potřeba procházet od začátku
+        if (size != t->arr_size)  // Provedl se resize - je potřeba procházet od začátku
         {
             i = -1;
             size = t->arr_size;
@@ -214,10 +213,8 @@ void htab_resize(htab_t *t, size_t newn) {
             htab_item_t *item = t->arr_ptr[i];
 
             while (item != NULL) {
-                backup[backup_index].token->attribute.string =
-                    malloc(strlen(item->token->attribute.string) + 1);
-                strcpy((char *)backup[backup_index].token->attribute.string,
-                       item->token->attribute.string);
+                backup[backup_index].token->attribute.string = malloc(strlen(item->token->attribute.string) + 1);
+                strcpy((char *)backup[backup_index].token->attribute.string, item->token->attribute.string);
                 backup[backup_index++].type = item->type;
                 backup[backup_index++].token = item->token;
                 item = item->next;
@@ -253,10 +250,8 @@ void htab_resize(htab_t *t, size_t newn) {
         // Nahrání klíčů a hodnot ze zásobníku do nové tabulky
         for (size_t i = 0; i < backup_index; i++) {
             htab_insert_item(t, backup[i].token);
-            htab_find(t, backup[i].token->attribute.string)->type =
-                backup[i].type;
-            htab_find(t, backup[i].token->attribute.string)->token =
-                backup[i].token;
+            htab_find(t, backup[i].token->attribute.string)->type = backup[i].type;
+            htab_find(t, backup[i].token->attribute.string)->token = backup[i].token;
 
             // Uvolnění paměti zásobníku
             // free((char *)backup[i].key);
@@ -265,8 +260,7 @@ void htab_resize(htab_t *t, size_t newn) {
 }
 
 void print_table(htab_t *t) {
-    const char *enum_type[6] = {"INT",   "STRING", "BOOL",
-                                "FLOAT", "FUNC",   "UNKNOWN"};
+    const char *enum_type[6] = {"INT", "STRING", "BOOL", "FLOAT", "FUNC", "UNKNOWN"};
     const char *enum_types2[] = {
         // OPERATORS, ordered from highest precedence to lowest
         "T_LT",  // <
@@ -320,9 +314,7 @@ void print_table(htab_t *t) {
             printf("\t%i\t ", i);
             htab_item_t *tmp = t->arr_ptr[i];
             while (tmp != NULL) {
-                printf("[ID_type: %s, Attribute: %s, Token_type: %s] - ",
-                       enum_type[tmp->type], tmp->token->attribute.string,
-                       enum_types2[tmp->token->type]);
+                printf("[ID_type: %s, Attribute: %s, Token_type: %s] - ", enum_type[tmp->type], tmp->token->attribute.string, enum_types2[tmp->token->type]);
                 tmp = tmp->next;
             }
             printf("\n");
