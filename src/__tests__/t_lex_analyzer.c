@@ -75,7 +75,7 @@ ENDTEST
 int run_lex_analyzer_tests() {
     int errors = 0;
     printf("\nRunning Lex analyzer complex tests...\n");
-    //errors += t_mock_getchar();
+    errors += t_mock_getchar();
     errors += t_get_non_white();
     return errors;
 }

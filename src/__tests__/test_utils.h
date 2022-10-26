@@ -15,35 +15,20 @@ typedef enum { PASSED, FAILED } TestResult_t;
 #define TEST(NAME)                    \
     int NAME() {                      \
         TestResult_t result = PASSED; \
-        char* t_name = #NAME;         \
-        char* e_msg = "no error";
-#define ENDTEST                                                         \
-    if (result == PASSED) {                                             \
-        printf(GREEN("[PASSED] %s \n"), t_name);                        \
-        return 0;                                                       \
-    } else {                                                            \
-        printf(RED("[FAILED] %s -> failed on: %s \n"), t_name, \
-                e_msg);                                                 \
-        return 1;                                                       \
-    }                                                                   \
+        char* t_name = #NAME;
+#define ENDTEST                                  \
+    if (result == PASSED) {                      \
+        printf(GREEN("[PASSED] %s \n"), t_name); \
+        return 0;                                \
+    } else {                                     \
+        printf(RED("[FAILED] %s \n"), t_name);   \
+        return 1;                                \
+    }                                            \
     }
 
-#define ENDTEST_LEX                                              \
-    if (result == PASSED) {                                             \
-        printf(GREEN("[PASSED] %s \n"), t_name);                        \
-        return 0;                                                       \
-    } else {                                                            \
-        printf(RED("[FAILED] %s -> failed on: %s, line: %d \n"), t_name, \
-                e_msg, line);                                                 \
-        return 1;                                                       \
-    }                                                                   \
+#define ASSERT_TRUE(CONDITION)                                               \
+    if (!(CONDITION)) {                                                      \
+        result = FAILED;                                                     \
+        printf(RED("Failed assertion in '%s' -> ASSERT_TRUE(%s)\n"), t_name, \
+               #CONDITION);                                                  \
     }
-
-#define ASSERT_TRUE(CONDITION) \
-    if (!(CONDITION)) {        \
-        result = FAILED;       \
-        e_msg = #CONDITION;    \
-    }
-
-// mock redefinition of getchar of testing purposes
-int getchar();
