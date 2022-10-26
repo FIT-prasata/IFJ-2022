@@ -13,13 +13,11 @@
 #include "scanner.h"
 
 char get_non_white() {
-    char tmp = getchar();
+    char tmp = (char)getchar();
     return (isspace(tmp)) ? get_non_white() : tmp;
 }
 
-void set_type(Token_t *token, T_type_t type) {
-    token->type = type;
-}
+void set_type(Token_t *token, T_type_t type) { token->type = type; }
 
 char skip_lc() {
     char tmp = getchar();
@@ -41,27 +39,26 @@ int skip_bc() {
 }
 
 int is_keyword(Token_t *token, char *curr) {
-    char *keywords[] = {"else", "float", "function", "if", "int", "null", "return", "string", "void", "while"};
-    
+    char *keywords[] = {"else", "float",  "function", "if",   "int",
+                        "null", "return", "string",   "void", "while"};
+
     // String init
 
     do {
-        if ((*curr >= 'A' &&  *curr <= 'Z') || \
-            (*curr >= 'a' && *curr <= 'z') || \
-            (*curr >= '0' && *curr <= '9') || \
-            (*curr == '_')) {
-                // Add curr to string
-                *curr = getchar();
-            }
-        else {
+        if ((*curr >= 'A' && *curr <= 'Z') || (*curr >= 'a' && *curr <= 'z') ||
+            (*curr >= '0' && *curr <= '9') || (*curr == '_')) {
+            // Add curr to string
+            *curr = getchar();
+        } else {
             break;
         }
-    }
-    while (true);
+    } while (true);
 
     for (int i = 0; i < 10; i++) {
-        // Compare string and keywords[i], if matches free allocated string and call set_type
-        set_type(token, keywords[i]); // This needs better approach -> Future Luke :{
+        // Compare string and keywords[i], if matches free allocated string and
+        // call set_type
+        set_type(token,
+                 keywords[i]);  // This needs better approach -> Future Luke :{
     }
     set_type(token, T_FUNC_ID);
     // Copy allocated string to token->attribute->string and free it
@@ -81,25 +78,22 @@ int num_handler(Token_t *token, char *curr) {
         *curr = getchar();
         if (*curr >= '0' && *curr <= '9') {
             // Add curr to string
-        }
-        else if (*curr == '.' && (dec_pt == false) && (exp == false)) {
+        } else if (*curr == '.' && (dec_pt == false) && (exp == false)) {
             // Add curr to string
             dec_pt = true;
             set_type(token, T_FLOAT);
-        }
-        else if ((*curr == 'e' || *curr == 'E') && (exp == false) && (last >= '0') && (last <= '9')) {
+        } else if ((*curr == 'e' || *curr == 'E') && (exp == false) &&
+                   (last >= '0') && (last <= '9')) {
             // Add curr to string
             exp = true;
             set_type(token, T_FLOAT);
-        }
-        else if ((*curr == '+' || *curr == '-') && (last == 'e' || last == 'E')) {
+        } else if ((*curr == '+' || *curr == '-') &&
+                   (last == 'e' || last == 'E')) {
             // Add curr to string
-        }
-        else {
+        } else {
             if (last >= '0' && last <= '9') {
                 break;
-            }
-            else {
+            } else {
                 return NUM_ERR;
             }
         }
@@ -107,8 +101,7 @@ int num_handler(Token_t *token, char *curr) {
     }
     if (token->type == T_INT) {
         // Convert string to int
-    }
-    else {
+    } else {
         // Convert string to float
     }
     // Free allocated string
@@ -155,13 +148,13 @@ int string_handler(Token_t *token) {
                 case '8':
                 case '9':
                     // Future Luke -> function to convert escaped nums
-                    // If correct -> convert if not -> just add the whole thing to string
+                    // If correct -> convert if not -> just add the whole thing
+                    // to string
                     break;
                 default:
                     return STR_ERR;
             }
-        }
-        else {
+        } else {
             // Add curr to string
         }
         last = curr;
@@ -182,13 +175,13 @@ int scan(Token_t *token) {
 
     if (last == EOF) {
         set_type(token, T_EOF);
-        return NOT_IMPLEMENTED; // Ultra edge case for calling scan after receiving EOF somehow
+        return NOT_IMPLEMENTED;  // Ultra edge case for calling scan after
+                                 // receiving EOF somehow
     }
     if (use_last) {
         curr = last;
         use_last = false;
-    }
-    else {
+    } else {
         curr = get_non_white();
     }
 
@@ -202,13 +195,11 @@ int scan(Token_t *token) {
                 if (curr == '*') {
                     if (skip_bc()) {
                         return BC_EOF_ERR;
-                    }
-                    else {
+                    } else {
                         curr = get_non_white();
                         break;
                     }
-                }
-                else {
+                } else {
                     last = curr;
                     if (isspace(curr)) {
                         last = get_non_white();
@@ -221,8 +212,9 @@ int scan(Token_t *token) {
             case '\n':
                 last = '\n';
                 set_type(token, T_EOL);
-            
-            case '_': // 'a' ... 'z' might work for gcc, but too tired to look into it, sorry for this mess...
+
+            case '_':  // 'a' ... 'z' might work for gcc, but too tired to look
+                       // into it, sorry for this mess...
             case 'a':
             case 'b':
             case 'c':
@@ -279,9 +271,9 @@ int scan(Token_t *token) {
                     last = isspace(curr) ? get_non_white() : curr;
                     use_last = true;
                     return OK;
-                }
-                else {
-                    return INTERNAL_ERR; // I guess that nothing else could go wrong here
+                } else {
+                    return INTERNAL_ERR;  // I guess that nothing else could go
+                                          // wrong here
                 }
             case '0':
             case '1':
@@ -295,8 +287,7 @@ int scan(Token_t *token) {
             case '9':
                 if ((ret = num_handler(token, &curr))) {
                     return ret;
-                }
-                else {
+                } else {
                     last = isspace(curr) ? get_non_white() : curr;
                     use_last = true;
                     return OK;
@@ -319,8 +310,7 @@ int scan(Token_t *token) {
                 if (curr == '=') {
                     set_type(token, T_LE);
                     return OK;
-                }
-                else {
+                } else {
                     if (isspace(curr)) {
                         last = get_non_white();
                     }
@@ -335,8 +325,7 @@ int scan(Token_t *token) {
                 if (curr == '=') {
                     set_type(token, T_GE);
                     return OK;
-                }
-                else {
+                } else {
                     if (isspace(curr)) {
                         last = get_non_white();
                     }
@@ -384,8 +373,7 @@ int scan(Token_t *token) {
                         last = curr;
                         set_type(token, T_EQ);
                         return OK;
-                    }
-                    else {
+                    } else {
                         return EQ_ERR;
                     }
                 }
@@ -403,8 +391,7 @@ int scan(Token_t *token) {
                         last = curr;
                         set_type(token, T_NE);
                         return OK;
-                    }
-                    else {
+                    } else {
                         return NE_ERR;
                     }
                 }

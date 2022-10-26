@@ -45,5 +45,13 @@ typedef struct Status {
 
 void error_display(int type, int line_num);
 // save function return with potential error handling
+
 // TODO just an idea if we want to use it name should be changed
-void fr(int code);
+// Wrapper for functions returning error code
+// param: code - error code (int)
+// either is OK(0) or executes error_display and exits with proper error code
+void try(int code);
+
+// Raise error
+// param: type - error type (int)
+void raise(int code);
