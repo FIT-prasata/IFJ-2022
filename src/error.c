@@ -53,6 +53,7 @@ void error_display(int type, int line_num) {
             exit(INTERNAL_ERR);
     }
 }
+
 void try(int code) {
     if (code != OK) {
         error_display(code, 0);  // TODO we need line num!!

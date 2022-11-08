@@ -37,6 +37,8 @@
 #define STR_ERR 14
 #define EQ_ERR 15
 #define NE_ERR 16
+#define TYPE_ERR 17
+#define ID_ERR 18
 
 typedef struct Status {
     int type;

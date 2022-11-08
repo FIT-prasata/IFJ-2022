@@ -16,309 +16,171 @@
 
 #include "string.h"
 
-// Konstruktor tabulky - vytvoří a inicializuje tabulku
-// Vrací ukazatel na tabulku při úspěchu, jinak NULL
-// PARAMS: n - velikost hashovací tabulky
-htab_t *htab_init(size_t n) {
-    if (n < 1) return NULL;
-
-    // Alokace paměti pro strukturu tabulky
-    htab_t *htab_table = malloc(sizeof(htab_t));
-
-    if (htab_table == NULL) return NULL;
-
+// Hashtable constructor - initializes hashtable
+Htab_t *htab_init(size_t size) {
+    if (size < 1) {
+        return NULL;
+    }
+    Htab_t *htab_table = malloc(sizeof(Htab_t));
+    if (htab_table == NULL) {
+        return NULL;
+    }
     htab_table->size = 0;
-    htab_table->arr_size = n;
-
-    // Alokace paměti pro pole prvků
-    htab_table->arr_ptr = malloc(n * sizeof(htab_item_t *));
-
-    if (htab_table->arr_ptr == NULL) return NULL;
-
-    for (size_t i = 0; i < n; i++) htab_table->arr_ptr[i] = NULL;
-
+    htab_table->arr_size = size;
+    htab_table->arr_ptr = malloc(size * sizeof(Htab_item_t *));
+    if (htab_table->arr_ptr == NULL) {
+        free(htab_table);
+        return NULL;
+    }
+    for (size_t i = 0; i < size; i++) {
+        htab_table->arr_ptr[i] = NULL;
+    }
     return htab_table;
 }
 
-// Konstruktor prvku - vytvoří a inicializuje prvek
-// Vrací ukazatel na prvek při úspěchu, jiank NULL
-// PARAMS: key - klíč
-/*htab_item_t *htab_item_init(htab_key_t key) {
-    // Alokace paměti pro strukturu prvku
-    htab_item_t *item = malloc(sizeof(htab_item_t));
-    if (item == NULL) return NULL;
-
-    // Alokace paměti pro klíč
-    //char *tmp = malloc(sizeof(htab_key_t) * (strlen(key) + 1));
-    //if (tmp == NULL) return NULL;
-
-    // Inicializace hodnot
-    //strcpy(tmp, key);
-    item->type = UNKNOWN;
-    item->token.type = T_UNDEF;
-    item->token.attribute.string = NULL;
-    item->next = NULL;
-
-    return item;
-}*/
-
-// Hashovací funkce - její výsledek modulo arr_size určuje index do tabulky
-// PARAMS: str - řetězec
-size_t htab_hash_function(const char *str) {
+// Hash function - hash % array size gives table index of item
+int htab_hash_function(Htab_key_t key) {
+    if (key == NULL) {
+        return -1;
+    }
     uint32_t h = 0;
     const unsigned char *p;
-
-    for (p = (const unsigned char *)str; *p != '\0'; p++) h = 65599 * h + *p;
-
+    for (p = (const unsigned char *)key; *p != '\0'; p++) {
+        h = 65599 * h + *p;
+    }
     return h;
 }
 
-// Vkládá prvek do tabulky
-// Vrací true při úspěchu, jiank false
-// PARAMS: t - hashovací tabulka
-//         key - klíč
-bool htab_insert_item(htab_t *t, Token_t *token) {
-    htab_key_t key = token->attribute.string;
-    int hash = htab_hash_function(key) % t->arr_size;
-
-    // Inicializace prvku
-    htab_item_t *item = malloc(sizeof(htab_item_t));
-    if (item == NULL) return false;
-
+// Inserts item into the hashtable
+int htab_insert_item(Htab_t *table, Token_t *token) {
+    if (table == NULL || token == NULL) {
+        return INTERNAL_ERR;
+    }
+    Htab_key_t key = token->attribute.string;
+    int hash = htab_hash_function(key) % table->arr_size;
+    Htab_item_t *item = malloc(sizeof(Htab_item_t));
+    if (item == NULL) {
+        return INTERNAL_ERR;
+    }
     item->token = token;
     item->type = UNKNOWN;
     item->next = NULL;
-
-    // Doplnění hodnot do prvku a do hashovací tabulky
-    htab_item_t *tmp = t->arr_ptr[hash];
-    t->arr_ptr[hash] = item;
+    Htab_item_t *tmp = table->arr_ptr[hash];
+    table->arr_ptr[hash] = item;
     item->next = tmp;
-    t->size++;
-
-    return true;
+    table->size++;
+    return OK;
 }
-
-htab_item_t *htab_find(htab_t *t, htab_key_t key) {
-    int hash = htab_hash_function(key) % t->arr_size;
-    htab_item_t *item = t->arr_ptr[hash];
-
-    // Prohledávání tabulky
+// Finds item in table according to the entered key
+Htab_item_t *htab_find(Htab_t *table, Htab_key_t key) {
+    if (table == NULL || key == NULL) {
+        return NULL;
+    }
+    int hash = htab_hash_function(key) % table->arr_size;
+    Htab_item_t *item = table->arr_ptr[hash];
     while (item != NULL && strcmp(item->token->attribute.string, key) != 0) {
         item = item->next;
     }
-    if (item == NULL) return NULL;
-
+    if (item == NULL) {
+        return NULL;
+    }
     return item;
 }
 
-htab_item_t *htab_lookup_add(htab_t *t, Token_t *token) {
-    htab_key_t key = token->attribute.string;
-    htab_item_t *item = htab_find(t, key);
+// Finds or instert item in table according to the entered key
+Htab_item_t *htab_lookup_add(Htab_t *table, Token_t *token) {
+    if (table == NULL || token == NULL) {
+        return NULL;
+    }
+    Htab_key_t key = token->attribute.string;
+    Htab_item_t *item = htab_find(table, key);
     if (item == NULL) {
-        if (htab_insert_item(t, token) == false) return NULL;
-
-        // Volání resize při překročení AVG_LEN_MAX
-        // if (t->size / t->arr_size > AVG_LEN_MAX)
-        // htab_resize(t, 2 * t->arr_size);
-
-        item = htab_find(t, key);
-
+        if (htab_insert_item(table, token) == INTERNAL_ERR) {
+            return NULL;
+        }
+        item = htab_find(table, key);
         return item;
     }
     return item;
 }
 
-// Vymaže prvek z tabulky podle zadaného klíče
-// Vrací true při vymazání prvku, jinak false
-// PARAMS: t - hashovací tabulka
-//         key - klíč
-bool htab_erase(htab_t *t, htab_key_t key) {
-    int hash = htab_hash_function(key) % t->arr_size;
-    htab_item_t *item = t->arr_ptr[hash];
-    htab_item_t *pervious = NULL;
-
-    // Prohledávání tabulky
+// Deletes item from hashtable according to the entered key
+int htab_erase(Htab_t *table, Htab_key_t key) {
+    if (table == NULL || key == NULL) {
+        return INTERNAL_ERR;
+    }
+    int hash = htab_hash_function(key) % table->arr_size;
+    Htab_item_t *item = table->arr_ptr[hash];
+    Htab_item_t *pervious = NULL;
     while (item != NULL && strcmp(item->token->attribute.string, key)) {
         pervious = item;
         item = item->next;
     }
-
-    // Nenalezení klíče
     if (item == NULL) {
-        fprintf(stderr, "Chyba pri mazani\n");
-        return false;
+        return INTERNAL_ERR;
     }
-
-    // Předání ukazatele následujícího prvku předchozímu ukazateli
     if (pervious == NULL) {
-        t->arr_ptr[hash] = item->next;
+        table->arr_ptr[hash] = item->next;
     } else {
         pervious->next = item->next;
     }
-
-    // Uvolnění paměti
     free(item);
-    t->size--;
-
-    // Volání resize při překročení AVG_LEN_MIN
-    // if (t->size / t->arr_size < AVG_LEN_MIN && t->arr_size > 1)
-    // htab_resize(t, t->arr_size / 2);
-
-    return true;
+    table->size--;
+    return OK;
 }
 
-// Vymaže všchny prvky v tabulce
-// PARAMS: t - hashovací tabulka
-void htab_clear(htab_t *t) {
-    for (size_t i = 0; i < t->arr_size; i++) {
-        size_t size = t->arr_size;
-        htab_item_t *item = t->arr_ptr[i];
+// Deletes all items from hashtable
+int htab_clear(Htab_t *table) {
+    if (table == NULL) {
+        return INTERNAL_ERR;
+    }
+    for (size_t i = 0; i < table->arr_size; i++) {
+        // size_t size = table->arr_size;
+        Htab_item_t *item = table->arr_ptr[i];
 
         while (item != NULL) {
-            htab_erase(t, item->token->attribute.string);
+            if (htab_erase(table, item->token->attribute.string) ==
+                INTERNAL_ERR) {
+                return INTERNAL_ERR;
+            }
             item = item->next;
         }
-        if (size !=
-            t->arr_size)  // Provedl se resize - je potřeba procházet od začátku
-        {
-            i = -1;
-            size = t->arr_size;
-        }
     }
-    t->size = 0;
+    table->size = 0;
+    return OK;
 }
 
-// Destruktor tabulky - vymaže všechny prvky a uvolní pamět
-// PARAMS: t - hashovací tabulka
-void htab_free(htab_t *t) {
-    htab_clear(t);
-
-    free(t->arr_ptr);
-
-    free(t);
-}
-
-// Změní velikost alokovaného pole a přesune položky z původních seznamů
-// PARAMS: t - hashovací tabulka
-//         newn - nová velikost hashovací tabulky
-void htab_resize(htab_t *t, size_t newn) {
-    if (newn < 1) {
-        fprintf(stderr, "Chyba pri zmene velikosti pole");
-    } else {
-        // Zásobník pro uložení klíčů a hodnot z tabulky
-        htab_item_t backup[t->size];
-        size_t backup_index = 0;
-
-        // Ukládání klíčů a hodnot do zásobníku
-        for (size_t i = 0; i < t->arr_size; i++) {
-            htab_item_t *item = t->arr_ptr[i];
-
-            while (item != NULL) {
-                backup[backup_index].token->attribute.string =
-                    malloc(strlen(item->token->attribute.string) + 1);
-                strcpy((char *)backup[backup_index].token->attribute.string,
-                       item->token->attribute.string);
-                backup[backup_index++].type = item->type;
-                backup[backup_index++].token = item->token;
-                item = item->next;
-            }
-        }
-
-        // Mazaní a uvolnění prvků v tabulce
-        htab_item_t *item2;
-        htab_item_t *toFree;
-
-        for (size_t i = 0; i < t->arr_size; i++) {
-            item2 = t->arr_ptr[i];
-
-            while (item2 != NULL) {
-                toFree = item2;
-                item2 = item2->next;
-                // free((char *)toFree->pair.key);
-                free(toFree);
-            }
-            t->arr_ptr[i] = NULL;
-        }
-
-        // Změna velikosti tabulky
-        t->arr_ptr = realloc(t->arr_ptr, newn * sizeof(htab_item_t *));
-        t->arr_size = newn;
-        t->size = 0;
-
-        // Inicializace nové tabulky
-        for (size_t i = 0; i < t->arr_size; i++) {
-            t->arr_ptr[i] = NULL;
-        }
-
-        // Nahrání klíčů a hodnot ze zásobníku do nové tabulky
-        for (size_t i = 0; i < backup_index; i++) {
-            htab_insert_item(t, backup[i].token);
-            htab_find(t, backup[i].token->attribute.string)->type =
-                backup[i].type;
-            htab_find(t, backup[i].token->attribute.string)->token =
-                backup[i].token;
-
-            // Uvolnění paměti zásobníku
-            // free((char *)backup[i].key);
-        }
+// Hashtable destructor - deletes all items and frees allocated memory
+int htab_free(Htab_t *table) {
+    if (table == NULL) {
+        return INTERNAL_ERR;
     }
+    if (htab_clear(table) == INTERNAL_ERR) {
+        return INTERNAL_ERR;
+    }
+    free(table->arr_ptr);
+    free(table);
+    return OK;
 }
 
-void print_table(htab_t *t) {
+void print_table(Htab_t *table) {
     const char *enum_type[6] = {"INT",   "STRING", "BOOL",
                                 "FLOAT", "FUNC",   "UNKNOWN"};
-    const char *enum_types2[] = {
-        // OPERATORS, ordered from highest precedence to lowest
-        "T_LT",  // <
-        "T_GT",  // >
-        "T_LE",  // <=
-        "T_GE",  // >=
-        "T_EQ",  // ===
-        "T_NE",  // !==
-
-        // KEYWORDS
-        "T_ELSE",   // else
-        "T_FLOAT",  // float
-        "T_FUNC",   // function
-        "T_IF",     // if
-        "T_INT",    // int
-        "T_NULL",   // null
-        "T_RET",    // return
-        "T_STR",    // string
-        "T_VOID",   // void
-        "T_WHILE",  // while
-
-        // PUNCTUATORS
-        "T_LCBR",    // {
-        "T_RCBR",    // }
-        "T_LBR",     // (
-        "T_RBR",     // )
-        "T_SEMCOL",  // ;
-        "T_COL",     // :
-        "T_CONCAT",  // .
-
-        // EXPRESSIONS
-        "T_MUL",     // *
-        "T_DIV",     // /
-        "T_ADD",     // +
-        "T_SUB",     // -
-        "T_ASSIGN",  // =
-        "T_NEG",     // !
-
-        // OTHERS
-        "T_ID",    // identifier
-        "T_EOF",   // end of file
-        "T_EOL",   // end of line
-        "T_UNDEF"  // undefined type
-
-    };
+    const char *enum_types2[38] = {
+        "T_LT",    "T_GT",     "T_LE",     "T_GE",      "T_EQ",     "T_NE",
+        "K_ELSE",  "K_FLOAT",  "K_FUNC",   "K_IF",      "K_INT",    "K_NULL",
+        "K_RET",   "K_STR",    "K_VOID",   "K_WHILE",   "T_LCBR",   "T_RCBR",
+        "T_LBR",   "T_RBR",    "T_SEMCOL", "T_COL",     "T_CONCAT", "T_MUL",
+        "T_DIV",   "T_ADD",    "T_SUB",    "T_ASSIGN",  "T_NEG",    "T_INT",
+        "T_FLOAT", "T_STRING", "T_ID",     "T_FUNC_ID", "T_EOF",    "T_EOL",
+        "T_UNDEF", "T_SEM"};
     printf("Start of htab \n");
-    for (int i = 0; i < (int)t->arr_size; i++) {
-        if (t->arr_ptr[i] == NULL) {
+    for (int i = 0; i < (int)table->arr_size; i++) {
+        if (table->arr_ptr[i] == NULL) {
             printf("\t%i\t---\n", i);
         } else {
             printf("\t%i\t ", i);
-            htab_item_t *tmp = t->arr_ptr[i];
+            Htab_item_t *tmp = table->arr_ptr[i];
             while (tmp != NULL) {
                 printf("[ID_type: %s, Attribute: %s, Token_type: %s] - ",
                        enum_type[tmp->type], tmp->token->attribute.string,

@@ -89,9 +89,9 @@ int d_string_add_str(DString_t *d_string, const char *c_str) {
 
 // Appends dynamic string by another dynamic string
 int d_string_add_d_string(DString_t *d_string, DString_t *d_string_to_add) {
-    printf("d_string_add_d_string");
-    printf("d_string_to_add->str: %s", d_string_to_add->str);
-    printf("d_string->str: %s", d_string->str);
+    if (d_string == NULL || d_string_to_add == NULL) {
+        return INTERNAL_ERR;
+    }
     return NOT_IMPLEMENTED;
 }
 
@@ -112,6 +112,34 @@ int d_string_copy(DString_t *src, DString_t *dest) {
         return INTERNAL_ERR;
     }
     if (d_string_add_str(dest, src->str) == INTERNAL_ERR) {
+        return INTERNAL_ERR;
+    }
+    return OK;
+}
+
+int get_d_string_value_to_integer(DString_t *d_string, int *value) {
+    if (d_string == NULL || value == NULL) {
+        return INTERNAL_ERR;
+    }
+    char *e;
+    *value = strtol(d_string->str, &e, 10);
+    // Check if conversion was successful
+    if (e == d_string->str || *e != '\0' || errno == ERANGE) {
+        *value = 0;
+        return INTERNAL_ERR;
+    }
+    return OK;
+}
+
+int get_d_string_value_to_double(DString_t *d_string, double *value) {
+    if (d_string == NULL || value == NULL) {
+        return INTERNAL_ERR;
+    }
+    char *e;
+    *value = strtod(d_string->str, &e);
+    // Check if conversion was successful
+    if (e == d_string->str || *e != '\0' || errno == ERANGE) {
+        *value = 0;
         return INTERNAL_ERR;
     }
     return OK;

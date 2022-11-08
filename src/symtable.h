@@ -15,43 +15,86 @@
 #include "scanner.h"
 #include "stack.h"
 
-#define AVG_LEN_MAX 10
-#define AVG_LEN_MIN 2
+// Hashtable key type
+typedef const char *Htab_key_t;
 
-// Tabulka:
-struct htab;  // neúplná deklarace struktury - uživatel nevidí obsah
-typedef struct htab htab_t;  // typedef podle zadání
+// Variable types
+typedef enum {
+    INT,
+    STRING,
+    BOOL,
+    FLOAT,
+    FUNC,
+    UNKNOWN
+} Id_type_t;  // TODO: maybe rename this
 
-typedef const char *htab_key_t;
+// Hashtable item
+typedef struct Htab_item Htab_item_t;
 
-// Prvek:
-struct htab_item;
-typedef struct htab_item htab_item_t;
-
-typedef enum { INT, STRING, BOOL, FLOAT, FUNC, UNKNOWN } Id_type_t;
-
-// Struktura prvku
-struct htab_item {
+// Hashtable item structure
+typedef struct Htab_item {
     Token_t *token;
     Id_type_t type;
-    htab_item_t *next;
-};
+    Htab_item_t *next;
+} Htab_item_t;
 
-// Struktura tabulky:
-struct htab {
+// Hashtable structure
+typedef struct Hashtable {
     size_t size;
     size_t arr_size;
-    htab_item_t **arr_ptr;
-};
+    Htab_item_t **arr_ptr;
+} Htab_t;
 
-htab_t *htab_init(size_t n);
-// htab_item_t *htab_item_init(htab_key_t key);
-size_t htab_hash_function(const char *str);
-bool htab_insert_item(htab_t *t, Token_t *token);
-void print_table(htab_t *t);
-htab_item_t *htab_find(htab_t *t, htab_key_t key);
-htab_item_t *htab_lookup_add(htab_t *t, Token_t *token);
-bool htab_erase(htab_t *t, htab_key_t key);
-void htab_clear(htab_t *t);
-void htab_free(htab_t *t);
-void htab_resize(htab_t *t, size_t newn);
+// Hashtable constructor - initializes hashtable
+// @param n - size of hashtable
+// @return - pointer to table when success
+// @return - NULL when failed
+Htab_t *htab_init(size_t size);
+
+// Hash function - hash % array size gives table index of item
+// @param str - string
+// @return - hash
+int htab_hash_function(Htab_key_t key);
+
+// Inserts item into the hashtable
+// @param table - hashtable
+// @param token - token
+// @return - status code
+int htab_insert_item(Htab_t *table, Token_t *token);
+
+// Finds item in table according to the entered key
+// @param table - hashtable
+// @param key - key
+// @return - pointer to item when success
+// @return - NULL when failed
+Htab_item_t *htab_find(Htab_t *table, Htab_key_t key);
+
+// Finds or instert item in table according to the entered key
+// @param table - hashtable
+// @param token - token
+// @return - when item is found, returns pointer to item
+// @return - when item is not found, inserts item into the hashtable and returns
+// pointer to item
+// @return - NULL when failed
+Htab_item_t *htab_lookup_add(Htab_t *table, Token_t *token);
+
+// Deletes item from hashtable according to the entered key
+// @param table - hashtable
+// @param key - key
+// @return - status code
+int htab_erase(Htab_t *table, Htab_key_t key);
+
+// Deletes all items from hashtable
+// @param table - hashtable
+// @param key - key
+// @return - status code
+int htab_clear(Htab_t *table);
+
+// Hashtable destructor - deletes all items and frees allocated memory
+// @param table - hashtable
+// @return - status code
+int htab_free(Htab_t *table);
+
+// DEBUG FUNCTION - prints hashtable
+// @param table - hashtable
+void print_table(Htab_t *table);
