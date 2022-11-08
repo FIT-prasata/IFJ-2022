@@ -75,6 +75,7 @@ typedef enum {
     T_SEM,      // semicolon
     T_KEYWORD
 
+
 } T_type_t;
 
 // Token attribute

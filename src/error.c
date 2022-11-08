@@ -53,8 +53,11 @@ void error_display(int type, int line_num) {
             exit(INTERNAL_ERR);
     }
 }
-void fr(int code) {
+
+void try(int code) {
     if (code != OK) {
-        error_display(code, 12);  // TODO we need line num!!
+        error_display(code, 0);  // TODO we need line num!!
     }
 }
+
+void raise(int code) { error_display(code, 0); }
