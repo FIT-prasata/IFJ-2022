@@ -14,14 +14,14 @@ typedef enum { PASSED, FAILED } TestResult_t;
     int NAME() {                      \
         TestResult_t result = PASSED; \
         char* t_name = #NAME;         \
-        char* t_desc = #DESCRIPTION;  \
+        char* t_desc = DESCRIPTION;  \
         char* e_msg = "no error";
 #define ENDTEST                                                         \
     if (result == PASSED) {                                             \
-        printf(GREEN("[PASSED] %s \n"), t_name);                        \
+        printf(GREEN("[PASSED] [%s] %s \n"), t_name, t_desc);                        \
         return 0;                                                       \
     } else {                                                            \
-        printf(RED("[FAILED] %s -> failed on: %s \n"), t_name, \
+        printf(RED("[FAILED] [%s] -> failed on: %s \n"), t_name, \
                 e_msg);                                                 \
         return 1;                                                       \
     }                                                                   \

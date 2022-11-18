@@ -46,7 +46,6 @@ int skip_bc() {
     }
 }
 
-
 int type_handler(Token_t *token) {
     char *id_types[] = {"int", "float", "string"};
     char *types[] = {K_INT, K_FLOAT, K_STR};
@@ -125,7 +124,6 @@ int num_handler(Token_t *token, char *curr) {
     while (true) {
         *curr = getchar();
         if (*curr >= '0' && *curr <= '9') {
-
             d_string_add_char(&dString, *curr);
         } else if (*curr == '.' && (dec_pt == false) && (exp == false)) {
             d_string_add_char(&dString, *curr);
@@ -133,14 +131,12 @@ int num_handler(Token_t *token, char *curr) {
             set_type(token, T_FLOAT);
         } else if ((*curr == 'e' || *curr == 'E') && (exp == false) &&
                    (last >= '0') && (last <= '9')) {
-
             d_string_add_char(&dString, *curr);
 
             exp = true;
             set_type(token, T_FLOAT);
         } else if ((*curr == '+' || *curr == '-') &&
                    (last == 'e' || last == 'E')) {
-
             d_string_add_char(&dString, *curr);
 
         } else {
@@ -153,11 +149,9 @@ int num_handler(Token_t *token, char *curr) {
         last = *curr;
     }
     if (token->type == T_INT) {
-
         get_d_string_value_to_integer(&dString, &(token->attribute.value));
     } else {
         get_d_string_value_to_double(&dString, &(token->attribute.dec_value));
-
     }
     d_string_free_and_clear(&dString);
     return OK;
@@ -212,9 +206,7 @@ int string_handler(Token_t *token) {
                     return STR_ERR;
             }
         } else {
-
             d_string_add_char(&dString, curr);
-
         }
         last = curr;
     }
@@ -261,7 +253,6 @@ int scan(Token_t *token) {
 
         return NOT_IMPLEMENTED;  // Ultra edge case for calling scan after
                                  // receiving EOF somehow
-
     }
     if (use_last) {
         curr = last;
@@ -285,7 +276,6 @@ int scan(Token_t *token) {
                     if (skip_lc()) {
                         return LC_EOF_ERR;
                     } else {
-
                         curr = get_non_white();
                         break;
                     }
@@ -302,7 +292,6 @@ int scan(Token_t *token) {
             case '\n':
                 last = '\n';
                 set_type(token, T_EOL);
-
 
             case '_':  // 'a' ... 'z' might work for gcc, but too tired to look
                        // into it, sorry for this mess...
@@ -364,10 +353,8 @@ int scan(Token_t *token) {
                     use_last = true;
                     return OK;
                 } else {
-
                     return INTERNAL_ERR;  // I guess that nothing else could go
                                           // wrong here
-
                 }
             case '0':
             case '1':

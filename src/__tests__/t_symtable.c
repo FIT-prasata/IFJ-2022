@@ -24,14 +24,14 @@
 
 
 
-TEST(T_htab_init_1, "test htab_init")
+TEST(T_htab_init_normal, "Init with normal size")
 Htab_t *test_table;
 size_t size = 69;
 ASSERT_TRUE((test_table = htab_init(size)) != NULL)
 HTAB_FREE
 ENDTEST
 
-TEST(T_htab_init_2, "test htab_init")
+TEST(T_htab_init_zero, "Init with zero size")
 Htab_t *test_table;
 size_t size = 0;
 ASSERT_TRUE((test_table = htab_init(size)) == NULL)
@@ -39,29 +39,29 @@ ENDTEST
 
 
 
-TEST(T_htab_hash_function_1, "test htab_hash_function")
+TEST(T_htab_hash_function_no_key, "Creating hash with no key")
 ASSERT_TRUE(htab_hash_function(NULL) == -1)
 ENDTEST
 
-TEST(T_htab_hash_function_2, "test htab_hash_function")
+TEST(T_htab_hash_function_normal, "Creating hash with normal key")
 ASSERT_TRUE(htab_hash_function("test") > 0)
 ENDTEST
 
 
 
-TEST(T_htab_insert_item_1, "test htab_insert_item")
+TEST(T_htab_insert_item_no_table, "Inserting item with no table")
 HTAB_TOKEN_INIT
 ASSERT_TRUE(htab_insert_item(NULL, test_token) == INTERNAL_ERR)
 HTAB_TOKEN_FREE
 ENDTEST
 
-TEST(T_htab_insert_item_2, "test htab_insert_item")
+TEST(T_htab_insert_item_no_token, "Inserting item with no token")
 HTAB_INIT
 ASSERT_TRUE(htab_insert_item(test_table, NULL) == INTERNAL_ERR)
 HTAB_FREE
 ENDTEST
 
-TEST(T_htab_insert_item_3, "test htab_insert_item")
+TEST(T_htab_insert_item_normal, "Inserting item with normal token")
 HTAB_INIT
 HTAB_TOKEN_INIT
 ASSERT_TRUE(htab_insert_item(test_table,test_token) == OK)
@@ -71,23 +71,23 @@ ENDTEST
 
 
 
-TEST(T_htab_find_1, "test htab_find")
+TEST(T_htab_find_no_table, "Finding item with no table")
 ASSERT_TRUE(htab_find(NULL, "test") == NULL)
 ENDTEST
 
-TEST(T_htab_find_2, "test htab_find")
+TEST(T_htab_find_no_key, "Finding item with no key")
 HTAB_INIT
 ASSERT_TRUE(htab_find(test_table, NULL) == NULL)
 HTAB_FREE
 ENDTEST
 
-TEST(T_htab_find_3, "test htab_find")
+TEST(T_htab_find_empty, "Finding item in empty table")
 HTAB_INIT
 ASSERT_TRUE(htab_find(test_table, "test") == NULL)
 HTAB_FREE
 ENDTEST
 
-TEST(T_htab_find_4, "test htab_find")
+TEST(T_htab_find_normal, "Finding item in table")
 HTAB_INIT
 HTAB_TOKEN_INIT
 HTAB_INSERT
@@ -96,7 +96,7 @@ HTAB_TOKEN_FREE
 HTAB_FREE
 ENDTEST
 
-TEST(T_htab_find_5, "test htab_find")
+TEST(T_htab_find_missing, "Finding missing item in table")
 HTAB_INIT
 HTAB_TOKEN_INIT
 HTAB_INSERT
@@ -107,19 +107,19 @@ ENDTEST
 
 
 
-TEST(T_htab_lookup_add_1, "test htab_lookup_add")
+TEST(T_htab_lookup_add_no_table, "Lookup add with no table")
 HTAB_TOKEN_INIT
 ASSERT_TRUE(htab_lookup_add(NULL, test_token) == NULL)
 HTAB_TOKEN_FREE
 ENDTEST
 
-TEST(T_htab_lookup_add_2, "test htab_lookup_add")
+TEST(T_htab_lookup_add_no_token, "Lookup add with no token")
 HTAB_INIT
 ASSERT_TRUE(htab_lookup_add(test_table, NULL) == NULL)
 HTAB_FREE
 ENDTEST
 
-TEST(T_htab_lookup_add_3, "test htab_lookup_add")
+TEST(T_htab_lookup_add_insert, "Lookup add with insert")
 HTAB_INIT
 HTAB_TOKEN_INIT
 ASSERT_TRUE(htab_lookup_add(test_table, test_token) != NULL)
@@ -127,7 +127,7 @@ HTAB_TOKEN_FREE
 HTAB_FREE
 ENDTEST
 
-TEST(T_htab_lookup_add_4, "test htab_lookup_add")
+TEST(T_htab_lookup_add_find, "Lookup add with find")
 HTAB_INIT
 HTAB_TOKEN_INIT
 HTAB_INSERT
@@ -138,23 +138,23 @@ ENDTEST
 
 
 
-TEST(T_htab_erase_1, "test htab_erase")
+TEST(T_htab_erase_no_table, "Erasing item with no table")
 ASSERT_TRUE(htab_erase(NULL, "test") == INTERNAL_ERR)
 ENDTEST
 
-TEST(T_htab_erase_2, "test htab_erase")
+TEST(T_htab_erase_no_key, "Erasing item with no key")
 HTAB_INIT
 ASSERT_TRUE(htab_erase(test_table, NULL) == INTERNAL_ERR)
 HTAB_FREE
 ENDTEST
 
-TEST(T_htab_erase_3, "test htab_erase")
+TEST(T_htab_erase_missing, "Erasing missing item")
 HTAB_INIT
 ASSERT_TRUE(htab_erase(test_table, "test") == INTERNAL_ERR)
 HTAB_FREE
 ENDTEST
 
-TEST(T_htab_erase_4, "test htab_erase")
+TEST(T_htab_erase_normal, "Erasing item")
 HTAB_INIT
 HTAB_TOKEN_INIT
 HTAB_INSERT
@@ -165,17 +165,17 @@ ENDTEST
 
 
 
-TEST(T_htab_clear_1, "test htab_clear")
+TEST(T_htab_clear_no_table, "Clearing table with no table")
 ASSERT_TRUE(htab_clear(NULL) == INTERNAL_ERR)
 ENDTEST
 
-TEST(T_htab_clear_2, "test htab_clear")
+TEST(T_htab_clear_empty, "Clearing empty table")
 HTAB_INIT
 ASSERT_TRUE(htab_clear(test_table) == OK)
 HTAB_FREE
 ENDTEST
 
-TEST(T_htab_clear_3, "test htab_clear")
+TEST(T_htab_clear_normal, "Clearing table")
 HTAB_INIT
 HTAB_TOKEN_INIT
 HTAB_INSERT
@@ -186,16 +186,16 @@ ENDTEST
 
 
 
-TEST(T_htab_free_1, "test htab_free")
+TEST(T_htab_free_no_table, "Freeing table with no table")
 ASSERT_TRUE(htab_free(NULL) == INTERNAL_ERR)
 ENDTEST
 
-TEST(T_htab_free_2, "test htab_free")
+TEST(T_htab_free_empty, "Freeing empty table")
 HTAB_INIT
 ASSERT_TRUE(htab_free(test_table) == OK)
 ENDTEST
 
-TEST(T_htab_free_3, "test htab_free")
+TEST(T_htab_free_normal, "Freeing table")
 HTAB_INIT
 HTAB_TOKEN_INIT
 HTAB_INSERT
@@ -208,31 +208,31 @@ ENDTEST
 int run_symtable_tests() {
     int errors = 0;
     printf("Running symtable tests...\n");
-    errors += T_htab_init_1();
-    errors += T_htab_init_2();
-    errors += T_htab_hash_function_1();
-    errors += T_htab_hash_function_2();
-    errors += T_htab_insert_item_1();
-    errors += T_htab_insert_item_2();
-    errors += T_htab_insert_item_3();
-    errors += T_htab_find_1();
-    errors += T_htab_find_2();
-    errors += T_htab_find_3();
-    errors += T_htab_find_4();
-    errors += T_htab_find_5();
-    errors += T_htab_lookup_add_1();
-    errors += T_htab_lookup_add_2();
-    errors += T_htab_lookup_add_3();
-    errors += T_htab_lookup_add_4();
-    errors += T_htab_erase_1();
-    errors += T_htab_erase_2();
-    errors += T_htab_erase_3();
-    errors += T_htab_erase_4();
-    errors += T_htab_clear_1();
-    errors += T_htab_clear_2();
-    errors += T_htab_clear_3();
-    errors += T_htab_free_1();
-    errors += T_htab_free_2();
-    errors += T_htab_free_3();
+    errors += T_htab_init_normal();
+    errors += T_htab_init_zero();
+    errors += T_htab_hash_function_no_key();
+    errors += T_htab_hash_function_normal();
+    errors += T_htab_insert_item_no_table();
+    errors += T_htab_insert_item_no_token();
+    errors += T_htab_insert_item_normal();
+    errors += T_htab_find_no_table();
+    errors += T_htab_find_no_key();
+    errors += T_htab_find_empty();
+    errors += T_htab_find_normal();
+    errors += T_htab_find_missing();
+    errors += T_htab_lookup_add_no_table();
+    errors += T_htab_lookup_add_no_token();
+    errors += T_htab_lookup_add_insert();
+    errors += T_htab_lookup_add_find();
+    errors += T_htab_erase_no_table();
+    errors += T_htab_erase_no_key();
+    errors += T_htab_erase_missing();
+    errors += T_htab_erase_normal();
+    errors += T_htab_clear_no_table();
+    errors += T_htab_clear_empty();
+    errors += T_htab_clear_normal();
+    errors += T_htab_free_no_table();
+    errors += T_htab_free_empty();
+    errors += T_htab_free_normal();
     return errors;
 }
