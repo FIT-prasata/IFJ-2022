@@ -79,7 +79,7 @@ typedef enum T_type {
 
 // Token attribute
 typedef union {
-    DString_t *string;
+    char *string;
     int value;
     double dec_value;
 } T_attr_t;

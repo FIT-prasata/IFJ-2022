@@ -12,6 +12,9 @@
 // LOCAL INCLUDES
 #include "parser.h"
 
+DString_t function_id;
+int param_number;
+
 Token_t *init_token(void) {
     Token_t *token = (Token_t *)malloc(sizeof(Token_t));
     if (token == NULL) return NULL;
@@ -103,6 +106,6 @@ int def_func_rule(Token_t *token, scope_t *scope_state, Htab_t *global_table) {
 
 int arg_rule(Token_t *token, Htab_item_t *func, Htab_t *global_table) {
     int status = OK;
-    
+
     return OK;
 }
