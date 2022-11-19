@@ -78,3 +78,25 @@ int program_rule(Token_t *token, scope_t *scope_state, Htab_t *global_table) {
     }
     return program_rule(token, scope_state, global_table);
 }
+
+int def_func_rule(Token_t *token, scope_t *scope_state, Htab_t *global_table) {
+    int status = OK;
+    if (token->type != K_FUNC) return SYNTAX_ERR;
+    if ((status = scan(token)) != OK) return status;
+    if (token->type != T_FUNC_ID) return SYNTAX_ERR;
+    if ((status = scan(token)) != OK) return status;
+    if (token->type != T_LBR) return SYNTAX_ERR;
+    if ((status = scan(token)) != OK) return status;
+    if ((status = arg_rule(token, global_table)) != OK) return status;
+    if ((status = scan(token)) != OK) return status;
+    if (token->type != T_COL) return SYNTAX_ERR;
+    if ((status = scan(token)) != OK) return status;
+    if ((status = type_rule(token, global_table)) != OK) return status;
+    if ((status = scan(token)) != OK) return status;
+    if (token->type != T_LCBR) return SYNTAX_ERR;
+    if ((status = scan(token)) != OK) return status;
+    if ((status = stat_rule(token, scope_state, global_table)) != OK)
+        return status;
+    return OK;
+}
+
