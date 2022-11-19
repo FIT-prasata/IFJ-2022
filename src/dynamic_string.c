@@ -56,8 +56,7 @@ int d_string_add_char(DString_t *d_string, char c) {
     }
     if (d_string->length + 1 >= d_string->allocated_size) {
         d_string->allocated_size += DYNAMIC_STRING_INIT_SIZE;
-        d_string->str =
-            (char *)realloc(d_string->str, d_string->allocated_size);
+        d_string->str = (char *)realloc(d_string->str, d_string->allocated_size);
         if (d_string->str == NULL) {
             return INTERNAL_ERR;
         }
@@ -75,8 +74,7 @@ int d_string_add_str(DString_t *d_string, const char *c_str) {
     unsigned int c_str_len = strlen(c_str);
     if (d_string->length + c_str_len >= d_string->allocated_size) {
         d_string->allocated_size += c_str_len + DYNAMIC_STRING_INIT_SIZE;
-        d_string->str = (char *)realloc(
-            d_string->str, d_string->allocated_size * sizeof(char));
+        d_string->str = (char *)realloc(d_string->str, d_string->allocated_size * sizeof(char));
         if (d_string->str == NULL) {
             return INTERNAL_ERR;
         }
