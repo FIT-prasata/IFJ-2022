@@ -15,35 +15,59 @@
 #include "scanner.h"
 #include "stack.h"
 
+// Predeclared types
+typedef struct Htab_item Htab_item_t;
+typedef struct Symbol Symbol_t;
+
+// Variable types
+typedef enum { INT, STRING, BOOL, FLOAT, NONE } Var_type_t;
+
+// Variable structure
+typedef struct Var {
+    Var_type_t type; // Type of the variable
+    bool asigned;    // true if variable has been asigned
+} Var_t;
+
+// Function structure
+typedef struct Function {
+    int argc;               // Number of arguments
+    Var_type_t *argv;       // Array of argument types
+    Var_type_t return_type; // Return type
+    bool defined;           // true if function is defined, false if only declared
+} Func_t;
+
+// Symbol types
+typedef union {
+    Var_t var;    // Variable
+    Func_t func;  // Function
+} Symbol_type_t;
+
+// Symbol structure
+typedef struct Symbol {
+    const char *name;   // Name of the symbol
+    Symbol_type_t type; // Variable or function
+    bool used;          // for unused variable warning
+    Symbol_t *next;     // Pointer to the next symbol
+} Symbol_t;
+
+
 // Hashtable key type
 typedef const char *Htab_key_t;
 
-// Variable types
-typedef enum {
-    INT,
-    STRING,
-    BOOL,
-    FLOAT,
-    FUNC,
-    UNKNOWN
-} Id_type_t;  // TODO: maybe rename this
-
-// Hashtable item
-typedef struct Htab_item Htab_item_t;
-
 // Hashtable item structure
 typedef struct Htab_item {
-    Token_t *token;
-    Id_type_t type;
+    Symbol_t data;
     Htab_item_t *next;
 } Htab_item_t;
 
 // Hashtable structure
 typedef struct Hashtable {
-    size_t size;
-    size_t arr_size;
-    Htab_item_t **arr_ptr;
+    size_t size;           // number of items in the table
+    size_t arr_size;       // size of the array
+    Htab_item_t **arr_ptr; // pointer to the array
 } Htab_t;
+
+
 
 /**
  * Hashtable constructor - initializes hashtable
@@ -110,9 +134,3 @@ int htab_clear(Htab_t *table);
  * @return - status code
  */
 int htab_free(Htab_t *table);
-
-/**
- * DEBUG FUNCTION - prints hashtable
- * @param table - hashtable
- */
-void print_table(Htab_t *table);

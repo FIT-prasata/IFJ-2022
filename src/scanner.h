@@ -24,7 +24,7 @@
 
 // Token types
 typedef enum T_type {
-    // OPERATORS, ordered from highest precedence to lowest
+    // OPERATORS, ordered from the highest precedence to lowest
     T_LT,  // <
     T_GT,  // >
     T_LE,  // <=
