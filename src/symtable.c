@@ -68,13 +68,11 @@ int htab_insert_item(Htab_t *table, Token_t *token) {
     if (token->type == T_ID) {
         item->data.type.var.type = NONE;
         item->data.type.var.asigned = false;
-    }
-    else if (token->type == T_FUNC_ID) {
+    } else if (token->type == T_FUNC_ID) {
         item->data.type.func.argc = 0;
-        item->data.type.func.params = NULL;
+        item->data.type.func.argv = NULL;
         item->data.type.func.return_type = NONE;
-    }
-    else {
+    } else {
         free(item);
         return INTERNAL_ERR;
     }
@@ -154,8 +152,7 @@ int htab_clear(Htab_t *table) {
         Htab_item_t *item = table->arr_ptr[i];
 
         while (item != NULL) {
-            if (htab_erase(table, item->data.name) ==
-                INTERNAL_ERR) {
+            if (htab_erase(table, item->data.name) == INTERNAL_ERR) {
                 return INTERNAL_ERR;
             }
             item = item->next;
@@ -176,34 +173,4 @@ int htab_free(Htab_t *table) {
     free(table->arr_ptr);
     free(table);
     return OK;
-}
-
-void print_table(Htab_t *table) {
-    const char *enum_type[6] = {"INT",   "STRING", "BOOL",
-                                "FLOAT", "FUNC",   "UNKNOWN"};
-    const char *enum_types2[38] = {
-        "T_LT",    "T_GT",     "T_LE",     "T_GE",      "T_EQ",     "T_NE",
-        "K_ELSE",  "K_FLOAT",  "K_FUNC",   "K_IF",      "K_INT",    "K_NULL",
-        "K_RET",   "K_STR",    "K_VOID",   "K_WHILE",   "T_LCBR",   "T_RCBR",
-        "T_LBR",   "T_RBR",    "T_SEMCOL", "T_COL",     "T_CONCAT", "T_MUL",
-        "T_DIV",   "T_ADD",    "T_SUB",    "T_ASSIGN",  "T_NEG",    "T_INT",
-        "T_FLOAT", "T_STRING", "T_ID",     "T_FUNC_ID", "T_EOF",    "T_EOL",
-        "T_UNDEF", "T_SEM"};
-    printf("Start of htab \n");
-    for (int i = 0; i < (int)table->arr_size; i++) {
-        if (table->arr_ptr[i] == NULL) {
-            printf("\t%i\t---\n", i);
-        } else {
-            printf("\t%i\t ", i);
-            Htab_item_t *tmp = table->arr_ptr[i];
-            while (tmp != NULL) {
-                printf("[ID_type: %s, Attribute: %s, Token_type: %s] - ",
-                       enum_type[tmp->type], tmp->token->attribute.string,
-                       enum_types2[tmp->token->type]);
-                tmp = tmp->next;
-            }
-            printf("\n");
-        }
-    }
-    printf("End of htab\n");
 }
