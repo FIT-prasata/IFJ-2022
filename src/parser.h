@@ -77,7 +77,7 @@ int def_func_rule(Token_t *current_token, scope_t *scope_state,
  * @param global_table
  * @return
  */
-int arg_rule(Token_t *current_token, Htab_t *global_table);
+int arg_rule(Token_t *current_token, Htab_item_t *func, Htab_t *global_table);
 
 /**
  * @brief   RULES
