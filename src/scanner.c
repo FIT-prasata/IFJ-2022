@@ -12,7 +12,6 @@
 // LOCAL INCLUDES
 #include "scanner.h"
 
-
 char get_non_white() {
     char tmp = (char)getchar();
     return (isspace(tmp)) ? get_non_white() : tmp;
@@ -59,7 +58,8 @@ int type_handler(Token_t *token) {
     char curr = getchar();
 
     do {
-        if ((curr >= 'A' && curr <= 'Z') || (curr >= 'a' && curr <= 'z') || (curr >= '0' && curr <= '9') || (curr == '_')) {
+        if ((curr >= 'A' && curr <= 'Z') || (curr >= 'a' && curr <= 'z') ||
+            (curr >= '0' && curr <= '9') || (curr == '_')) {
             curr = getchar();
             d_string_add_char(&dString, curr);
         } else {
@@ -80,15 +80,18 @@ int type_handler(Token_t *token) {
 }
 
 int keyword_handler(Token_t *token, char *curr) {
-    char *keywords[] = {"else", "float", "function", "if", "int", "null", "return", "string", "void", "while"};
-    int keyword_types[] = {K_ELSE, K_FLOAT, K_FUNC, K_IF, K_INT, K_NULL, K_RET, K_STR, K_VOID, K_WHILE};
+    char *keywords[] = {"else", "float",  "function", "if",   "int",
+                        "null", "return", "string",   "void", "while"};
+    int keyword_types[] = {K_ELSE, K_FLOAT, K_FUNC, K_IF,   K_INT,
+                           K_NULL, K_RET,   K_STR,  K_VOID, K_WHILE};
     int keywords_array_size = sizeof(keywords) / sizeof(keywords[0]);
 
     DString_t dString;
     d_string_init(&dString);
 
     do {
-        if ((*curr >= 'A' && *curr <= 'Z') || (*curr >= 'a' && *curr <= 'z') || (*curr >= '0' && *curr <= '9') || (*curr == '_')) {
+        if ((*curr >= 'A' && *curr <= 'Z') || (*curr >= 'a' && *curr <= 'z') ||
+            (*curr >= '0' && *curr <= '9') || (*curr == '_')) {
             *curr = getchar();
             d_string_add_char(&dString, *curr);
         } else {
@@ -127,11 +130,13 @@ int num_handler(Token_t *token, char *curr) {
             d_string_add_char(&dString, *curr);
             dec_pt = true;
             set_type(token, T_FLOAT);
-        } else if ((*curr == 'e' || *curr == 'E') && (exp == false) && (last >= '0') && (last <= '9')) {
+        } else if ((*curr == 'e' || *curr == 'E') && (exp == false) &&
+                   (last >= '0') && (last <= '9')) {
             d_string_add_char(&dString, *curr);
             exp = true;
             set_type(token, T_FLOAT);
-        } else if ((*curr == '+' || *curr == '-') && (last == 'e' || last == 'E')) {
+        } else if ((*curr == '+' || *curr == '-') &&
+                   (last == 'e' || last == 'E')) {
             d_string_add_char(&dString, *curr);
         } else {
             if (last >= '0' && last <= '9') {
@@ -165,7 +170,9 @@ int string_handler(Token_t *token) {
     set_type(token, T_STRING);
 
     while (true) {
-        if (last != '"') {  // should secure that when <\x6"> is the end of string, next char (most time ';' or ')') should not be schroustán xd
+        if (last !=
+            '"') {  // should secure that when <\x6"> is the end of string, next
+                    // char (most time ';' or ')') should not be schroustán xd
             curr = getchar();
         }
         if ((curr == '\"' || last == '"') && last != '\\') {
@@ -191,17 +198,30 @@ int string_handler(Token_t *token) {
                     break;
                 case 'x':
                     for (int i = 0; i < 2; i++) {
-                        oct_hex[i] = getchar();   // get next number of octal (2. and 3.)
-                        oct_hex[i + 1] = '\0';    // move string termination char
-                        if (oct_hex[i] == '"') {  // pokud je uživatel kokot a dá něco v tomto stylu: ...\x6"    :)
+                        oct_hex[i] =
+                            getchar();  // get next number of octal (2. and 3.)
+                        oct_hex[i + 1] = '\0';  // move string termination char
+                        if (oct_hex[i] ==
+                            '"') {  // pokud je uživatel kokot a dá něco v tomto
+                                    // stylu: ...\x6"    :)
                             num_ok = false;
                             curr = '"';
                         }
-                        if ((oct_hex[i] < '0' || oct_hex[i] > '9') && (oct_hex[i] < 'A' || oct_hex[i] > 'F') && (oct_hex[i] < 'a' || oct_hex[i] > 'f')) {  // check if oct char are in valid range
-                            d_string_add_char(&dString, '\\');  // if not, write into string '\' (by instructions)
+                        if ((oct_hex[i] < '0' || oct_hex[i] > '9') &&
+                            (oct_hex[i] < 'A' || oct_hex[i] > 'F') &&
+                            (oct_hex[i] < 'a' ||
+                             oct_hex[i] > 'f')) {  // check if oct char are in
+                                                   // valid range
+                            d_string_add_char(
+                                &dString, '\\');  // if not, write into string
+                                                  // '\' (by instructions)
                             d_string_add_char(&dString, 'x');
-                            for (int j = 0; oct_hex[j] != '\0' && oct_hex[j] != '"'; j++) {
-                                d_string_add_char(&dString, oct_hex[j]);  // insert into string rest of loaded items
+                            for (int j = 0;
+                                 oct_hex[j] != '\0' && oct_hex[j] != '"'; j++) {
+                                d_string_add_char(
+                                    &dString,
+                                    oct_hex[j]);  // insert into string rest of
+                                                  // loaded items
                             }
                             num_ok = false;
                             break;
@@ -220,16 +240,27 @@ int string_handler(Token_t *token) {
                 case '3':
                     oct_hex[0] = curr;  // get first number of octal (0-3)
                     for (int i = 1; i < 3; i++) {
-                        oct_hex[i] = getchar();   // get next number of octal (2. and 3.)
-                        oct_hex[i + 1] = '\0';    // move string termination char
-                        if (oct_hex[i] == '"') {  // pokud je uživatel kokot a dá něco v tomto stylu: ...\x6"    :)
+                        oct_hex[i] =
+                            getchar();  // get next number of octal (2. and 3.)
+                        oct_hex[i + 1] = '\0';  // move string termination char
+                        if (oct_hex[i] ==
+                            '"') {  // pokud je uživatel kokot a dá něco v tomto
+                                    // stylu: ...\x6"    :)
                             num_ok = false;
                             curr = '"';
                         }
-                        if (oct_hex[i] < '0' || oct_hex[i] > '7') {  // check if oct char are in valid range
-                            d_string_add_char(&dString, '\\');       // if not, write into string '\' (by instructions)
-                            for (int j = 0; oct_hex[j] != '\0' && oct_hex[j] != '"'; j++) {
-                                d_string_add_char(&dString, oct_hex[j]);  // insert into string rest of loaded items
+                        if (oct_hex[i] < '0' ||
+                            oct_hex[i] >
+                                '7') {  // check if oct char are in valid range
+                            d_string_add_char(
+                                &dString, '\\');  // if not, write into string
+                                                  // '\' (by instructions)
+                            for (int j = 0;
+                                 oct_hex[j] != '\0' && oct_hex[j] != '"'; j++) {
+                                d_string_add_char(
+                                    &dString,
+                                    oct_hex[j]);  // insert into string rest of
+                                                  // loaded items
                             }
                             num_ok = false;
                             break;
@@ -243,7 +274,8 @@ int string_handler(Token_t *token) {
                     num_ok = true;
                     break;
                 default:
-                    return STR_ERR;  // insert into string full loaded statement, '\' included
+                    return STR_ERR;  // insert into string full loaded
+                                     // statement, '\' included
             }
         } else {
             d_string_add_char(&dString, curr);
@@ -266,7 +298,8 @@ int id_handler(Token_t *token) {
     if ((curr >= 'A' && curr <= 'Z') || (curr >= 'a' && curr <= 'z') ||
         (curr == '_')) {
         do {
-            if ((curr >= 'A' && curr <= 'Z') || (curr >= 'a' && curr <= 'z') || (curr >= '0' && curr <= '9') || (curr == '_')) {
+            if ((curr >= 'A' && curr <= 'Z') || (curr >= 'a' && curr <= 'z') ||
+                (curr >= '0' && curr <= '9') || (curr == '_')) {
                 curr = getchar();
                 d_string_add_char(&dString, curr);
             } else {
