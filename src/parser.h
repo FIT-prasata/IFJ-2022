@@ -21,7 +21,6 @@
 #include "scanner.h"
 #include "symtable.h"
 
-
 // Function prototypes
 Token_t *init_token(void);
 void free_token(Token_t *token);
@@ -32,83 +31,126 @@ void free_token(Token_t *token);
  */
 int parse(void);
 
+/**
+ * @brief   PROGRAM -> DEFVAR PROGRAM
+ *          PROGRAM -> DEFUNC PROGRAM
+ *          PROGRAM -> STAT PROGRAM
+ *          PROGRAM -> EOF
+ *
+ * @param current_token
+ * @param global_table
+ *
+ * @return int - error code
+ */
+int program_rule(Token_t *current_token, Htab_t *global_table);
 
 /**
- * @brief handler of PROGRAM rule
+ * @brief   TODO
+ *
+ * @param current_token
+ * @param global_table
+ *
+ * @return int - error code
+ */
+int def_var_rule(Token_t *current_token, Htab_t *global_table);
+
+/**
+ * @brief   DEFFUNC -> function f_id ( ARG : TYPE { STAT
+ *
+ * @param current_token
+ * @param global_table
+ *
+ * @return int - error code
+ */
+int def_func_rule(Token_t *current_token, Htab_t *global_table);
+
+/**
+ * @brief   ARG -> TYPE PARAM ARGLIST
+ *
  * @param current_token
  * @param global_table
  * @return
  */
-int program_rule(Token_t *current_token,Htab_t* global_table);
+int arg_rule(Token_t *current_token, Htab_t *global_table);
 
 /**
- * @brief handler of DEFVAR rule
+ * @brief   ARGLIST -> , PARAM ARGLIST
+ *          ARGLIST -> ')'
+ *
  * @param current_token
  * @param global_table
  * @return
  */
-int def_var_rule(Token_t *current_token,Htab_t* global_table);
+int arg_list_rule(Token_t *current_token, Htab_t *global_table);
 
 /**
- * @brief handler of DEFFUN rule
+ * @brief   PARAM -> var_id
+ *          PARAM -> const
+ *
  * @param current_token
  * @param global_table
  * @return
  */
-int def_func_rule(Token_t *current_token,Htab_t* global_table);
+int param_rule(Token_t *current_token, Htab_t *global_table);
 
 /**
- * @brief handler of ARG rule
+ * @brief   TYPE -> string
+ *          TYPE -> int
+ *          TYPE -> float
+ *          TYPE -> null
+ *
  * @param current_token
  * @param global_table
  * @return
  */
-int arg_rule(Token_t *current_token,Htab_t* global_table);
+int type_rule(Token_t *current_token, Htab_t *global_table);
 
 /**
- * @brief handler of ARGLIST rule
+ * @brief   STAT -> id = ASSIGN_TYPE STATLIST
+ *          STAT ->  if ( EXPR ) { STAT STATLIST else { STAT STATLIST
+ *          STAT -> while ( EXPR ) { STAT STATLIST
+ *
  * @param current_token
  * @param global_table
  * @return
  */
-int arg_list_rule(Token_t *current_token,Htab_t* global_table);
+int stat_rule(Token_t *current_token, Htab_t *global_table);
 
 /**
- * @brief handler of PARAM rule
+ * @brief   ASIGN_TYPE -> EXPR
+ *          ASIGN_TYPE -> FUNC_CALL
+ *
  * @param current_token
  * @param global_table
  * @return
  */
-int param_rule(Token_t *current_token,Htab_t* global_table);
+int assign_type_rule(Token_t *current_token, Htab_t *global_table);
 
 /**
- * @brief handler of TYPE rule
+ * @brief  function f_id ( ARG
+ *
  * @param current_token
  * @param global_table
  * @return
  */
-int type_rule(Token_t *current_token,Htab_t* global_table);
+int func_call_rule(Token_t *current_token, Htab_t *global_table);
 
 /**
- * @brief handler of STAT rule
+ * @brief   STATLIST -> ; STAT STATLIST
+ *          STATLIST -> '}'
+ *
+ *
  * @param current_token
  * @param global_table
  * @return
  */
-int stat_rule(Token_t *current_token,Htab_t* global_table);
+int stat_list_rule(Token_t *current_token, Htab_t *global_table);
 
 /**
- * @brief handler of STATLIST rule
+ * @brief EXPR -> precedent analysis -> bottom up parser
+ *
  * @param current_token
  * @param global_table
  * @return
  */
-int stat_list_rule(Token_t *current_token,Htab_t* global_table);
-
-/**
- * @brief handler of EXPR rule
- * @param current_token
- * @param global_table
- * @return
- */
-int expr_rule(Token_t *current_token,Htab_t* global_table);
+int expr_rule(Token_t *current_token, Htab_t *global_table);
