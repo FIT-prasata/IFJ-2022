@@ -10,11 +10,16 @@
 // Author: <xsvetl07> - Adam Světlík
 
 // LOCAL INCLUDES
-//#include "dynamic_string.h"
+// #include "dynamic_string.h"
 #include "error.h"
-//#include "stack.h"
+// #include "stack.h"
+#include "parser.h"
 #include "symtable.h"
 
 int main(void) {
-    return 0;
+    int status = OK;
+
+    status |= parse();
+
+    return status;
 }
