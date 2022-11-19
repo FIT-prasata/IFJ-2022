@@ -15,8 +15,11 @@
 #include "scanner.h"
 #include "stack.h"
 
-// Hashtable key type
-typedef const char *Htab_key_t;
+
+// Predeclared types
+typedef struct Htab_item Htab_item_t;
+typedef struct Symbol Symbol_t;
+
 
 // Variable types
 typedef enum {
@@ -25,16 +28,53 @@ typedef enum {
     BOOL,
     FLOAT,
     FUNC,
-    UNKNOWN
-} Id_type_t;  // TODO: maybe rename this
+    NONE
+} Var_type_t;
 
-// Hashtable item
-typedef struct Htab_item Htab_item_t;
+// Variable structure
+typedef struct Var {
+    Var_type_t type;
+    char *name;
+    bool asigned;
+} Var_t;
+
+// Parameter types
+typedef union {
+    int number;
+    Var_t var;
+    char *string;
+    bool boolean;
+    float real;
+} Param_t;
+
+// Function structure
+typedef struct Function {
+    int argc;
+    Param_t *params;
+    Var_type_t return_type;
+    bool defined;
+} Func_t;
+
+// Symbol types
+typedef union {
+    Var_t var;
+    Func_t func;
+} Symbol_type_t;
+
+// Symbol structure
+typedef struct Symbol {
+    Symbol_type_t type;
+    bool used;
+    Symbol_t *next;
+} Symbol_t;
+
+
+// Hashtable key type
+typedef const char *Htab_key_t;
 
 // Hashtable item structure
 typedef struct Htab_item {
-    Token_t *token;
-    Id_type_t type;
+    Symbol_t data;
     Htab_item_t *next;
 } Htab_item_t;
 
@@ -44,6 +84,9 @@ typedef struct Hashtable {
     size_t arr_size;
     Htab_item_t **arr_ptr;
 } Htab_t;
+
+
+
 
 /**
  * Hashtable constructor - initializes hashtable
