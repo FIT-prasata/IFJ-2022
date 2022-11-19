@@ -10,7 +10,7 @@
 // Author: <xsvetl07> - Adam Světlík
 
 // LOCAL INCLUDES
-#include "parser.h"#include "parser.h"
+#include "parser.h"
 
 Token_t *init_token(void) {
     Token_t *token = (Token_t *)malloc(sizeof(Token_t));
@@ -52,4 +52,29 @@ int parse(void) {
     free_token(token);
     htab_free(global_table);
     return status;
+}
+
+int program_rule(Token_t *token, scope_t *scope_state, Htab_t *global_table) {
+    int status = OK;
+    if ((status = scan(token)) != OK) return status;
+    switch (token->type) {
+        case T_EOF:
+            return OK;
+        case K_FUNC:
+            if ((status = def_func_rule(token, scope_state, global_table)) !=
+                OK)
+                return status;
+            break;
+        case K_IF:
+        case K_WHILE:
+        case K_RET:
+        case T_ID:
+        case T_FUNC_ID:
+            if ((status = stat_rule(token, scope_state, global_table) != OK))
+                return status;
+            break;
+        default:
+            return SYNTAX_ERR;
+    }
+    return program_rule(token, scope_state, global_table);
 }
