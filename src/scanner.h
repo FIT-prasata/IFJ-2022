@@ -127,6 +127,10 @@ typedef enum T_State{
     S_EOF,
     S_START,
     S_ERR
+    // S_PROL_ST1,
+    // S_PROL_ST2,
+    // S_PROL_END,
+    // S_PROL_SKIP
 
 } T_State_t;
 
@@ -156,7 +160,7 @@ void set_type(Token_t *token, T_type_t type);
 char skip_lc(void);
 
 // Skips block comment
-int skip_bc(void);
+int skip_bc(int *line_num);
 
 // Sets token value to either specific keyword or function name
 // @param token - token to be set
@@ -177,3 +181,6 @@ int id_handler(Token_t *token);
 
 // TODO
 int scan(Token_t *token);
+
+// TODO
+int prolog_handler(int *line_num);
