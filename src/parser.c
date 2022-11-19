@@ -100,3 +100,13 @@ int def_func_rule(Token_t *token, scope_t *scope_state, Htab_t *global_table) {
     return OK;
 }
 
+int arg_rule(Token_t *token, Htab_t *global_table) {
+    int status = OK;
+    if (token->type == T_RBR) return OK;
+    if (type_rule(token, global_table) != OK) return SYNTAX_ERR;
+    if ((status = scan(token)) != OK) return status;
+    if (param_rule(token, global_table) != OK) return SYNTAX_ERR;
+    if ((status = scan(token)) != OK) return status;
+    if (arg_list_rule(token, global_table) != OK) return SYNTAX_ERR;
+    return OK;
+}
