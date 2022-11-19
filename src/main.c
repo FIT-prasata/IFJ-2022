@@ -15,4 +15,14 @@
 //#include "stack.h"
 #include "symtable.h"
 
-int main(void) { return 0; }
+int main(void) {
+    Token_t *token = malloc(sizeof(Token_t));
+    if (token == NULL) {
+        return INTERNAL_ERR;
+    }
+    int line_num = 1;
+    printf("%d\n", prolog_handler(&line_num));
+    printf("line: %d\n", line_num);
+
+    return 0;
+    }
