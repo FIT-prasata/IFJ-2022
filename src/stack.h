@@ -18,6 +18,8 @@
 // LOCAL INCLUDES
 #include "scanner.h"  // for accessing token struct later on
 
+
+
 // DEFINES
 #define EMPTY_STACK INT_MIN
 #define NO_TYPE INT_MAX

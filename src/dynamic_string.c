@@ -12,6 +12,8 @@
 // LOCAL INCLUDES
 #include "dynamic_string.h"
 
+extern int line_num;
+
 // Clears dynamic string
 int d_string_clear(DString_t *d_string) {
     if (d_string == NULL) {

@@ -15,6 +15,7 @@
 #include "error.h"
 #include "string.h"
 
+
 #define DYNAMIC_STRING_INIT_SIZE 8
 
 typedef struct DynamicString {

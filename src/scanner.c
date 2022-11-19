@@ -12,6 +12,8 @@
 // LOCAL INCLUDES
 #include "scanner.h"
 
+extern int line_num;
+
 int is_white(int input)
 {
     return (input == ' ' || input == '\t' || (input >= 11 && input <= 13));
@@ -49,13 +51,13 @@ int skip_bc(int *line_num) {
             return OK;
         }
         if (curr == '\n') {
-            (*line_num)++;
+            line_num++;
         }
         prev = curr;
     }
 }
 
-int prolog_handler(int *line_num){
+int prolog_handler(){
     char prolog_start[25] = {'\0',};
     int curr;
     bool is_ok = false;
@@ -75,7 +77,7 @@ int prolog_handler(int *line_num){
             return 1;
         }
         if (curr == '\n'){ // add line count
-            (*line_num)++;
+            line_num++;
             curr = getchar();
         }
         for(int i = 0; i < 24; i++){
@@ -94,22 +96,37 @@ int prolog_handler(int *line_num){
 
 
 
-// T_State_t state(T_State_t act, int curr){
-//     switch(act){
-//         // TODO: implement state machine
-//     }
-// }
+T_State_t state(T_State_t act, int curr){
+    switch(act){
+        case S_START:
+            if (curr >= 'a' && curr <= 'z'){
+                return S_KEYWORD; // muze byt i nazev funkce :)
+            }
+            if (curr == '('){
+                return S_LBR;
+            }
+            if (curr == ')'){
+                return S_RBR;
+            }
+            if (curr == '"'){
+                return S_STRING;
+            }
+            if (curr == ';'){
+                return S_SEM;
+            }
+    }
+}
 
 int scan(Token_t *token) {
     int curr;
     // static char last;
-    // static T_State_t state = S_START;
+    T_State_t act_state = S_START;
     static bool start_of_file = true;
-    static int line_num = 1; // line counter
+    //static int line_num = 1; // line counter
 
     // prolog handler
     if (start_of_file) {
-        if (prolog_handler(&line_num)) {
+        if (prolog_handler()) {
             return LEX_ERR;
         }
         start_of_file = false;
@@ -124,6 +141,26 @@ int scan(Token_t *token) {
         if (curr == '\n'){ // a zaroven stav neni string
             line_num++;
             continue;
+        }
+        if (is_white(curr)){ // skip white chars
+            continue;
+        }
+        T_State_t next = state(act_state, curr);
+        if (next == S_LBR){
+            token->type = T_LBR;
+            return OK;
+        }
+        if (next == S_RBR){
+            token->type = T_RBR;
+            return OK;
+        }
+        if (next == S_SEM){
+            token->type = T_SEM;
+            return OK;
+        }
+        if (next == S_STRING){
+            token->type = T_STRING;
+            return OK;
         }
     }
 }

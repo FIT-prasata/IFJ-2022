@@ -22,6 +22,8 @@
 #include "dynamic_string.h"
 #include "error.h"
 
+
+
 // Token types
 typedef enum T_type {
     // OPERATORS, ordered from highest precedence to lowest
@@ -97,7 +99,7 @@ typedef enum T_State{
     S_RCBR,    // }
     S_LBR,     // (
     S_RBR,     // )
-    S_SEMCOL,  // ;
+    S_SEM,  // ;
     S_COL,     // :
     S_CONCAT,  // .
 
@@ -126,7 +128,8 @@ typedef enum T_State{
     S_ID2,
     S_EOF,
     S_START,
-    S_ERR
+    S_ERR,
+    S_KEYWORD
     // S_PROL_ST1,
     // S_PROL_ST2,
     // S_PROL_END,
@@ -183,4 +186,4 @@ int id_handler(Token_t *token);
 int scan(Token_t *token);
 
 // TODO
-int prolog_handler(int *line_num);
+int prolog_handler();
