@@ -27,7 +27,6 @@ typedef enum {
     STRING,
     BOOL,
     FLOAT,
-    FUNC,
     NONE
 } Var_type_t;
 
@@ -45,12 +44,13 @@ typedef union {
     char *string;
     bool boolean;
     float real;
-} Param_t;
+} Param_t; //TODO: mby not needed
 
 // Function structure
 typedef struct Function {
+    char *name;
     int argc;
-    Param_t *params;
+    Var_type_t *params; //TODO changed to Var_type_t from Param_t
     Var_type_t return_type;
     bool defined;
 } Func_t;

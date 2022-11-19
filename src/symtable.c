@@ -62,8 +62,23 @@ int htab_insert_item(Htab_t *table, Token_t *token) {
     if (item == NULL) {
         return INTERNAL_ERR;
     }
-    item->token = token;
-    item->type = UNKNOWN;
+    item->data.next = NULL;
+    item->data.used = false;
+    if (token->type == T_ID) {
+        item->data.type.var.type = NONE;
+        item->data.type.var.name = token->attribute.string;
+        item->data.type.var.asigned = false;
+    }
+    else if (token->type == T_FUNC_ID) {
+        item->data.type.func.name = token->attribute.string;
+        item->data.type.func.argc = 0;
+        item->data.type.func.params = NULL;
+        item->data.type.func.return_type = NONE;
+    }
+    else {
+        free(item);
+        return INTERNAL_ERR;
+    }
     item->next = NULL;
     Htab_item_t *tmp = table->arr_ptr[hash];
     table->arr_ptr[hash] = item;
