@@ -67,15 +67,68 @@ typedef enum T_type {
     T_STRING,  // string type
 
     // OTHERS
-    T_ID,       // variable identifier
-    T_FUNC_ID,  // function identifier
-    T_EOF,      // end of file
-    T_EOL,      // end of line
-    T_UNDEF,    // undefined type
-    T_SEM,      // semicolon
-    T_KEYWORD
+    T_ID,        // variable identifier
+    T_FUNC_ID,   // function identifier
+    T_EOF,       // end of file
+    T_EOL,       // end of line
+    T_UNDEF,     // undefined type
+    T_SEM,       // semicolon
+    T_KEYWORD,
+    T_PROLOG1,   // prolog <?php
+    T_PROLOG2,   // prolog declare(strict_types=1);
+    T_END_PROLOG // end of prolog
 
 } T_type_t;
+
+// FSM states
+typedef enum T_State{
+    // OPERATOR STATES
+    S_LT,  // <
+    S_GT,  // >
+    S_LE,  // <=
+    S_GE,  // >=
+    S_POSS_EQ,  // ==
+    S_EQ, // ===
+    S_POSS_NEQ, // !=
+    S_NEQ, // !==
+
+    // PUNCTUATOR STATES
+    S_LCBR,    // {
+    S_RCBR,    // }
+    S_LBR,     // (
+    S_RBR,     // )
+    S_SEMCOL,  // ;
+    S_COL,     // :
+    S_CONCAT,  // .
+
+    // EXPRESSION STATES
+    S_MUL,     // *
+    S_DIV,     // /
+    S_ADD,     // +
+    S_SUB,     // -
+    S_ASSIGN,  // =
+    S_NEG,     // !
+
+    // COMMENT STATES
+    S_BC_START, // /*
+    S_POSS_BC_END,   // *
+    S_BC_END, // */
+    S_LC, // //
+
+    // CONSTANT STATES
+    S_INT, // integer constant
+    S_FLOAT, // float constant
+    S_STRING, // string constant
+
+    // OTHER STATES
+    S_SPACE,
+    S_ID1,
+    S_ID2,
+    S_EOF,
+    S_START,
+    S_ERR
+
+} T_State_t;
 
 // Token attribute
 typedef union {
