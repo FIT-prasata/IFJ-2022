@@ -33,7 +33,6 @@ typedef enum {
 // Variable structure
 typedef struct Var {
     Var_type_t type;
-    char *name;
     bool asigned;
 } Var_t;
 
@@ -48,7 +47,6 @@ typedef union {
 
 // Function structure
 typedef struct Function {
-    char *name;
     int argc;
     Var_type_t *params; //TODO changed to Var_type_t from Param_t
     Var_type_t return_type;
@@ -63,6 +61,7 @@ typedef union {
 
 // Symbol structure
 typedef struct Symbol {
+    const char *name;
     Symbol_type_t type;
     bool used;
     Symbol_t *next;

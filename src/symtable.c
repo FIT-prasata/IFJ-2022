@@ -64,13 +64,12 @@ int htab_insert_item(Htab_t *table, Token_t *token) {
     }
     item->data.next = NULL;
     item->data.used = false;
+    item->data.name = key;
     if (token->type == T_ID) {
         item->data.type.var.type = NONE;
-        item->data.type.var.name = token->attribute.string;
         item->data.type.var.asigned = false;
     }
     else if (token->type == T_FUNC_ID) {
-        item->data.type.func.name = token->attribute.string;
         item->data.type.func.argc = 0;
         item->data.type.func.params = NULL;
         item->data.type.func.return_type = NONE;
@@ -86,6 +85,7 @@ int htab_insert_item(Htab_t *table, Token_t *token) {
     table->size++;
     return OK;
 }
+
 // Finds item in table according to the entered key
 Htab_item_t *htab_find(Htab_t *table, Htab_key_t key) {
     if (table == NULL || key == NULL) {
@@ -93,7 +93,7 @@ Htab_item_t *htab_find(Htab_t *table, Htab_key_t key) {
     }
     int hash = htab_hash_function(key) % table->arr_size;
     Htab_item_t *item = table->arr_ptr[hash];
-    while (item != NULL && strcmp(item->token->attribute.string, key) != 0) {
+    while (item != NULL && strcmp(item->data.name, key) != 0) {
         item = item->next;
     }
     if (item == NULL) {
@@ -127,7 +127,7 @@ int htab_erase(Htab_t *table, Htab_key_t key) {
     int hash = htab_hash_function(key) % table->arr_size;
     Htab_item_t *item = table->arr_ptr[hash];
     Htab_item_t *pervious = NULL;
-    while (item != NULL && strcmp(item->token->attribute.string, key)) {
+    while (item != NULL && strcmp(item->data.name, key)) {
         pervious = item;
         item = item->next;
     }
@@ -154,7 +154,7 @@ int htab_clear(Htab_t *table) {
         Htab_item_t *item = table->arr_ptr[i];
 
         while (item != NULL) {
-            if (htab_erase(table, item->token->attribute.string) ==
+            if (htab_erase(table, item->data.name) ==
                 INTERNAL_ERR) {
                 return INTERNAL_ERR;
             }
