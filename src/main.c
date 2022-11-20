@@ -19,8 +19,8 @@ int line_num = 1;
 
 
 int main(void) {
-    int ret_value;
-    char* tmp[41] = {"T_LT",  // <
+    //int ret_value;
+    char* tmp[] = {"T_LT",  // <
     "T_GT",  // >
     "T_LE",  // <=
     "T_GE",  // >=
@@ -67,7 +67,6 @@ int main(void) {
     "T_EOL",       // end of line
     "T_UNDEF",     // undefined type
     "T_SEM",       // semicolon
-    "T_KEYWORD",
     "T_PROLOG1",   // prolog <?php
     "T_PROLOG2",   // prolog declare(strict_types=1);
     "T_END_PROLOG"
@@ -80,7 +79,7 @@ int main(void) {
     token->attribute.string = NULL;
 
     while(token->type != T_EOF){
-        ret_value = scan(token);
+        scan(token);
         printf("L: %d -- ", line_num);
         printf("Type: %s -- ", tmp[token->type]);
         //printf("Type: %d -- ", token->type);

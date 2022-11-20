@@ -19,11 +19,6 @@ int is_white(int input)
     return (input == ' ' || input == '\t' || (input >= 11 && input <= 13));
 }
 
-char get_non_white() {
-    int tmp = getchar();
-    return (is_white(tmp)) ? get_non_white() : tmp;
-}
-
 // line comment
 char skip_lc() {
     int curr;
@@ -95,6 +90,26 @@ int prolog_handler(){
 }
 
 
+int keyword_handler(DString_t *dString, Token_t *token){
+    char *keywords[] = {"else", "float",  "function", "if",   "int",
+                        "null", "return", "string",   "void", "while"};
+    int keyword_types[] = {K_ELSE, K_FLOAT, K_FUNC, K_IF,   K_INT,
+                           K_NULL, K_RET,   K_STR,  K_VOID, K_WHILE};
+    int keywords_array_size = sizeof(keywords) / sizeof(keywords[0]);
+
+    for (int i = 0; i < keywords_array_size; i++) {
+        if (strcmp(keywords[i], dString->str) == 0) {
+            token->type = keyword_types[i];
+            return OK;
+        }
+    }
+    token->type = T_FUNC_ID;
+    token->attribute.string = malloc(sizeof(char) * (dString->length + 1));
+    strcpy(token->attribute.string, dString->str);
+    return OK;
+}
+
+
 
 T_State_t state(T_State_t act, int curr, DString_t *DString){
     switch(act){
@@ -115,6 +130,7 @@ T_State_t state(T_State_t act, int curr, DString_t *DString){
             if (curr == ';'){
                 return S_SEM;
             }
+            return LEX_ERR;
         case S_KEYWORD:
             if (curr >= 'a' && curr <= 'z'){
                 d_string_add_char(DString, curr);
@@ -122,7 +138,7 @@ T_State_t state(T_State_t act, int curr, DString_t *DString){
             }
             else{
                 ungetc(curr, stdin);
-                return S_ERR;
+                return S_KEYWORD_END;
             }
         case S_STRING:
             if (curr != '"'){
@@ -130,8 +146,10 @@ T_State_t state(T_State_t act, int curr, DString_t *DString){
                 return S_STRING;
             }
             else{
-                return S_ERR;
+                return S_STRING_END;
             }
+        default: // should never happen, maybe raise error or something? TODO, temporary solution just to get rid of warnings
+            return S_START;
     }
 }
 
@@ -166,35 +184,50 @@ int scan(Token_t *token) {
             continue;
         }
         T_State_t next = state(act_state, curr, &dString);
-        if (next == S_ERR){ // tady se ještě musí zavolat funkce na string nebo keyword, která u keyword zjistí jeslti to je keyword nebo volání fce nebo jméno fce nebo tak
-                             // nebo u stringu ho zformátuje podle pravidel
-            token->attribute.string = malloc(sizeof(char) * dString.length + 1);
-            strcpy(token->attribute.string, dString.str);
-            return OK;
-        }
-        if (next == S_LBR){
-            token->type = T_LBR;
-            return OK;
-        }
-        if (next == S_RBR){
-            token->type = T_RBR;
-            return OK;
-        }
-        if (next == S_SEM){
-            token->type = T_SEM;
-            return OK;
-        }
-        if (next == S_STRING){
-            act_state = next;
-            token->type = T_STRING;
-            continue;
-            return OK;
-        }
-        if (next == S_KEYWORD){
-            act_state = next;
-            token->type = T_KEYWORD; // do NOT set type here, could be keyword or function name
-            continue;
-            return OK;
+        switch (next){
+            // error case
+            case S_ERR:
+                return LEX_ERR;
+
+            // one char tokens
+            case S_LBR:
+                token->type = T_LBR;
+                return OK;
+            case S_RBR:
+                token->type = T_RBR;
+                return OK;
+            case S_SEM:
+                token->type = T_SEM;
+                return OK;
+
+            // keywords
+            case S_KEYWORD:
+                act_state = next;
+                break;
+            case S_KEYWORD_END:
+                if (keyword_handler(&dString, token)){
+                    d_string_free_and_clear(&dString);
+                    return LEX_ERR; // zjistit jestli nevracet KEYWORD_ERR nebo tak neco
+                }
+                d_string_free_and_clear(&dString);
+                return OK;
+
+            // strings
+            case S_STRING:
+                act_state = next;
+                token->type = T_STRING;
+                break;
+            case S_STRING_END:
+                token->attribute.string = malloc(sizeof(char) * dString.length + 1);
+                strcpy(token->attribute.string, dString.str);
+                //TODO: free string
+                return OK;
+
+            // something really bad happened
+            default:
+                printf("DEFAULT in next switch, shouldn't happen\n");
+                return LEX_ERR;
+            
         }
     }
 }

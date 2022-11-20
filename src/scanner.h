@@ -74,7 +74,6 @@ typedef enum T_type {
     T_EOL,       // end of line
     T_UNDEF,     // undefined type
     T_SEM,       // semicolon
-    T_KEYWORD,
     T_PROLOG1,   // prolog <?php
     T_PROLOG2,   // prolog declare(strict_types=1);
     T_END_PROLOG // end of prolog
@@ -120,6 +119,7 @@ typedef enum T_State{
     S_INT, // integer constant
     S_FLOAT, // float constant
     S_STRING, // string constant
+    S_STRING_END,
 
     // OTHER STATES
     S_SPACE,
@@ -128,7 +128,8 @@ typedef enum T_State{
     S_EOF,
     S_START,
     S_ERR,
-    S_KEYWORD
+    S_KEYWORD,
+    S_KEYWORD_END
     // S_PROL_ST1,
     // S_PROL_ST2,
     // S_PROL_END,
@@ -164,10 +165,8 @@ char skip_lc(void);
 // Skips block comment
 int skip_bc(int *line_num);
 
-// Sets token value to either specific keyword or function name
-// @param token - token to be set
-// @param *curr - pointer to current character
-int keyword_handler(Token_t *token, char *curr);
+// TODO
+//int keyword_handler(DString_t *dString, Token_t *token);
 
 // Sets token value to number
 // @param token - token to be set
