@@ -51,7 +51,6 @@ typedef enum T_type {
     T_RCBR,    // }
     T_LBR,     // (
     T_RBR,     // )
-    T_SEMCOL,  // ;
     T_COL,     // :
     T_CONCAT,  // .
 

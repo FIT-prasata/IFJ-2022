@@ -96,10 +96,11 @@ int prolog_handler(){
 
 
 
-T_State_t state(T_State_t act, int curr){
+T_State_t state(T_State_t act, int curr, DString_t *DString){
     switch(act){
         case S_START:
             if (curr >= 'a' && curr <= 'z'){
+                d_string_add_char(DString, curr);
                 return S_KEYWORD; // muze byt i nazev funkce :)
             }
             if (curr == '('){
@@ -114,10 +115,29 @@ T_State_t state(T_State_t act, int curr){
             if (curr == ';'){
                 return S_SEM;
             }
+        case S_KEYWORD:
+            if (curr >= 'a' && curr <= 'z'){
+                d_string_add_char(DString, curr);
+                return S_KEYWORD;
+            }
+            else{
+                ungetc(curr, stdin);
+                return S_ERR;
+            }
+        case S_STRING:
+            if (curr != '"'){
+                d_string_add_char(DString, curr);
+                return S_STRING;
+            }
+            else{
+                return S_ERR;
+            }
     }
 }
 
 int scan(Token_t *token) {
+    DString_t dString;
+    d_string_init(&dString); // TODO: uvolnit pamet!!!!!!
     int curr;
     // static char last;
     T_State_t act_state = S_START;
@@ -145,7 +165,13 @@ int scan(Token_t *token) {
         if (is_white(curr)){ // skip white chars
             continue;
         }
-        T_State_t next = state(act_state, curr);
+        T_State_t next = state(act_state, curr, &dString);
+        if (next == S_ERR){ // tady se ještě musí zavolat funkce na string nebo keyword, která u keyword zjistí jeslti to je keyword nebo volání fce nebo jméno fce nebo tak
+                             // nebo u stringu ho zformátuje podle pravidel
+            token->attribute.string = malloc(sizeof(char) * dString.length + 1);
+            strcpy(token->attribute.string, dString.str);
+            return OK;
+        }
         if (next == S_LBR){
             token->type = T_LBR;
             return OK;
@@ -159,7 +185,15 @@ int scan(Token_t *token) {
             return OK;
         }
         if (next == S_STRING){
+            act_state = next;
             token->type = T_STRING;
+            continue;
+            return OK;
+        }
+        if (next == S_KEYWORD){
+            act_state = next;
+            token->type = T_KEYWORD; // do NOT set type here, could be keyword or function name
+            continue;
             return OK;
         }
     }
