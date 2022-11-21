@@ -92,9 +92,9 @@ int prolog_handler(){
 
 int keyword_handler(DString_t *dString, Token_t *token){
     char *keywords[] = {"else", "float",  "function", "if",   "int",
-                        "null", "return", "string",   "void", "while"};
+                        "null", "return", "string",   "void", "while", "?int", "?string", "?float"};
     int keyword_types[] = {K_ELSE, K_FLOAT, K_FUNC, K_IF,   K_INT,
-                           K_NULL, K_RET,   K_STR,  K_VOID, K_WHILE};
+                           K_NULL, K_RET,   K_STR,  K_VOID, K_WHILE, K_INT_NULL, K_STR_NULL, K_FLOAT_NULL};
     int keywords_array_size = sizeof(keywords) / sizeof(keywords[0]);
 
     for (int i = 0; i < keywords_array_size; i++) {
@@ -114,9 +114,13 @@ int keyword_handler(DString_t *dString, Token_t *token){
 T_State_t state(T_State_t act, int curr, DString_t *DString){
     switch(act){
         case S_START:
-            if (curr >= 'a' && curr <= 'z'){
+            if ((curr >= 'a' && curr <= 'z') || (curr >= 'A' && curr <= 'Z') || (curr == '_')){
                 d_string_add_char(DString, curr);
                 return S_KEYWORD; // muze byt i nazev funkce :)
+            }
+            if (curr == '?'){
+                d_string_add_char(DString, curr);
+                return QUEST_MARK;
             }
             if (curr == '('){
                 return S_LBR;
@@ -132,13 +136,24 @@ T_State_t state(T_State_t act, int curr, DString_t *DString){
             }
             return LEX_ERR;
         case S_KEYWORD:
-            if (curr >= 'a' && curr <= 'z'){
+            if ((curr >= 'a' && curr <= 'z') || (curr >= 'A' && curr <= 'Z') || (curr == '_') || (curr >= '0' && curr <= '9')){
                 d_string_add_char(DString, curr);
                 return S_KEYWORD;
             }
             else{
                 ungetc(curr, stdin);
                 return S_KEYWORD_END;
+            }
+        case QUEST_MARK:
+            if (curr == '>'){
+                return S_PROL_END;
+            }
+            else if((curr >= 'a' && curr <= 'z') || (curr >= 'A' && curr <= 'Z') || (curr == '_')){
+                d_string_add_char(DString, curr);
+                return S_KEYWORD;
+            }
+            else{
+                return LEX_ERR; // ex: ?8 or ?= ...
             }
         case S_STRING:
             if (curr != '"'){
@@ -155,8 +170,8 @@ T_State_t state(T_State_t act, int curr, DString_t *DString){
 
 int scan(Token_t *token) {
     DString_t dString;
-    d_string_init(&dString); // TODO: uvolnit pamet!!!!!!
-    int curr;
+    d_string_init(&dString);
+    int curr, return_type = -1;
     // static char last;
     T_State_t act_state = S_START;
     static bool start_of_file = true;
@@ -170,11 +185,12 @@ int scan(Token_t *token) {
         start_of_file = false;
     }
 
-    while(true){
+    while(return_type == -1){
         curr = getchar();
         if (curr == EOF) {
             token->type = T_EOF;
-            return OK;
+            return_type = OK;
+            break;
         }
         if (curr == '\n'){ // a zaroven stav neni string
             line_num++;
@@ -183,22 +199,35 @@ int scan(Token_t *token) {
         if (is_white(curr)){ // skip white chars
             continue;
         }
+
+
+
         T_State_t next = state(act_state, curr, &dString);
         switch (next){
             // error case
             case S_ERR:
-                return LEX_ERR;
+                return_type = LEX_ERR;
+                break;
 
             // one char tokens
             case S_LBR:
                 token->type = T_LBR;
-                return OK;
+                return_type =  OK;
+                break;
             case S_RBR:
                 token->type = T_RBR;
-                return OK;
+                return_type = OK;
+                break;
             case S_SEM:
                 token->type = T_SEM;
-                return OK;
+                return_type = OK;
+                break;
+            
+            // longer tokens but of known length
+            case S_PROL_END:
+                token->type = T_END_PROLOG;
+                return_type = OK; // TODO: dodelat overovani ze za koncem prologu uz nic neni
+                break;
 
             // keywords
             case S_KEYWORD:
@@ -206,11 +235,14 @@ int scan(Token_t *token) {
                 break;
             case S_KEYWORD_END:
                 if (keyword_handler(&dString, token)){
-                    d_string_free_and_clear(&dString);
-                    return LEX_ERR; // zjistit jestli nevracet KEYWORD_ERR nebo tak neco
+                    return_type = LEX_ERR; // zjistit jestli nevracet KEYWORD_ERR nebo tak neco
+                    break;
                 }
-                d_string_free_and_clear(&dString);
-                return OK;
+                return_type = OK;
+                break;
+            case QUEST_MARK:
+                act_state = next;
+                break;
 
             // strings
             case S_STRING:
@@ -220,14 +252,17 @@ int scan(Token_t *token) {
             case S_STRING_END:
                 token->attribute.string = malloc(sizeof(char) * dString.length + 1);
                 strcpy(token->attribute.string, dString.str);
-                //TODO: free string
-                return OK;
+                return_type = OK;
+                break;
 
             // something really bad happened
             default:
                 printf("DEFAULT in next switch, shouldn't happen\n");
-                return LEX_ERR;
+                return_type = LEX_ERR;
+                break;
             
         }
     }
+    d_string_free_and_clear(&dString); // check with valgrind, ASAP, until the leaks becomes untrackable
+    return return_type;
 }

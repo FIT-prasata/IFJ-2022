@@ -26,6 +26,7 @@
 
 // Token types
 typedef enum T_type {
+    T_UNDEF,     // undefined type
     // OPERATORS, ordered from highest precedence to lowest
     T_LT,  // <
     T_GT,  // >
@@ -37,12 +38,15 @@ typedef enum T_type {
     // KEYWORDS
     K_ELSE,   // else
     K_FLOAT,  // float
+    K_FLOAT_NULL,
     K_FUNC,   // function
     K_IF,     // if
     K_INT,    // int
+    K_INT_NULL,
     K_NULL,   // null
     K_RET,    // return
     K_STR,    // string
+    K_STR_NULL,
     K_VOID,   // void
     K_WHILE,  // while
 
@@ -72,7 +76,6 @@ typedef enum T_type {
     T_FUNC_ID,   // function identifier
     T_EOF,       // end of file
     T_EOL,       // end of line
-    T_UNDEF,     // undefined type
     T_SEM,       // semicolon
     T_PROLOG1,   // prolog <?php
     T_PROLOG2,   // prolog declare(strict_types=1);
@@ -129,10 +132,11 @@ typedef enum T_State{
     S_START,
     S_ERR,
     S_KEYWORD,
-    S_KEYWORD_END
+    S_KEYWORD_END,
+    QUEST_MARK,
     // S_PROL_ST1,
     // S_PROL_ST2,
-    // S_PROL_END,
+    S_PROL_END,
     // S_PROL_SKIP
 
 } T_State_t;

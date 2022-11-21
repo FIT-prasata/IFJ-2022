@@ -20,7 +20,9 @@ int line_num = 1;
 
 int main(void) {
     //int ret_value;
-    char* tmp[] = {"T_LT",  // <
+    char* tmp[] = {
+    "T_UNDEF",     // undefined type
+    "T_LT",  // <
     "T_GT",  // >
     "T_LE",  // <=
     "T_GE",  // >=
@@ -30,12 +32,15 @@ int main(void) {
     // KEYWORDS
     "K_ELSE",   // else
     "K_FLOAT",  // float
+    "K_FLOAT_NULL",  // float with ?
     "K_FUNC",   // function
     "K_IF",     // if
     "K_INT",    // int
+    "K_INT_NULL",    // int with ?
     "K_NULL",   // null
     "K_RET",    // return
     "K_STR",    // string
+    "K_STR_NULL",    // string with ?
     "K_VOID",   // void
     "K_WHILE",  // while
 
@@ -65,7 +70,6 @@ int main(void) {
     "T_FUNC_ID",   // function identifier
     "T_EOF",       // end of file
     "T_EOL",       // end of line
-    "T_UNDEF",     // undefined type
     "T_SEM",       // semicolon
     "T_PROLOG1",   // prolog <?php
     "T_PROLOG2",   // prolog declare(strict_types=1);
@@ -77,6 +81,7 @@ int main(void) {
         return INTERNAL_ERR;
     }
     token->attribute.string = NULL;
+    token->type = T_UNDEF;
 
     while(token->type != T_EOF){
         scan(token);
@@ -93,6 +98,11 @@ int main(void) {
         //token = malloc(sizeof(Token_t));
         //token->attribute.string = NULL;
     }
+    if (token->attribute.string != NULL) {
+            free(token->attribute.string);
+            token->attribute.string = NULL;
+        }
+    free(token);
 
     return 0;
     }
