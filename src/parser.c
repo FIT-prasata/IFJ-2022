@@ -41,7 +41,7 @@ int parse(void) {
         free_token(token);
         return INTERNAL_ERR;
     }
-    scope_t scope_state = {false, false, false, false, false, 0, 0};
+    scope_t scope_state = {false, false, false, false, true, 0, 0};
     if ((status = d_string_init(&function_id)) != OK) {
         free_token(token);
         htab_free(global_table);
@@ -65,10 +65,20 @@ int parse(void) {
 
 int program_rule(Token_t *token, scope_t *scope_state, Htab_t *global_table) {
     int status = OK;
+
+    // set scope states
+    scope_state->in_global = true;
+
+    // get token
     if ((status = scan(token)) != OK) return status;
+
+    // handle
+    // <PROGRAM> -> <DEFFUNC>>
+    // <PROGRAM> -> <STAT>
+    // <PROGRAM> -> EOF
     switch (token->type) {
         case T_EOF:
-            return OK;
+            return OK;  // TODO: maybe we want to throw error in some cases
         case K_FUNC:
             if ((status = def_func_rule(token, scope_state, global_table)) !=
                 OK)
@@ -85,6 +95,8 @@ int program_rule(Token_t *token, scope_t *scope_state, Htab_t *global_table) {
         default:
             return SYNTAX_ERR;
     }
+    // handle
+    // ... -> ... <PROGRAM>
     return program_rule(token, scope_state, global_table);
 }
 
