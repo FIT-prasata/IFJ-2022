@@ -26,7 +26,6 @@ Token_t *init_token(void) {
 int free_token(Token_t *token) {
     int status = OK;
     if (token == NULL) return INTERNAL_ERR;
-    status |= d_string_free_and_clear(token->attribute.string);
     free(token->attribute.string);
     free(token);
     return status;
