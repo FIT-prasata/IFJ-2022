@@ -113,7 +113,7 @@ typedef enum T_State{
     S_NEG,     // !
 
     // COMMENT STATES
-    S_BC_START, // /*
+    S_BC, // /*
     S_POSS_BC_END,   // *
     S_BC_END, // */
     S_LC, // //
@@ -179,7 +179,7 @@ int num_handler(Token_t *token, char *curr);
 
 // Sets token value to string
 // @param token - token to be set
-int string_handler(Token_t *token);
+//int string_handler(Token_t *token);
 
 // TODO
 int id_handler(Token_t *token);

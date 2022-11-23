@@ -105,10 +105,147 @@ int keyword_handler(DString_t *dString, Token_t *token){
     }
     token->type = T_FUNC_ID;
     token->attribute.string = malloc(sizeof(char) * (dString->length + 1));
+    if (token->attribute.string == NULL) {
+        return INTERNAL_ERR;
+    }
     strcpy(token->attribute.string, dString->str);
     return OK;
 }
 
+
+int string_handler(DString_t *dString, Token_t *token){ // NEFUNGUJE, dodelat \x a \octal
+
+    // int curr;
+    // char last = '0';
+    // char oct_hex[4] = {0,};
+    // // oct_hex[3] = '\0';
+    // char *garbage_strtol;
+    // bool num_ok = true;
+    // int decimal = 0;
+    // DString_t dString_local;
+    // d_string_init(&dString_local);
+    // // set_type(token, T_STRING);
+
+    // for (unsigned int i = 0; i < dString->length; i++) {
+    //     curr = dString->str[i];
+    //     if (curr >= 0 && curr <= 31) {
+    //         return STR_ERR;
+    //     }
+    //     if (curr == '$'){
+    //         continue;
+    //     }
+    //     if (curr == '\\') {
+    //         curr = dString->str[++i];
+    //         switch (curr) {
+    //             case 'n':
+    //                 d_string_add_char(&dString_local, '\n');
+    //                 break;
+    //             case 't':
+    //                 d_string_add_char(&dString_local, '\t');
+    //                 break;
+    //             case '\"':
+    //                 d_string_add_char(&dString_local, curr);
+    //                 break;
+    //             case '\\':
+    //                 d_string_add_char(&dString_local, curr);
+    //                 break;
+    //             case '$':
+    //                 d_string_add_char(&dString_local, curr);
+    //                 break;
+    //             case 'x':
+    //                 for (int i = 0; i < 2; i++) {
+    //                     // get next number of octal (2. and 3.)
+    //                     oct_hex[i] = dString->str[++i];
+    //                     oct_hex[i + 1] = '\0';
+    //                     // very rare edge case ("...x\x6") - end of string in \ part
+    //                     if (oct_hex[i] == '"') { // TODO: vyresit trochu jinak
+    //                         num_ok = false;
+    //                         curr = '"';
+    //                     }
+    //                     // check if oct char are in valid range
+    //                     if ((oct_hex[i] < '0' || oct_hex[i] > '9') && (oct_hex[i] < 'A' || oct_hex[i] > 'F') && (oct_hex[i] < 'a' || oct_hex[i] > 'f')) {
+    //                         // if not, write into string '\' (by instructions)
+    //                         d_string_add_char(&dString_local, '\\');
+    //                         d_string_add_char(&dString_local, 'x');
+    //                         for (int j = 0; oct_hex[j] != '\0' && oct_hex[j] != '"'; j++) {
+    //                             // insert into string rest of loaded items
+    //                             d_string_add_char(&dString_local, oct_hex[j]);
+    //                         }
+    //                         num_ok = false;
+    //                         break;
+    //                     }
+    //                 }
+    //                 if (num_ok == true) {
+    //                     decimal = strtol(oct_hex, &garbage_strtol, 16);
+    //                     d_string_add_char(&dString_local, (char)decimal);
+    //                 }
+    //                 decimal = 0;
+    //                 num_ok = true;
+    //                 break;
+    //             case '0':
+    //             case '1':
+    //             case '2':
+    //             case '3':
+    //                 // get first number of octal (0-3)
+    //                 oct_hex[0] = curr;
+    //                 for (int i = 1; i < 3; i++) {
+    //                     // get next number of octal (2. and 3.)
+    //                     oct_hex[i] = getchar();
+    //                     oct_hex[i + 1] = '\0';
+    //                     // very rare edge case ("...x\06") - end of string in \ part
+    //                     if (oct_hex[i] == '"') {
+    //                         num_ok = false;
+    //                         curr = '"';
+    //                     }
+    //                     // check if oct chars are in valid range
+    //                     if (oct_hex[i] < '0' || oct_hex[i] > '7') {
+    //                         // if not, write into string '\' (by instructions)
+    //                         d_string_add_char(&dString_local, '\\');
+    //                         for (int j = 0; oct_hex[j] != '\0' && oct_hex[j] != '"'; j++) {
+    //                             // insert into string rest of loaded items
+    //                             d_string_add_char(&dString_local, oct_hex[j]);
+    //                         }
+    //                         num_ok = false;
+    //                         break;
+    //                     }
+    //                 }
+    //                 if (num_ok == true) {
+    //                     decimal = strtol(oct_hex, &garbage_strtol, 8);
+    //                     d_string_add_char(&dString_local, (char)decimal);
+    //                 }
+    //                 decimal = 0;
+    //                 num_ok = true;
+    //                 break;
+    //             default:
+    //                 d_string_add_char(&dString_local, '\\'); // adds '\' to string
+    //                 d_string_add_char(&dString_local, curr); // adds char after '\' to string
+    //         }
+    //     } else {
+    //         d_string_add_char(&dString_local, curr);
+    //     }
+    //     last = curr;
+    // }
+
+
+
+    // token->attribute.string = malloc(sizeof(char) * (dString_local.length + 1));
+    // if (token->attribute.string == NULL) {
+    //     return INTERNAL_ERR;
+    // }
+    // strcpy(token->attribute.string, dString_local.str);
+    // d_string_free_and_clear(&dString_local);
+    // token->type = T_STRING;
+
+    token->attribute.string = malloc(sizeof(char) * (dString->length + 1));
+    if (token->attribute.string == NULL) {
+        return INTERNAL_ERR;
+    }
+    strcpy(token->attribute.string, dString->str);
+    token->type = T_STRING;
+
+
+    return OK;
+}
 
 
 T_State_t state(T_State_t act, int curr, DString_t *DString){
@@ -133,6 +270,18 @@ T_State_t state(T_State_t act, int curr, DString_t *DString){
             }
             if (curr == ';'){
                 return S_SEM;
+            }
+            if (curr == '/'){
+                return S_DIV;
+            }
+            return LEX_ERR;
+        
+        case S_DIV:
+            if (curr == '/'){
+                return S_LC;
+            }
+            else if (curr == '*'){
+                return S_BC;
             }
             return LEX_ERR;
         case S_KEYWORD:
@@ -163,6 +312,17 @@ T_State_t state(T_State_t act, int curr, DString_t *DString){
             else{
                 return S_STRING_END;
             }
+        //comments
+        case S_LC:
+            if (curr != '\n'){
+                return S_LC;
+            }
+            return S_START;
+        case S_BC:
+            if (curr == '*'){
+                return S_POSS_BC_END;
+            }
+            return S_BC;
         default: // should never happen, maybe raise error or something? TODO, temporary solution just to get rid of warnings
             return S_START;
     }
@@ -192,11 +352,14 @@ int scan(Token_t *token) {
             return_type = OK;
             break;
         }
-        if (curr == '\n'){ // a zaroven stav neni string
+        if (curr == '\n'){ // a zaroven stav neni string, TODO: spravit keywordy kdyz jsou na dalsim radku bez ; (return LEX_ERR)
             line_num++;
-            continue;
+            if (act_state != S_LC){
+                continue;
+            }
+            //continue;
         }
-        if (is_white(curr)){ // skip white chars
+        if (is_white(curr) && (act_state != S_STRING)){ // skip white chars, except in string
             continue;
         }
 
@@ -207,6 +370,10 @@ int scan(Token_t *token) {
             // error case
             case S_ERR:
                 return_type = LEX_ERR;
+                break;
+
+            case S_START:
+                act_state = S_START;
                 break;
 
             // one char tokens
@@ -222,6 +389,23 @@ int scan(Token_t *token) {
                 token->type = T_SEM;
                 return_type = OK;
                 break;
+
+            // expressions
+            case S_DIV:
+                curr = getchar();
+                if (curr == '/'){
+                    ungetc(curr, stdin);
+                    act_state = S_LC;
+                    break;
+                }
+                else if (curr == '*'){
+                    ungetc(curr, stdin);
+                    act_state = S_BC;
+                    break;
+                }
+                token->type = T_DIV;
+                return_type = OK;
+                break;
             
             // longer tokens but of known length
             case S_PROL_END:
@@ -235,7 +419,7 @@ int scan(Token_t *token) {
                 break;
             case S_KEYWORD_END:
                 if (keyword_handler(&dString, token)){
-                    return_type = LEX_ERR; // zjistit jestli nevracet KEYWORD_ERR nebo tak neco
+                    return_type = INTERNAL_ERR; // zjistit jestli nevracet KEYWORD_ERR nebo tak neco
                     break;
                 }
                 return_type = OK;
@@ -250,11 +434,34 @@ int scan(Token_t *token) {
                 token->type = T_STRING;
                 break;
             case S_STRING_END:
-                token->attribute.string = malloc(sizeof(char) * dString.length + 1);
-                strcpy(token->attribute.string, dString.str);
+                if (string_handler(&dString, token) == INTERNAL_ERR){
+                    return_type = INTERNAL_ERR;
+                    break;
+                }
+                else if (string_handler(&dString, token) == LEX_ERR){
+                    return_type = LEX_ERR;
+                    break;
+                }
                 return_type = OK;
                 break;
-
+            // comments
+            case S_LC:
+                act_state = next;
+                break;
+            case S_BC:
+                act_state = next;
+                break;
+            case S_POSS_BC_END:
+                curr = getchar();
+                if (curr == '/'){
+                    act_state = S_START;
+                    break;
+                }
+                else{
+                    //ungetc(curr, stdin);
+                    act_state = S_BC;
+                    break;
+                }
             // something really bad happened
             default:
                 printf("DEFAULT in next switch, shouldn't happen\n");
@@ -263,6 +470,6 @@ int scan(Token_t *token) {
             
         }
     }
-    d_string_free_and_clear(&dString); // check with valgrind, ASAP, until the leaks becomes untrackable
+    d_string_free_and_clear(&dString);
     return return_type;
 }
