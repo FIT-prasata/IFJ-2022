@@ -19,15 +19,7 @@ Token_t *init_token(void) {
     Token_t *token = (Token_t *)malloc(sizeof(Token_t));
     if (token == NULL) return NULL;
     token->type = NO_TYPE;
-    if ((token->attribute.string = (char *)malloc(sizeof(char))) == NULL) {
-        free(token);
-        return NULL;
-    }
-    if (d_string_init(token->attribute.string) != OK) {
-        free(token->attribute.string);
-        free(token);
-        return NULL;
-    }
+    token->attribute.string = NULL;
     return token;
 }
 
