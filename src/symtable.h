@@ -34,7 +34,7 @@ typedef struct Function {
     int argc;                // Number of arguments
     Var_type_t *argv;        // Array of argument types
     Var_type_t return_type;  // Return type
-    bool defined;  // true if function is defined, false if only declared
+    bool defined;  // true if function is defined, false if only called
 } Func_t;
 
 // Symbol types

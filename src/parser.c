@@ -102,28 +102,72 @@ int program_rule(Token_t *token, scope_t *scope_state, Htab_t *global_table) {
 
 int def_func_rule(Token_t *token, scope_t *scope_state, Htab_t *global_table) {
     int status = OK;
+    // no states to set yet
+
+    // handle <DEFFUNC> -> K_FUNC
     if (token->type != K_FUNC) return SYNTAX_ERR;
     if ((status = scan(token)) != OK) return status;
+
+    // handle ... -> ... T__FUNC_ID
     if (token->type != T_FUNC_ID) return SYNTAX_ERR;
-    Htab_item_t *func = htab_lookup_add(global_table, token);
+
+    // get/set function id
+    Htab_item_t *func_ptr = htab_lookup_add(global_table, token);
+    if (func_ptr == NULL) return INTERNAL_ERR;
+
+    // check if function wasn't already defined
+    if (func_ptr->data.type.func.defined == true) return UNDEF_FUNC_ERR;
+
+    // store key of function in global variable
+    if ((status =
+             d_string_replace_str(&function_id, token->attribute.string)) != OK)
+        return status;
+
+    // get new token
     if ((status = scan(token)) != OK) return status;
+
+    // handle ... -> ... T_LBR
     if (token->type != T_LBR) return SYNTAX_ERR;
+
+    // get new token
     if ((status = scan(token)) != OK) return status;
-    if ((status = arg_rule(token, func, global_table)) != OK) return status;
+
+    // handle ... -> ... <ARG>
+    if ((status = arg_rule(token, global_table)) != OK) return status;
+
+    // get new token
     if ((status = scan(token)) != OK) return status;
+
+    // handle ... -> ... T_COL
     if (token->type != T_COL) return SYNTAX_ERR;
+
+    // get new token
     if ((status = scan(token)) != OK) return status;
+
+    // handle ... -> ... <TYPE>
     if ((status = type_rule(token, global_table)) != OK) return status;
+
+    // get new token
     if ((status = scan(token)) != OK) return status;
+
+    // handle ... -> ... T_LCBR
     if (token->type != T_LCBR) return SYNTAX_ERR;
+
+    // set scope to function
+    scope_state->in_func = true;
+
+    // get new token
     if ((status = scan(token)) != OK) return status;
+
+    // handle ... -> ... <STAT>
     if ((status = stat_rule(token, scope_state, global_table)) != OK)
         return status;
     return OK;
 }
 
-int arg_rule(Token_t *token, Htab_item_t *func, Htab_t *global_table) {
+int arg_rule(Token_t *token, Htab_t *global_table) {
     int status = OK;
+
 
     return OK;
 }
