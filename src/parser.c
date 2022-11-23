@@ -33,6 +33,7 @@ int free_token(Token_t *token) {
 
 int parse(void) {
     int status = OK;
+    // Initializing necessary variables and structures
     Token_t *token = init_token();
     if (token == NULL) return INTERNAL_ERR;
     Htab_t *global_table = htab_init(50);
@@ -40,11 +41,25 @@ int parse(void) {
         free_token(token);
         return INTERNAL_ERR;
     }
-
     scope_t scope_state = {false, false, false, false, false, 0, 0};
-    status |= program_rule(token, &scope_state, global_table);
+    if ((status = d_string_init(&function_id)) != OK) {
+        free_token(token);
+        htab_free(global_table);
+        return status;
+    }
+
+    // Start recursive descent
+    if ((status = program_rule(token, &scope_state, global_table)) != OK) {
+        free_token(token);
+        htab_free(global_table);
+        d_string_free_and_clear(&function_id);
+        return status;
+    }
+
+    // Freeing memory after parsing
     free_token(token);
     htab_free(global_table);
+    d_string_free_and_clear(&function_id);
     return status;
 }
 
