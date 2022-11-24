@@ -1,0 +1,8 @@
+//
+// Created by adamm on 24.11.2022.
+//
+
+#ifndef PROJEKT_CODE_GENERATOR_H
+#define PROJEKT_CODE_GENERATOR_H
+
+#endif //PROJEKT_CODE_GENERATOR_H
