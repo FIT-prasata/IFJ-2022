@@ -1,5 +1,12 @@
+// Filename: code_generator.c
+// IFJ 2022/2023 project
+// TRP variant
 //
-// Created by adamm on 24.11.2022.
+// Scanner for lexical analysis
 //
+// Author: <xsklen14> - David Sklenář
+// Author: <xproch0o> - Marek Procházka
+// Author: <xzavad20> - Lukáš Zavadil
+// Author: <xsvetl07> - Adam Světlík
 
 #include "code_generator.h"
