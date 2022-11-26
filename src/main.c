@@ -106,3 +106,34 @@ int main(void) {
 
     return 0;
     }
+
+
+                    // for (int i = 0; i < 2; i++) {
+                    //     // get next number of octal (2. and 3.)
+                    //     oct_hex-.[i] = getchar();
+                    //     oct_hex[i + 1] = '\0';
+                    //     // very rare edge case ("...x\x6") - end of string in \ part
+                    //     if (oct_hex[i] == '"') {
+                    //         num_ok = false;
+                    //         curr = '"';
+                    //     }
+                    //     // check if oct char are in valid range
+                    //     if ((oct_hex[i] < '0' || oct_hex[i] > '9') && (oct_hex[i] < 'A' || oct_hex[i] > 'F') && (oct_hex[i] < 'a' || oct_hex[i] > 'f')) {
+                    //         // if not, write into string '\' (by instructions)
+                    //         d_string_add_char(&dString, '\\');
+                    //         d_string_add_char(&dString, 'x');
+                    //         for (int j = 0; oct_hex[j] != '\0' && oct_hex[j] != '"'; j++) {
+                    //             // insert into string rest of loaded items
+                    //             d_string_add_char(&dString, oct_hex[j]);
+                    //         }
+                    //         num_ok = false;
+                    //         break;
+                    //     }
+                    // }
+                    // if (num_ok == true) {
+                    //     decimal = strtol(oct_hex, &garbage_strtol, 16);
+                    //     d_string_add_char(&dString, (char)decimal);
+                    // }
+                    // decimal = 0;
+                    // num_ok = true;
+                    // break;
