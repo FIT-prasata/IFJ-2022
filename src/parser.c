@@ -188,3 +188,28 @@ int arg_rule(Token_t *token, Htab_t *global_table) {
 
     return status;
 }
+
+int arg_list_rule(Token_t *current_token, Htab_t *global_table) {
+    int status = OK;
+
+    // handle <ARGLIST> -> T_RBR (end of arguments)
+    if (current_token->type == T_RBR) return OK;
+
+    // handle ... -> T_COMMA
+    if (current_token->type != T_COMMA) return SYNTAX_ERR;
+
+    // get new token
+    if ((status = scan(current_token)) != OK) return status;
+
+    // handle ... -> ... <PARAM>
+    if ((status = param_rule(current_token, global_table)) != OK) return status;
+
+    // get new token
+    if ((status = scan(current_token)) != OK) return status;
+
+    // handle ... -> ... <ARGLIST>
+    if ((status = arg_list_rule(current_token, global_table)) != OK)
+        return status;
+
+    return status;
+}

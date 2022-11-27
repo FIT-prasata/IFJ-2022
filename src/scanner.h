@@ -52,6 +52,7 @@ typedef enum T_type {
     T_SEMCOL,  // ;
     T_COL,     // :
     T_CONCAT,  // .
+    T_COMMA,   // ,
 
     // EXPRESSIONS
     T_MUL,     // *
