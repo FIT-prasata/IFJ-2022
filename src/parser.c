@@ -168,6 +168,23 @@ int def_func_rule(Token_t *token, scope_t *scope_state, Htab_t *global_table) {
 int arg_rule(Token_t *token, Htab_t *global_table) {
     int status = OK;
 
+    // handle <ARG> -> T_RBR (end of arguments)
+    if (token->type == T_RBR) return OK;
 
-    return OK;
+    // handle ... -> <TYPE>
+    if ((status = type_rule(token, global_table)) != OK) return status;
+
+    // get new token
+    if ((status = scan(token)) != OK) return status;
+
+    // handle ... -> ... <PARAM>
+    if ((status = param_rule(token, global_table)) != OK) return status;
+
+    // get new token
+    if ((status = scan(token)) != OK) return status;
+
+    // handle ... -> ... <ARGLIST>
+    if ((status = arg_list_rule(token, global_table)) != OK) return status;
+
+    return status;
 }
