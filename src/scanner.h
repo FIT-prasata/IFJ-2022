@@ -57,6 +57,7 @@ typedef enum T_type {
     T_RBR,     // )
     T_COL,     // :
     T_CONCAT,  // .
+    T_COMMA,   // ,
 
     // EXPRESSIONS
     T_MUL,     // *
@@ -103,6 +104,7 @@ typedef enum T_State{
     S_SEM,  // ;
     S_COL,     // :
     S_CONCAT,  // .
+    S_COMMA,  // ,
 
     // EXPRESSION STATES
     S_MUL,     // *
@@ -129,8 +131,8 @@ typedef enum T_State{
 
     // OTHER STATES
     S_SPACE,
-    S_ID1,
-    S_ID2,
+    S_ID,
+    S_ID_END,
     S_EOF,
     S_START,
     S_ERR,
@@ -191,7 +193,7 @@ int num_handler(Token_t *token, char *curr);
 //int string_handler(Token_t *token);
 
 // TODO
-int id_handler(Token_t *token);
+//int id_handler(Token_t *token);
 
 // TODO
 int scan(Token_t *token);

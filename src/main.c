@@ -21,7 +21,8 @@ int line_num = 1;
 int main(void) {
     int ret_value;
     char* tmp[] = {
-    "T_UNDEF",     // undefined type
+    T_UNDEF,     // undefined type
+    // OPERATORS, ordered from highest precedence to lowest
     "T_LT",  // <
     "T_GT",  // >
     "T_LE",  // <=
@@ -32,15 +33,15 @@ int main(void) {
     // KEYWORDS
     "K_ELSE",   // else
     "K_FLOAT",  // float
-    "K_FLOAT_NULL",  // float with ?
+    "K_FLOAT_NULL",
     "K_FUNC",   // function
     "K_IF",     // if
     "K_INT",    // int
-    "K_INT_NULL",    // int with ?
+    "K_INT_NULL",
     "K_NULL",   // null
     "K_RET",    // return
     "K_STR",    // string
-    "K_STR_NULL",    // string with ?
+    "K_STR_NULL",
     "K_VOID",   // void
     "K_WHILE",  // while
 
@@ -51,6 +52,7 @@ int main(void) {
     "T_RBR",     // )
     "T_COL",     // :
     "T_CONCAT",  // .
+    "T_COMMA",   // ,
 
     // EXPRESSIONS
     "T_MUL",     // *
@@ -73,7 +75,7 @@ int main(void) {
     "T_SEM",       // semicolon
     "T_PROLOG1",   // prolog <?php
     "T_PROLOG2",   // prolog declare(strict_types=1);
-    "T_END_PROLOG"
+    "T_END_PROLOG" // end of prolog
     };
 
     Token_t *token = malloc(sizeof(Token_t));

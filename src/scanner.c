@@ -229,17 +229,33 @@ int string_handler(DString_t *dString, Token_t *token){ // NEFUNGUJE, dodelat \x
 }
 
 
+int id_handler(DString_t *dString, Token_t *token) {
+    token->attribute.string = malloc(sizeof(char) * (dString->length + 1));
+    if (token->attribute.string == NULL) {
+        return INTERNAL_ERR;
+    }
+    strcpy(token->attribute.string, dString->str);
+    token->type = T_ID;
+    return OK;
+}
+
+
 int int_handler(DString_t *dString, Token_t *token){
     char *garbage_strtol;
     int decimal = (int) strtol(dString->str, &garbage_strtol, 10);
+    token->attribute.string = malloc(sizeof(char) * (dString->length + 1));
+    if (token->attribute.string == NULL) {
+        return INTERNAL_ERR;
+    }
+    strcpy(token->attribute.string, dString->str);
     token->attribute.value = decimal;
     token->type = T_INT;
     return OK;
 }
 
 
-int float_handler(DString_t *dString, Token_t *token){
-    printf("%s\n", dString->str);
+int float_handler(DString_t *dString, Token_t *token){ // TODO: vracet float i do stringu
+    //printf("%s\n", dString->str);
     char *garbage_strtol;
     double decimal = strtod(dString->str, &garbage_strtol);
     token->attribute.dec_value = decimal;
@@ -263,6 +279,15 @@ T_State_t state(T_State_t act, int curr, DString_t *DString){
                 d_string_add_char(DString, curr);
                 return QUEST_MARK;
             }
+            if (curr == '$'){
+                d_string_add_char(DString, curr);
+                curr = getchar();
+                if (curr >= '0' && curr <= '9'){
+                    return S_ERR;
+                }
+                ungetc(curr, stdin);
+                return S_ID;
+            }
             if (curr == '('){
                 return S_LBR;
             }
@@ -284,6 +309,24 @@ T_State_t state(T_State_t act, int curr, DString_t *DString){
             if (curr == '-'){
                 return S_SUB;
             }
+            if (curr == '*'){
+                return S_MUL;
+            }
+            if (curr == ','){
+                return S_COMMA;
+            }
+            if (curr == '{'){
+                return S_LCBR;
+            }
+            if (curr == '}'){
+                return S_RCBR;
+            }
+            if (curr == ':'){
+                return S_COL;
+            }
+            if (curr == '.'){
+                return S_CONCAT;
+            }
             return S_ERR;
         
         case S_DIV:
@@ -293,7 +336,7 @@ T_State_t state(T_State_t act, int curr, DString_t *DString){
             else if (curr == '*'){
                 return S_BC;
             }
-            return LEX_ERR;
+            return S_ERR;
         //keywords and epilog
         case S_KEYWORD:
             if ((curr >= 'a' && curr <= 'z') || (curr >= 'A' && curr <= 'Z') || (curr == '_') || (curr >= '0' && curr <= '9')){
@@ -331,6 +374,16 @@ T_State_t state(T_State_t act, int curr, DString_t *DString){
         case S_STRING_ESC:
             d_string_add_char(DString, curr);
             return S_STRING;
+        // identificators
+        case S_ID:
+            if ((curr >= 'a' && curr <= 'z') || (curr >= 'A' && curr <= 'Z') || (curr == '_') || (curr >= '0' && curr <= '9')){
+                d_string_add_char(DString, curr);
+                return S_ID;
+            }
+            else{
+                ungetc(curr, stdin);
+                return S_ID_END;
+            }
         // numbers
         case S_INT:
             if (curr >= '0' && curr <= '9'){
@@ -340,7 +393,7 @@ T_State_t state(T_State_t act, int curr, DString_t *DString){
             else if (curr == '.' || curr == 'e' || curr == 'E'){
                 d_string_add_char(DString, curr);
                 curr = getchar();
-                printf("now_int %c\n", curr);
+                //printf("now_int %c\n", curr);
                 if (curr == '+' || curr == '-'){
                     d_string_add_char(DString, curr);
                     curr = getchar();
@@ -372,7 +425,7 @@ T_State_t state(T_State_t act, int curr, DString_t *DString){
             else if (curr == 'e' || curr == 'E'){
                 d_string_add_char(DString, curr);
                 curr = getchar();
-                printf("now %c\n", curr);
+                //printf("now %c\n", curr);
                 if (curr == '+' || curr == '-'){
                     d_string_add_char(DString, curr);
                     curr = getchar();
@@ -453,12 +506,17 @@ int scan(Token_t *token) {
                 ungetc(curr, stdin);
                 break;
             }
+            if (act_state == S_ID){
+                return_type = id_handler(&dString, token);
+                ungetc(curr, stdin);
+                break;
+            }
             line_num++;
             if (act_state != S_LC){ // TODO: mozna vracet LEX_ERR kdyz stav neni && S_START nebo ty co listuju nahore
                 continue;
             }
         }
-        if (is_white(curr) && act_state != S_STRING && act_state != S_STRING_ESC && act_state != S_KEYWORD && act_state != S_INT && act_state != S_FLOAT){ // skip white chars, except in string or keyword
+        if (is_white(curr) && act_state != S_STRING && act_state != S_STRING_ESC && act_state != S_KEYWORD && act_state != S_INT && act_state != S_FLOAT && act_state != S_ID){ // skip white chars, except in string or keyword
             continue;
         }
 
@@ -496,6 +554,30 @@ int scan(Token_t *token) {
                 token->type = T_SUB;
                 return_type = OK;
                 break;
+            case S_MUL:
+                token->type = T_MUL;
+                return_type = OK;
+                break;
+            case S_COMMA:
+                token->type = T_COMMA;
+                return_type = OK;
+                break;
+            case S_LCBR:
+                token->type = T_LCBR;
+                return_type = OK;
+                break;
+            case S_RCBR:
+                token->type = T_RCBR;
+                return_type = OK;
+                break;
+            case S_COL:
+                token->type = T_COL;
+                return_type = OK;
+                break;
+            case S_CONCAT:
+                token->type = T_CONCAT;
+                return_type = OK;
+                break;
 
             // expressions
             case S_DIV:
@@ -510,6 +592,7 @@ int scan(Token_t *token) {
                     act_state = S_BC;
                     break;
                 }
+                ungetc(curr, stdin);
                 token->type = T_DIV;
                 return_type = OK;
                 break;
@@ -533,6 +616,14 @@ int scan(Token_t *token) {
                 break;
             case QUEST_MARK:
                 act_state = next;
+                break;
+
+            // identificators
+            case S_ID:
+                act_state = next;
+                break;
+            case S_ID_END:
+                return_type = id_handler(&dString, token);
                 break;
 
             // strings
