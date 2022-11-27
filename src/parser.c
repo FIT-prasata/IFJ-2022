@@ -220,3 +220,17 @@ int param_rule(Token_t *token, Htab_t *global_table) {
 
     return status;
 }
+
+int type_rule(Token_t *token, Htab_t *global_table) {
+    int status = OK;
+
+    switch (token->type) {
+        case T_STRING:
+        case T_INT:
+        case T_FLOAT:
+        case K_NULL: // TODO: you sure there is type null?
+            return OK;
+        default:
+            return SYNTAX_ERR;
+    }
+}
