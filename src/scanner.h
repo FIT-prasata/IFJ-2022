@@ -120,6 +120,7 @@ typedef enum T_State{
 
     // CONSTANT STATES
     S_INT, // integer constant
+    S_INT_END,
     S_FLOAT, // float constant
     S_STRING, // string constant
     S_STRING_END,
@@ -142,8 +143,14 @@ typedef enum T_State{
 
 } T_State_t;
 
-// Token attribute
-typedef union {
+// Token attribute - commented for testing purposes!!!
+// typedef union {
+//     char *string;
+//     int value;
+//     double dec_value;
+// } T_attr_t;
+
+typedef struct { // only for testing purposes!!! change afterwards
     char *string;
     int value;
     double dec_value;

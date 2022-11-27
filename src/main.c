@@ -81,6 +81,8 @@ int main(void) {
         return INTERNAL_ERR;
     }
     token->attribute.string = NULL;
+    token->attribute.value = -1;
+    token->attribute.dec_value = -1;
     token->type = T_UNDEF;
 
     while(token->type != T_EOF){
@@ -92,6 +94,14 @@ int main(void) {
             printf("Attribute: %s", token->attribute.string);
             free(token->attribute.string);
             token->attribute.string = NULL;
+        }
+        if (token->attribute.value != -1) {
+            printf("Attribute: %d", token->attribute.value);
+            token->attribute.value = -1;
+        }
+        if (token->attribute.dec_value != -1) {
+            printf("Attribute: %f", token->attribute.dec_value);
+            token->attribute.dec_value = -1;
         }
         printf("\n");
         //free(token);

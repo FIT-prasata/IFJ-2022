@@ -116,15 +116,11 @@ int keyword_handler(DString_t *dString, Token_t *token){
 int string_handler(DString_t *dString, Token_t *token){ // NEFUNGUJE, dodelat \x a \octal
 
     int curr;
-    // char last = '0';
     char oct_hex[4] = {0,};
-    // oct_hex[3] = '\0';
     char *garbage_strtol;
     bool num_ok = true;
-    // int decimal = 0;
     DString_t dString_local;
     d_string_init(&dString_local);
-    // set_type(token, T_STRING);
 
     for (unsigned int i = 0; i < dString->length; i++) {
         curr = dString->str[i];
@@ -218,7 +214,6 @@ int string_handler(DString_t *dString, Token_t *token){ // NEFUNGUJE, dodelat \x
         } else {
             d_string_add_char(&dString_local, curr);
         }
-        // last = curr;
     }
 
 
@@ -230,15 +225,15 @@ int string_handler(DString_t *dString, Token_t *token){ // NEFUNGUJE, dodelat \x
     strcpy(token->attribute.string, dString_local.str);
     d_string_free_and_clear(&dString_local);
     token->type = T_STRING;
-
-    // token->attribute.string = malloc(sizeof(char) * (dString->length + 1));
-    // if (token->attribute.string == NULL) {
-    //     return INTERNAL_ERR;
-    // }
-    // strcpy(token->attribute.string, dString->str);
-    // token->type = T_STRING;
+    return OK;
+}
 
 
+int int_handler(DString_t *dString, Token_t *token){
+    char *garbage_strtol;
+    int decimal = (int) strtol(dString->str, &garbage_strtol, 10);
+    token->attribute.value = decimal;
+    token->type = T_INT;
     return OK;
 }
 
@@ -249,6 +244,10 @@ T_State_t state(T_State_t act, int curr, DString_t *DString){
             if ((curr >= 'a' && curr <= 'z') || (curr >= 'A' && curr <= 'Z') || (curr == '_')){
                 d_string_add_char(DString, curr);
                 return S_KEYWORD; // muze byt i nazev funkce :)
+            }
+            if (curr >= '0' && curr <= '9'){
+                d_string_add_char(DString, curr);
+                return S_INT;
             }
             if (curr == '?'){
                 d_string_add_char(DString, curr);
@@ -279,6 +278,7 @@ T_State_t state(T_State_t act, int curr, DString_t *DString){
                 return S_BC;
             }
             return LEX_ERR;
+        //keywords and epilog
         case S_KEYWORD:
             if ((curr >= 'a' && curr <= 'z') || (curr >= 'A' && curr <= 'Z') || (curr == '_') || (curr >= '0' && curr <= '9')){
                 d_string_add_char(DString, curr);
@@ -315,6 +315,20 @@ T_State_t state(T_State_t act, int curr, DString_t *DString){
         case S_STRING_ESC:
             d_string_add_char(DString, curr);
             return S_STRING;
+        // numbers
+        case S_INT:
+            if (curr >= '0' && curr <= '9'){
+                d_string_add_char(DString, curr);
+                return S_INT;
+            }
+            else if (curr == '.'){
+                d_string_add_char(DString, curr);
+                return S_FLOAT;
+            }
+            else{
+                ungetc(curr, stdin);
+                return S_INT_END;
+            }
         // comments
         case S_LC:
             if (curr != '\n'){
@@ -355,19 +369,29 @@ int scan(Token_t *token) {
             return_type = OK;
             break;
         }
-        if (curr == '\n'){ // a zaroven stav neni string, TODO: spravit keywordy kdyz jsou na dalsim radku bez ; (return LEX_ERR)
+        if (curr == '\n'){ // a zaroven stav neni string
+            
+            if (act_state == S_KEYWORD){
+                return_type = keyword_handler(&dString, token);
+                ungetc(curr, stdin);
+                break;
+            }
+            if (act_state == S_INT){
+                return_type = int_handler(&dString, token);
+                ungetc(curr, stdin);
+                break;
+            }
             line_num++;
             if (act_state != S_LC){
                 continue;
             }
-            //continue;
         }
         if (is_white(curr) && act_state != S_STRING && act_state != S_STRING_ESC){ // skip white chars, except in string
             continue;
         }
 
 
-
+        //printf("curr: %c, state: %d\n", curr, act_state);
         T_State_t next = state(act_state, curr, &dString);
         switch (next){
             // error case
@@ -449,6 +473,15 @@ int scan(Token_t *token) {
             case S_STRING_ESC:
                 act_state = next;
                 break;
+
+            // numbers - int
+            case S_INT:
+                act_state = next;
+                break;
+            case S_INT_END:
+                return_type = int_handler(&dString, token);
+                break;
+
             // comments
             case S_LC:
                 act_state = next;
@@ -463,13 +496,12 @@ int scan(Token_t *token) {
                     break;
                 }
                 else{
-                    //ungetc(curr, stdin);
                     act_state = S_BC;
                     break;
                 }
             // something really bad happened
             default:
-                printf("DEFAULT in next switch, shouldn't happen\n");
+                printf("DEFAULT in next switch (scan func), shouldn't happen\n");
                 return_type = LEX_ERR;
                 break;
             
