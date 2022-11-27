@@ -19,7 +19,7 @@ int line_num = 1;
 
 
 int main(void) {
-    //int ret_value;
+    int ret_value;
     char* tmp[] = {
     "T_UNDEF",     // undefined type
     "T_LT",  // <
@@ -86,7 +86,7 @@ int main(void) {
     token->type = T_UNDEF;
 
     while(token->type != T_EOF){
-        scan(token);
+        ret_value = scan(token);
         printf("L: %d -- ", line_num);
         printf("Type: %s -- ", tmp[token->type]);
         //printf("Type: %d -- ", token->type);
@@ -104,6 +104,9 @@ int main(void) {
             token->attribute.dec_value = -1;
         }
         printf("\n");
+        if (ret_value != 0) {
+            printf("ERROR, ret_value: %d\n", ret_value);
+        }
         //free(token);
         //token = malloc(sizeof(Token_t));
         //token->attribute.string = NULL;

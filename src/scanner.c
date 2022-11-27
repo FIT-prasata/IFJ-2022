@@ -19,38 +19,38 @@ int is_white(int input)
     return (input == ' ' || input == '\t' || (input >= 11 && input <= 13));
 }
 
-// line comment
-char skip_lc() {
-    int curr;
-    while (true) {
-        curr = getchar();
-        if (curr == EOF) {
-            return LC_EOF_ERR;
-        }
-        if (curr == '\n') {
-            return OK;
-        }
-    }
-}
+// // line comment - probably useless, I'll see
+// char skip_lc() {
+//     int curr;
+//     while (true) {
+//         curr = getchar();
+//         if (curr == EOF) {
+//             return LC_EOF_ERR;
+//         }
+//         if (curr == '\n') {
+//             return OK;
+//         }
+//     }
+// }
 
-// block comment
-int skip_bc(int *line_num) {
-    char prev;
-    int curr;
-    while (true) {
-        curr = getchar();
-        if (curr == EOF) {
-            return BC_EOF_ERR;
-        }
-        if (prev == '*' && curr == '/') {
-            return OK;
-        }
-        if (curr == '\n') {
-            line_num++;
-        }
-        prev = curr;
-    }
-}
+// // block comment
+// int skip_bc(int *line_num) {
+//     char prev;
+//     int curr;
+//     while (true) {
+//         curr = getchar();
+//         if (curr == EOF) {
+//             return BC_EOF_ERR;
+//         }
+//         if (prev == '*' && curr == '/') {
+//             return OK;
+//         }
+//         if (curr == '\n') {
+//             line_num++;
+//         }
+//         prev = curr;
+//     }
+// }
 
 int prolog_handler(){
     char prolog_start[25] = {'\0',};
@@ -238,6 +238,16 @@ int int_handler(DString_t *dString, Token_t *token){
 }
 
 
+int float_handler(DString_t *dString, Token_t *token){
+    printf("%s\n", dString->str);
+    char *garbage_strtol;
+    double decimal = strtod(dString->str, &garbage_strtol);
+    token->attribute.dec_value = decimal;
+    token->type = T_FLOAT;
+    return OK;
+}
+
+
 T_State_t state(T_State_t act, int curr, DString_t *DString){
     switch(act){
         case S_START:
@@ -268,7 +278,13 @@ T_State_t state(T_State_t act, int curr, DString_t *DString){
             if (curr == '/'){
                 return S_DIV;
             }
-            return LEX_ERR;
+            if (curr == '+'){
+                return S_ADD;
+            }
+            if (curr == '-'){
+                return S_SUB;
+            }
+            return S_ERR;
         
         case S_DIV:
             if (curr == '/'){
@@ -297,7 +313,7 @@ T_State_t state(T_State_t act, int curr, DString_t *DString){
                 return S_KEYWORD;
             }
             else{
-                return LEX_ERR; // ex: ?8 or ?= ...
+                return S_ERR; // ex: ?8 or ?= ...
             }
         // strings
         case S_STRING:
@@ -321,13 +337,64 @@ T_State_t state(T_State_t act, int curr, DString_t *DString){
                 d_string_add_char(DString, curr);
                 return S_INT;
             }
-            else if (curr == '.'){
+            else if (curr == '.' || curr == 'e' || curr == 'E'){
                 d_string_add_char(DString, curr);
+                curr = getchar();
+                printf("now_int %c\n", curr);
+                if (curr == '+' || curr == '-'){
+                    d_string_add_char(DString, curr);
+                    curr = getchar();
+                    if (curr >= '0' && curr <= '9'){
+                        ungetc(curr, stdin);
+                        return S_FLOAT;
+                    }
+                    else{
+                        return S_ERR;
+                    }
+                }
+                else if (curr >= '0' && curr <= '9'){
+                    ungetc(curr, stdin);
+                }
+                else{
+                    return S_ERR;
+                }
                 return S_FLOAT;
             }
             else{
                 ungetc(curr, stdin);
                 return S_INT_END;
+            }
+        case S_FLOAT:
+            if (curr >= '0' && curr <= '9'){
+                d_string_add_char(DString, curr);
+                return S_FLOAT;
+            }
+            else if (curr == 'e' || curr == 'E'){
+                d_string_add_char(DString, curr);
+                curr = getchar();
+                printf("now %c\n", curr);
+                if (curr == '+' || curr == '-'){
+                    d_string_add_char(DString, curr);
+                    curr = getchar();
+                    if (curr >= '0' && curr <= '9'){
+                        ungetc(curr, stdin);
+                        return S_FLOAT;
+                    }
+                    else{
+                        return S_ERR;
+                    }
+                }
+                else if (curr >= '0' && curr <= '9'){
+                    ungetc(curr, stdin);
+                }
+                else{
+                    return S_ERR;
+                }
+                return S_FLOAT;
+            }
+            else{
+                ungetc(curr, stdin);
+                return S_FLOAT_END;
             }
         // comments
         case S_LC:
@@ -381,12 +448,17 @@ int scan(Token_t *token) {
                 ungetc(curr, stdin);
                 break;
             }
+            if (act_state == S_FLOAT){
+                return_type = float_handler(&dString, token);
+                ungetc(curr, stdin);
+                break;
+            }
             line_num++;
-            if (act_state != S_LC){
+            if (act_state != S_LC){ // TODO: mozna vracet LEX_ERR kdyz stav neni && S_START nebo ty co listuju nahore
                 continue;
             }
         }
-        if (is_white(curr) && act_state != S_STRING && act_state != S_STRING_ESC){ // skip white chars, except in string
+        if (is_white(curr) && act_state != S_STRING && act_state != S_STRING_ESC && act_state != S_KEYWORD && act_state != S_INT && act_state != S_FLOAT){ // skip white chars, except in string or keyword
             continue;
         }
 
@@ -414,6 +486,14 @@ int scan(Token_t *token) {
                 break;
             case S_SEM:
                 token->type = T_SEM;
+                return_type = OK;
+                break;
+            case S_ADD:
+                token->type = T_ADD;
+                return_type = OK;
+                break;
+            case S_SUB:
+                token->type = T_SUB;
                 return_type = OK;
                 break;
 
@@ -460,15 +540,7 @@ int scan(Token_t *token) {
                 act_state = next;
                 break;
             case S_STRING_END:
-                if (string_handler(&dString, token) == INTERNAL_ERR){
-                    return_type = INTERNAL_ERR;
-                    break;
-                }
-                else if (string_handler(&dString, token) == LEX_ERR){
-                    return_type = LEX_ERR;
-                    break;
-                }
-                return_type = OK;
+                return_type = string_handler(&dString, token);
                 break;
             case S_STRING_ESC:
                 act_state = next;
@@ -480,6 +552,15 @@ int scan(Token_t *token) {
                 break;
             case S_INT_END:
                 return_type = int_handler(&dString, token);
+                break;
+
+            // numbers - float
+            case S_FLOAT:
+                act_state = next;
+                break;
+            case S_FLOAT_END:
+                return_type = float_handler(&dString, token);
+                token->type = T_FLOAT;
                 break;
 
             // comments

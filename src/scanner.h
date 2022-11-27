@@ -122,6 +122,7 @@ typedef enum T_State{
     S_INT, // integer constant
     S_INT_END,
     S_FLOAT, // float constant
+    S_FLOAT_END,
     S_STRING, // string constant
     S_STRING_END,
     S_STRING_ESC,
