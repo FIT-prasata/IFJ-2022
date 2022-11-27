@@ -213,3 +213,10 @@ int arg_list_rule(Token_t *current_token, Htab_t *global_table) {
 
     return status;
 }
+
+// TODO: conversation needed
+int param_rule(Token_t *token, Htab_t *global_table) {
+    int status = OK;
+
+    return status;
+}

@@ -94,6 +94,8 @@ int arg_list_rule(Token_t *current_token, Htab_t *global_table);
  * @brief   RULES
  *          <PARAM> -> T_ID
  *          <PARAM> -> <TYPE>
+ *          <PARAM> -> <TYPE> only be ID
+ *          TODO: shouldn't be <TYPE> T_ID?
  *
  * @param current_token
  * @param global_table
