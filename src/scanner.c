@@ -49,6 +49,7 @@ int prolog_handler(void){
             prolog_start[i] = curr;
             curr = getchar();
         }
+        ungetc(curr, stdin);
         if (strcmp(prolog_start, "declare(strict_types=1);") == 0){
             return 0;
         } else{
@@ -102,7 +103,6 @@ int keyword_handler(DString_t *dString, Token_t *token){
             return OK;
         }
     }
-    printf("%c\n", dString->str[0]);
     if (dString->str[0] == '?'){
         return LEX_ERR;
     }
@@ -266,6 +266,14 @@ int float_handler(DString_t *dString, Token_t *token){ // TODO: vracet float i d
     double decimal = strtod(dString->str, &garbage_strtol);
     token->attribute.dec_value = decimal;
     token->type = T_FLOAT;
+    // insert float value into token.attribute.string
+    char output[100] = {0};
+    snprintf(output, 100, "%f", decimal);
+    token->attribute.string = malloc(sizeof(char) * (strlen(output) + 1));
+    if (token->attribute.string == NULL) {
+        return INTERNAL_ERR;
+    }
+    strcpy(token->attribute.string, output);
     return OK;
 }
 
