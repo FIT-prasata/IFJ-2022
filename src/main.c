@@ -25,10 +25,10 @@ int main(void) {
     // OPERATORS, ordered from highest precedence to lowest
     "T_LT",  // <
     "T_GT",  // >
-    "T_LE",  // <=
-    "T_GE",  // >=
+    "T_LEQ",  // <=
+    "T_GEQ",  // >=
     "T_EQ",  // ===
-    "T_NE",  // !==
+    "T_NEQ",  // !==
 
     // KEYWORDS
     "K_ELSE",   // else

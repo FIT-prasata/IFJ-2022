@@ -327,6 +327,18 @@ T_State_t state(T_State_t act, int curr, DString_t *DString){
             if (curr == '.'){
                 return S_CONCAT;
             }
+            if (curr == '<'){
+                return S_LT;
+            }
+            if (curr == '>'){
+                return S_GT;
+            }
+            if (curr == '='){
+                return S_ASSIGN;
+            }
+            if (curr == '!'){
+                return S_NEQ;
+            }
             return S_ERR;
         
         case S_DIV:
@@ -335,6 +347,17 @@ T_State_t state(T_State_t act, int curr, DString_t *DString){
             }
             else if (curr == '*'){
                 return S_BC;
+            }
+            return S_ERR;
+        
+        case S_POSS_EQ:
+            if (curr == '='){
+                return S_EQ_OK;
+            }
+            return S_ERR;
+        case S_POSS_NEQ:
+            if (curr == '='){
+                return S_NEQ_OK;
             }
             return S_ERR;
         //keywords and epilog
@@ -477,7 +500,7 @@ int scan(Token_t *token) {
     // prolog handler
     if (start_of_file) {
         if (prolog_handler()) {
-            return LEX_ERR;
+            return LEX_ERR; // syntax error in prolog not lex_err
         }
         start_of_file = false;
     }
@@ -516,7 +539,10 @@ int scan(Token_t *token) {
                 continue;
             }
         }
-        if (is_white(curr) && act_state != S_STRING && act_state != S_STRING_ESC && act_state != S_KEYWORD && act_state != S_INT && act_state != S_FLOAT && act_state != S_ID){ // skip white chars, except in string or keyword
+        // if (is_white(curr) && act_state != S_STRING && act_state != S_STRING_ESC && act_state != S_KEYWORD && act_state != S_INT && act_state != S_FLOAT && act_state != S_ID){ // skip white chars, except in string or keyword
+        //     continue;
+        // }
+        if (is_white(curr) && act_state == S_START){ // should do same magic as ta nechutnost above
             continue;
         }
 
@@ -601,6 +627,59 @@ int scan(Token_t *token) {
             case S_PROL_END:
                 token->type = T_END_PROLOG;
                 return_type = OK; // TODO: dodelat overovani ze za koncem prologu uz nic neni
+                break;
+            case S_LT:
+                curr = getchar();
+                if (curr == '='){
+                    token->type = T_LEQ;
+                    return_type = OK;
+                }
+                else{
+                    ungetc(curr, stdin);
+                    token->type = T_LT;
+                    return_type = OK;
+                }
+                break;
+            case S_GT:
+                curr = getchar();
+                if (curr == '='){
+                    token->type = T_GEQ;
+                    return_type = OK;
+                }
+                else{
+                    ungetc(curr, stdin);
+                    token->type = T_GT;
+                    return_type = OK;
+                }
+                break;
+            case S_ASSIGN:
+                curr = getchar();
+                if (curr == '='){
+                    act_state = S_POSS_EQ;
+                }
+                else{
+                    ungetc(curr, stdin);
+                    token->type = T_ASSIGN;
+                    return_type = OK;
+                }
+                break;
+            case S_EQ_OK:
+                token->type = T_EQ;
+                return_type = OK;
+                break;
+            case S_NEQ:
+                curr = getchar();
+                if (curr == '='){
+                    act_state = S_POSS_NEQ;
+                }
+                else{ // IFJ22 does not have ! operator (negation)
+                    ungetc(curr, stdin);
+                    return_type = LEX_ERR;
+                }
+                break;
+            case S_NEQ_OK:
+                token->type = T_NEQ;
+                return_type = OK;
                 break;
 
             // keywords

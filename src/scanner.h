@@ -30,10 +30,10 @@ typedef enum T_type {
     // OPERATORS, ordered from highest precedence to lowest
     T_LT,  // <
     T_GT,  // >
-    T_LE,  // <=
-    T_GE,  // >=
+    T_LEQ,  // <=
+    T_GEQ,  // >=
     T_EQ,  // ===
-    T_NE,  // !==
+    T_NEQ,  // !==
 
     // KEYWORDS
     K_ELSE,   // else
@@ -89,12 +89,11 @@ typedef enum T_State{
     // OPERATOR STATES
     S_LT,  // <
     S_GT,  // >
-    S_LE,  // <=
-    S_GE,  // >=
     S_POSS_EQ,  // ==
-    S_EQ, // ===
+    S_EQ_OK, // ===
+    S_NEQ_OK, // !==
     S_POSS_NEQ, // !=
-    S_NEQ, // !==
+    S_NEQ, // !
 
     // PUNCTUATOR STATES
     S_LCBR,    // {
