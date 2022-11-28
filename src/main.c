@@ -13,8 +13,15 @@
 //#include "dynamic_string.h"
 #include "error.h"
 //#include "stack.h"
+#include "code_generator.h"
 #include "symtable.h"
 
 int main(void) {
+    Token_t *token = malloc(sizeof(Token_t));
+    token->attribute.string = "word word";
+    token->type = T_STRING;
+    char *tmp = string_convert(token);
+    printf("%s", tmp);
+
     return 0;
 }

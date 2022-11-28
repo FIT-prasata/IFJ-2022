@@ -17,7 +17,7 @@
 #include "symtable.h"
 
 // Frame types
-typedef enum { GF, LF, TF } Frame_t;
+typedef enum Frame { GF, LF, TF } Frame_t;
 
 /**
  * @brief Generates code for while loop start
@@ -28,7 +28,8 @@ typedef enum { GF, LF, TF } Frame_t;
  * @param var2 Second variable of the condition
  * @param file File to write the code to
  */
-void generate_while_start(int label, char *condition, char *var1, char *var2, FILE *file);
+void generate_while_start(int label, char *condition, char *var1, char *var2,
+                          FILE *file);
 
 /**
  * @brief Generates code for while loop end
@@ -47,7 +48,8 @@ void generate_while_end(int label, FILE *file);
  * @param var2 Second variable of the condition
  * @param file File to write the code to
  */
-void generate_if_start(int label, char *condition, char *var1, char *var2, FILE *file);
+void generate_if_start(int label, char *condition, char *var1, char *var2,
+                       FILE *file);
 
 /**
  * @brief Generates code for if statement end
@@ -223,4 +225,5 @@ char *string_convert(Token_t *token);
  *
  * @todo not implemented yet
  */
-int generate(T_type_t operation, char *var1, char *var2, char *destination, FILE *file);
+int generate(T_type_t operation, char *var1, char *var2, char *destination,
+             FILE *file);

@@ -11,7 +11,7 @@
 
 CC=gcc
 CFLAGS=-g -std=c11 -pedantic -Wall -Wextra
-MODULES=error.o parser.o scanner.o stack.o symtable.o dynamic_string.o
+MODULES=error.o parser.o scanner.o stack.o symtable.o dynamic_string.o code_generator.o
 
 
 all: main
@@ -46,6 +46,8 @@ symtable.o: src/symtable.c
 dynamic_string.o: src/dynamic_string.c
 	$(CC) $(CFLAGS) $< -c -o $@
 
+code_generator.o: src/code_generator.c
+	$(CC) $(CFLAGS) $< -c -o $@
 
 # Formatting
 lint:
