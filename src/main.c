@@ -9,19 +9,21 @@
 // Author: <xzavad20> - Lukáš Zavadil
 // Author: <xsvetl07> - Adam Světlík
 
+// GLOBAL line number
 int line_num = 1;
 
-// LOCAL INCLUDES
-//#include "dynamic_string.h"
+// LOCAL INCLUDES - tohletoto legacy code nechat v tomto poradi plsky
 #include "error.h"
-//#include "stack.h"
+#include "dynamic_string.h"
+#include "stack.h"
+#include "scanner.h"
 #include "symtable.h"
 
 
 int main(void) {
     int ret_value;
     char* tmp[] = {
-    T_UNDEF,     // undefined type
+    "T_UNDEF",     // undefined type
     // OPERATORS, ordered from highest precedence to lowest
     "T_LT",  // <
     "T_GT",  // >

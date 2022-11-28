@@ -1,5 +1,8 @@
 #pragma once
 
+#ifndef _ERROR_H_
+#define _ERROR_H_
+
 // Filename: error.h
 // IFJ 2022/2023 project
 // TRP variant
@@ -13,9 +16,7 @@
 
 // EXTERNAL INCLUDES
 #include <stdlib.h>
-
-// LOCAL INCLUDES
-#include "scanner.h"
+#include <stdio.h>
 
 
 
@@ -59,3 +60,5 @@ void try(int code);
 // Raise error
 // param: type - error type (int)
 void raise(int code);
+
+#endif // _ERROR_H_

@@ -1,5 +1,8 @@
 #pragma once
 
+#ifndef _PARSER_H_
+#define _PARSER_H_
+
 // Filename: parser.h
 // IFJ 2022/2023 project
 // TRP variant
@@ -19,3 +22,5 @@
 
 
 // LOCAL INCLUDES
+
+#endif // _PARSER_H_

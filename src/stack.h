@@ -1,5 +1,8 @@
 #pragma once
 
+#ifndef _STACK_H_
+#define _STACK_H_
+
 // Filename: stack.h
 // IFJ 2022/2023 project
 // TRP variant
@@ -36,3 +39,5 @@ Token_t stack_get_head(Stack_t *stack);
 void stack_push(Stack_t *stack, Token_t token);
 int stack_pop(Stack_t *stack);
 void stack_clear(Stack_t *stack);
+
+#endif // _STACK_H_

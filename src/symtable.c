@@ -12,8 +12,6 @@
 // LOCAL INCLUDES
 #include "symtable.h"
 
-#include <stdint.h>
-
 extern int line_num;
 
 // Hashtable constructor - initializes hashtable

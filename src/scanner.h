@@ -1,5 +1,8 @@
 #pragma once
 
+#ifndef _SCANNER_H_
+#define _SCANNER_H_
+
 // Filename: scanner.h
 // IFJ 2022/2023 project
 // TRP variant
@@ -16,7 +19,6 @@
 #include <stdbool.h>
 #include <stdio.h>
 
-#include "ctype.h"
 
 // LOCAL INCLUDES
 #include "dynamic_string.h"
@@ -164,38 +166,107 @@ typedef struct {
     T_attr_t attribute;  // attribute of token
 } Token_t;
 
-// Gets first non-space character from input file
-char get_non_white(void);
 
-// Sets token type
-// @param token - token to be set
-// @param type - type to be set
-void set_type(Token_t *token, T_type_t type);
+/**
+ * @brief Checks if character is a white character (not a newline)
+ * 
+ * @param input - current character
+ * @return  1 if character is a white character, 0 otherwise
+ */
+int is_white(int input);
 
-// TODO: Why does lc returns char in bc int?
-// Skips line comment
-char skip_lc(void);
 
-// Skips block comment
-int skip_bc(int *line_num);
+/**
+ * @brief Function for handling prolog
+ * 
+ * @return 0 if prolog is correct, 1 otherwise 
+ */
+int prolog_handler(void);
 
-// TODO
-//int keyword_handler(DString_t *dString, Token_t *token);
 
-// Sets token value to number
-// @param token - token to be set
-// @param *curr - pointer to current character
-int num_handler(Token_t *token, char *curr);
+/**
+ * @brief Function for handling epilog
+ * 
+ * @return 0 if epilog is correct, 1 otherwise  
+ */
+int epilog_handler(void);
 
-// Sets token value to string
-// @param token - token to be set
-//int string_handler(Token_t *token);
 
-// TODO
-//int id_handler(Token_t *token);
+/**
+ * @brief Function for keyword handling
+ * 
+ * @param dString - pointer to dynamic strung
+ * @param token - pointer to token
+ * @return LEX_ERR if lexical error occurs
+ * @return INTERNAL_ERR if memory problem occurs
+ * @return OK if keyword is correct 
+ */
+int keyword_handler(DString_t *dString, Token_t *token);
 
-// TODO
+
+/**
+ * @brief Function for string handling
+ * 
+ * @param dString - pointer to dynamic strung
+ * @param token - pointer to token
+ * @return LEX_ERR if lexical error occurs
+ * @return INTERNAL_ERR if memory problem occurs
+ * @return OK if string is correct 
+ */
+int string_handler(DString_t *dString, Token_t *token);
+
+
+/**
+ * @brief Function for variable IDs handling
+ * 
+ * @param dString - pointer to dynamic strung
+ * @param token - pointer to token
+ * @return INTERNAL_ERR if memory problem occurs
+ * @return OK if variable ID is correct 
+ */
+int id_handler(DString_t *dString, Token_t *token);
+
+
+/**
+ * @brief Function for integer handling
+ * 
+ * @param dString - pointer to dynamic strung
+ * @param token - pointer to token
+ * @return INTERNAL_ERR if memory problem occurs
+ * @return OK if integer is correct 
+ */
+int int_handler(DString_t *dString, Token_t *token);
+
+
+/**
+ * @brief Function for double handling
+ * 
+ * @param dString - pointer to dynamic strung
+ * @param token - pointer to token
+ * @return INTERNAL_ERR if memory problem occurs
+ * @return OK if float is correct 
+ */
+int float_handler(DString_t *dString, Token_t *token);
+
+
+/**
+ * @brief Part of FSM implemetation, returns FSM STATE according to current state and input char
+ *  
+ * @param act - current state
+ * @param curr - current charachter
+ * @param DString - pointer to dynamic string
+ * @return FSM state
+ */
+T_State_t state(T_State_t act, int curr, DString_t *DString);
+
+
+/**
+ * @brief Function that returns the token through the pointer and returns if the token is valid
+ * 
+ * @param token - pointer to token 
+ * @return token through the pointer
+ * @return LEX_ERR if lexical error occurs, OK otherwise 
+ */
 int scan(Token_t *token);
 
-// TODO
-int prolog_handler();
+#endif // SCANNER_H

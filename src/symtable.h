@@ -1,5 +1,8 @@
 #pragma once
 
+#ifndef _SYMTABLE_H_
+#define _SYMTABLE_H_
+
 // Filename: scanner.c
 // IFJ 2022/2023 project
 // TRP variant
@@ -14,6 +17,7 @@
 // LOCAL INCLUDES
 #include "scanner.h"
 #include "stack.h"
+#include <stdint.h>
 
 
 
@@ -118,3 +122,5 @@ int htab_free(Htab_t *table);
  * @param table - hashtable
  */
 void print_table(Htab_t *table);
+
+#endif // _SYMTABLE_H_
