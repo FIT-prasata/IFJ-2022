@@ -1,13 +1,15 @@
-// Filename: symtable.c
-// IFJ 2022/2023 project
-// TRP variant
-//
-// Symtable
-//
-// Author: <xsklen14> - David Sklenář
-// Author: <xproch0o> - Marek Procházka
-// Author: <xzavad20> - Lukáš Zavadil
-// Author: <xsvetl07> - Adam Světlík
+/**
+ * @c file symtable.c
+ * @project IFJ 2022/2023
+ * @variant TRP
+ *
+ * @brief Symbol table for IFJcode22
+ *
+ * @authors <xsklen14> - David Sklenář
+ *          <xproch0o> - Marek Procházka
+ *          <xzavad20> - Lukáš Zavadil
+ *          <xsvetl07> - Adam Světlík
+ */
 
 // LOCAL INCLUDES
 #include "symtable.h"

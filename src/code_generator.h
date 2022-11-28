@@ -1,22 +1,31 @@
 #pragma once
 
-// Filename: code_generator.h
-// IFJ 2022/2023 project
-// TRP variant
-//
-// Scanner for lexical analysis
-//
-// Author: <xsklen14> - David Sklenář
-// Author: <xproch0o> - Marek Procházka
-// Author: <xzavad20> - Lukáš Zavadil
-// Author: <xsvetl07> - Adam Světlík
+/**
+ * @headerfile code_generator.h
+ * @project IFJ 2022/2023
+ * @variant TRP
+ *
+ * @brief Code generator for IFJcode22
+ *
+ * @authors <xsklen14> - David Sklenář
+ *          <xproch0o> - Marek Procházka
+ *          <xzavad20> - Lukáš Zavadil
+ *          <xsvetl07> - Adam Světlík
+ */
 
+// Local includes
 #include "dynamic_string.h"
 #include "error.h"
 #include "scanner.h"
 #include "symtable.h"
 
-// Frame types
+/**
+ * @brief Frame type
+ *
+ * @param GF - Global frame
+ * @param LF - Local frame
+ * @param TF - Temporary frame
+ */
 typedef enum Frame { GF, LF, TF } Frame_t;
 
 /**
@@ -185,32 +194,264 @@ void generate_or(char *var1, char *var2, char *destination, FILE *file);
 void generate_not(char *var1, char *destination, FILE *file);
 
 /**
+ * @brief Generates code for createframe
+ *
+ * @param file File to write the code to
+ */
+void generate_createframe(FILE *file);
+
+/**
+ * @brief Generates code for pushframe
+ *
+ * @param file File to write the code to
+ */
+void generate_pushframe(FILE *file);
+
+/**
+ * @brief Generates code for popframe
+ *
+ * @param file File to write the code to
+ */
+void generate_popframe(FILE *file);
+
+/**
+ * @brief Generates code for defvar
+ *
+ * @param var Variable to call
+ * @param file File to write the code to
+ */
+void generate_defvar(char *var, FILE *file);
+
+/**
+ * @brief Generates code for call
+ *
+ * @param label Label to call
+ * @param file File to write the code to
+ */
+void generate_call(char *label, FILE *file);
+
+/**
+ * @brief Generates code for return
+ *
+ * @param file File to write the code to
+ */
+void generate_return(FILE *file);
+
+/**
+ * @brief Generates code for pushs
+ *
+ * @param var Variable to write
+ * @param file File to write the code to
+ */
+void generate_pushs(char *var, FILE *file);
+
+/**
+ * @brief Generates code for pops
+ *
+ * @param var Variable to write
+ * @param file File to write the code to
+ */
+void generate_pops(char *var, FILE *file);
+
+/**
+ * @brief Generates code for clears
+ *
+ * @param file File to write the code to
+ */
+void generate_clears(FILE *file);
+
+/**
+ * @brief Generates code for int2float
+ *
+ * @param source Source variable
+ * @param destination Destination variable
+ * @param file File to write the code to
+ */
+void generate_int2float(char *source, char *destination, FILE *file);
+
+/**
+ * @brief Generates code for float2int
+ *
+ * @param source Source variable
+ * @param destination Destination variable
+ * @param file File to write the code to
+ */
+void generate_float2int(char *source, char *destination, FILE *file);
+
+/**
+ * @brief Generates code for int2char
+ *
+ * @param source Source variable
+ * @param destination Destination variable
+ * @param file File to write the code to
+ */
+void generate_int2char(char *source, char *destination, FILE *file);
+
+/**
+ * @brief Generates code for stri2int
+ *
+ * @param var1 First variable
+ * @param var2 Second variable
+ * @param destination Destination variable
+ * @param file File to write the code to
+ */
+void generate_stri2int(char *var1, char *var2, char *destination, FILE *file);
+
+/**
+ * @brief Generates code for read
+ *
+ * @param var Variable to write
+ * @param type Type of variable
+ * @param file File to write the code to
+ */
+void generate_read(char *var, char *type, FILE *file);
+
+/**
+ * @brief Generates code for write
+ *
+ * @param var Variable to write
+ * @param file File to write the code to
+ */
+void generate_write(char *var, FILE *file);
+
+/**
+ * @brief Generates code for concat
+ *
+ * @param var1 First variable
+ * @param var2 Second variable
+ * @param destination Destination variable
+ * @param file File to write the code to
+ */
+void generate_concat(char *var1, char *var2, char *destination, FILE *file);
+
+/**
+ * @brief Generates code for strlen
+ *
+ * @param source Source variable
+ * @param destination Destination variable
+ * @param file File to write the code to
+ */
+void generate_strlen(char *source, char *destination, FILE *file);
+
+/**
+ * @brief Generates code for getchar
+ *
+ * @param var Variable to read
+ * @param pos Position of character
+ * @param destination Destination variable
+ * @param file File to write the code to
+ */
+void generate_getchar(char *var, char *pos, char *destination, FILE *file);
+
+/**
+ * @brief Generates code for setchar
+ *
+ * @param var Variable to write
+ * @param pos Position of character
+ * @param ch Character to write
+ * @param file File to write the code to
+ */
+void generate_setchar(char *var, char *pos, char *ch, FILE *file);
+
+/**
+ * @brief Generates code for type
+ *
+ * @param source Source variable
+ * @param destination Destination variable
+ * @param file File to write the code to
+ */
+void generate_type(char *source, char *destination, FILE *file);
+
+/**
+ * @brief Generates code for label
+ *
+ * @param label Label to call
+ * @param file File to write the code to
+ */
+void generate_label(char *label, FILE *file);
+
+/**
+ * @brief Generates code for jump
+ *
+ * @param label Label to call
+ * @param file File to write the code to
+ */
+void generate_jump(char *label, FILE *file);
+
+/**
+ * @brief Generates code for jumpifeq
+ *
+ * @param label Label to call
+ * @param var1 First variable
+ * @param var2 Second variable
+ * @param file File to write the code to
+ */
+void generate_jumpifeq(char *label, char *var1, char *var2, FILE *file);
+
+/**
+ * @brief Generates code for jumpifneq
+ *
+ * @param label Label to call
+ * @param var1 First variable
+ * @param var2 Second variable
+ * @param file File to write the code to
+ */
+void generate_jumpifneq(char *label, char *var1, char *var2, FILE *file);
+
+/**
+ * @brief Generates code for exit
+ *
+ * @param var Variable to write
+ * @param file File to write the code to
+ */
+void generate_exit(char *var, FILE *file);
+
+/**
+ * @brief Generates code for break
+ *
+ * @param file File to write the code to
+ */
+void generate_break(FILE *file);
+
+/**
+ * @brief Generates code for dprint
+ *
+ * @param var Variable to write
+ * @param file File to write the code to
+ */
+void generate_dprint(char *var, FILE *file);
+
+/**
  * @brief Converts variable from IFJ22 to IFJcode22 format
  *
  * @param item Variable to convert
  * @param frame Frame of the variable
+ * @param converted_string Converted string
  *
- * @return char* Converted variable
+ * @return status code
  */
-char *variable_convert(Htab_item_t *item, Frame_t frame);
+int variable_convert(Htab_item_t *item, Frame_t frame,
+                     DString_t *converted_var);
 
 /**
  * @brief Converts constant from IFJ22 to IFJcode22 format
  *
  * @param token Token to convert
+ * @param converted_string Converted string
  *
- * @return char* Converted constant
+ * @return status code
  */
-char *const_convert(Token_t *token);
+int const_convert(Token_t *token, DString_t *converted_const);
 
 /**
  * @brief Converts string from IFJ22 to IFJcode22 format
  *
  * @param token Token to convert
+ * @param converted_string Converted string
  *
- * @return char* Converted string
+ * @return status code
  */
-char *string_convert(Token_t *token);
+int string_convert(Token_t *token, DString_t *converted_str);
 
 /**
  * @brief Generates IFJcode22 code
@@ -225,5 +466,5 @@ char *string_convert(Token_t *token);
  *
  * @todo not implemented yet
  */
-int generate(T_type_t operation, char *var1, char *var2, char *destination,
-             FILE *file);
+/*int generate(T_type_t operation, char *var1, char *var2, char *destination,
+             FILE *file);*/
