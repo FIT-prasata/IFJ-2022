@@ -479,3 +479,9 @@ int func_call_rule(Token_t *current_token, Htab_t *global_table) {
 
     return status;
 }
+
+int expr_rule(Token_t *current_token, Htab_t *global_table) {
+    int status = OK;
+    // TODO
+    return status;
+}
