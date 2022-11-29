@@ -147,7 +147,7 @@ int assign_type_rule(Token_t *current_token, Htab_t *global_table);
 
 /**
  * @brief   RULES
- *          T_FUNC_ID T_LBR <ARG>
+ *          <FUNC_CALL> -> T_FUNC_ID T_LBR <ARG>
  *
  * @param current_token
  * @param global_table

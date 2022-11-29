@@ -390,29 +390,29 @@ int stat_rule(Token_t *current_token, scope_t *scope_state,
         }
     }
 
-        // handle ... -> T_SEM
-        if (current_token->type == T_SEM) {
-            // get new token
-            if ((status = scan(current_token)) != OK) return status;
+    // handle ... -> T_SEM
+    if (current_token->type == T_SEM) {
+        // get new token
+        if ((status = scan(current_token)) != OK) return status;
 
-            // handle ... -> ... <STAT>
-            if ((status = stat_rule(current_token, scope_state, global_table)) !=
-                OK)
-                return status;
-        }
+        // handle ... -> ... <STAT>
+        if ((status = stat_rule(current_token, scope_state, global_table)) !=
+            OK)
+            return status;
+    }
 
-        // handle ... -> T_RCBR
-        if (current_token->type == T_RCBR) {
-            // get new token
-            if ((status = scan(current_token)) != OK) return status;
+    // handle ... -> T_RCBR
+    if (current_token->type == T_RCBR) {
+        // get new token
+        if ((status = scan(current_token)) != OK) return status;
 
-            // handle ... -> ... <STAT>
-            if ((status = stat_rule(current_token, scope_state, global_table)) !=
-                OK)
-                return status;
-        }
+        // handle ... -> ... <STAT>
+        if ((status = stat_rule(current_token, scope_state, global_table)) !=
+            OK)
+            return status;
+    }
 
-        // end + ε
+    // end + ε
     return status;
 }
 
@@ -446,17 +446,36 @@ int else_rule(Token_t *current_token, scope_t *scope_state,
 }
 
 int assign_type_rule(Token_t *current_token, Htab_t *global_table) {
-        int status = OK;
+    int status = OK;
 
-        // handle <ASSIGN_TYPE> -> <FUNC_CALL>
-        if (current_token->type == T_FUNC_ID) {
-            if ((status = func_call_rule(current_token, global_table)) != OK)
-                return status;
-        }
-
-        // handle ... -> <EXPR>
-        if ((status = expr_rule(current_token, global_table)) != OK)
+    // handle <ASSIGN_TYPE> -> <FUNC_CALL>
+    if (current_token->type == T_FUNC_ID) {
+        if ((status = func_call_rule(current_token, global_table)) != OK)
             return status;
+    }
 
-        return status;
+    // handle ... -> <EXPR>
+    if ((status = expr_rule(current_token, global_table)) != OK) return status;
+
+    return status;
+}
+
+int func_call_rule(Token_t *current_token, Htab_t *global_table) {
+    int status = OK;
+
+    // handle <FUNC_CALL> -> T_FUNC_ID
+    if (current_token->type != T_FUNC_ID) return SYNTAX_ERR;
+    // get new token
+    if ((status = scan(current_token)) != OK) return status;
+
+    // handle ... -> ... T_LBR
+    if (current_token->type != T_LBR) return SYNTAX_ERR;
+
+    // get new token
+    if ((status = scan(current_token)) != OK) return status;
+
+    // handle ... -> ... <ARG>
+        if ((status = arg_rule(current_token, global_table)) != OK) return status;
+
+    return status;
 }
