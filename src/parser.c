@@ -415,3 +415,32 @@ int stat_rule(Token_t *current_token, scope_t *scope_state,
         // end + ε
     return status;
 }
+
+// TODO needs formal definition this was only a quick draft
+int else_rule(Token_t *current_token, scope_t *scope_state,
+              Htab_t *global_table) {
+    int status = OK;
+
+    // handle <ELSE> -> K_ELSE
+    if (current_token->type == K_ELSE) {
+        // get new token
+        if ((status = scan(current_token)) != OK) return status;
+
+        // handle ... -> ... T_LCBR
+        if (current_token->type != T_LCBR) return SYNTAX_ERR;
+
+        // get new token
+        if ((status = scan(current_token)) != OK) return status;
+
+        // handle ... -> ... <STAT>
+        if ((status = stat_rule(current_token, scope_state, global_table)) !=
+            OK)
+            return status;
+    }
+
+    // handle ... -> <STAT>
+    if ((status = stat_rule(current_token, scope_state, global_table)) != OK)
+        return status;
+
+    return status;
+}
