@@ -228,73 +228,190 @@ int type_rule(Token_t *token, Htab_t *global_table) {
         case T_STRING:
         case T_INT:
         case T_FLOAT:
-        case K_NULL: // TODO: you sure there is type null?
+        case K_NULL:  // TODO: you sure there is type null?
             return OK;
         default:
             return SYNTAX_ERR;
     }
 }
 
-
 int stat_rule(Token_t *current_token, scope_t *scope_state,
               Htab_t *global_table) {
-        int status = OK;
+    int status = OK;
 
-        // handle <STAT> -> K_IF
-        if (current_token->type == K_IF) {
-            // update scope
-                scope_state->in_if = true;
-                scope_state->count_if++;
+    // handle <STAT> -> K_IF
+    if (current_token->type == K_IF) {
+        // update scope
+        scope_state->in_if = true;
+        scope_state->count_if++;
+        // get new token
+        if ((status = scan(current_token)) != OK) return status;
+
+        // handle ... -> ... T_LBR
+        if (current_token->type != T_LBR) return SYNTAX_ERR;
+
+        // get new token
+        if ((status = scan(current_token)) != OK) return status;
+
+        // handle ... -> ... <EXPR>
+        if ((status = expr_rule(current_token, global_table)) != OK)
+            return status;
+
+        // get new token
+        if ((status = scan(current_token)) != OK) return status;
+
+        // handle ... -> ... T_LCBR
+        if (current_token->type != T_LCBR) return SYNTAX_ERR;
+
+        // get new token
+        if ((status = scan(current_token)) != OK) return status;
+
+        // handle ... -> ... <STAT>
+        if ((status = stat_rule(current_token, scope_state, global_table)) !=
+            OK)
+            return status;
+
+        // get new token
+        if ((status = scan(current_token)) != OK) return status;
+
+        // handle ... -> ... <ELSE>
+        if ((status = else_rule(current_token, scope_state, global_table)) !=
+            OK)
+            return status;
+
+        // get new token
+        if ((status = scan(current_token)) != OK) return status;
+
+        // handle ... -> ... T_LCBR
+        if (current_token->type != T_LCBR) return SYNTAX_ERR;
+
+        // get new token
+        if ((status = scan(current_token)) != OK) return status;
+
+        // handle ... -> ... <STAT>
+        if ((status = stat_rule(current_token, scope_state, global_table)) !=
+            OK)
+            return status;
+
+        // update scope
+        scope_state->in_if = false;
+        scope_state->count_if--;
+    }
+
+    // handle ... -> K_WHILE
+    if (current_token->type == K_WHILE) {
+        // update scope
+        scope_state->in_while = true;
+        scope_state->count_while++;
+        // get new token
+        if ((status = scan(current_token)) != OK) return status;
+
+        // handle ... -> ... T_LBR
+        if (current_token->type != T_LBR) return SYNTAX_ERR;
+
+        // get new token
+        if ((status = scan(current_token)) != OK) return status;
+
+        // handle ... -> ... <EXPR>
+        if ((status = expr_rule(current_token, global_table)) != OK)
+            return status;
+
+        // get new token
+        if ((status = scan(current_token)) != OK) return status;
+
+        // handle ... -> ... T_LCBR
+        if (current_token->type != T_LCBR) return SYNTAX_ERR;
+
+        // get new token
+        if ((status = scan(current_token)) != OK) return status;
+
+        // handle ... -> ... <STAT>
+        if ((status = stat_rule(current_token, scope_state, global_table)) !=
+            OK)
+            return status;
+
+        // update scope
+        scope_state->in_while = false;
+        scope_state->count_while--;
+    }
+
+    // handle ... -> K_RET
+    if (current_token->type == K_RET) {
+        // get new token
+        if ((status = scan(current_token)) != OK) return status;
+
+        // handle ... -> ... <EXPR>
+        if ((status = expr_rule(current_token, global_table)) != OK)
+            return status;
+
+        // get new token
+        if ((status = scan(current_token)) != OK) return status;
+
+        // handle ... -> ... <STAT>
+        if ((status = stat_rule(current_token, scope_state, global_table)) !=
+            OK)
+            return status;
+    }
+
+    // handle ... -> T_ID
+    if (current_token->type == T_ID) {
+        // get new token
+        if ((status = scan(current_token)) != OK) return status;
+
+        // handle ... -> ... T_ASSIGN
+        if (current_token->type == T_ASSIGN) {
             // get new token
-                if ((status = scan(current_token)) != OK) return status;
+            if ((status = scan(current_token)) != OK) return status;
 
-                // handle ... -> ... T_LBR
-                if (current_token->type != T_LBR) return SYNTAX_ERR;
+            // handle ... -> ... <ASSIGN_TYPE>
+            if ((status = assign_type_rule(current_token, global_table)) != OK)
+                return status;
 
-                // get new token
-                if ((status = scan(current_token)) != OK) return status;
+            // get new token
+            if ((status = scan(current_token)) != OK) return status;
 
-                // handle ... -> ... <EXPR>
-                if ((status = expr_rule(current_token, global_table)) != OK)
-                    return status;
+            // handle ... -> ... <STAT>
+            if ((status =
+                     stat_rule(current_token, scope_state, global_table)) != OK)
+                return status;
+        }
+        // handle ... -> ...<TYPE>
+        else {
+            if ((status = type_rule(current_token, global_table)) != OK)
+                return status;
 
-                // get new token
-                if ((status = scan(current_token)) != OK) return status;
+            // get new token
+            if ((status = scan(current_token)) != OK) return status;
 
-                // handle ... -> ... T_LCBR
-                if (current_token->type != T_LCBR) return SYNTAX_ERR;
+            // handle ... -> ... <STAT>
+            if ((status =
+                     stat_rule(current_token, scope_state, global_table)) != OK)
+                ;
+        }
+    }
 
-                // get new token
-                if ((status = scan(current_token)) != OK) return status;
+        // handle ... -> T_SEM
+        if (current_token->type == T_SEM) {
+            // get new token
+            if ((status = scan(current_token)) != OK) return status;
 
-                // handle ... -> ... <STAT>
-                if ((status = stat_rule(current_token, scope_state, global_table)) != OK)
-                    return status;
-
-                // get new token
-                if ((status = scan(current_token)) != OK) return status;
-
-                // handle ... -> ... <ELSE>
-                if ((status = else_rule(current_token, scope_state, global_table)) != OK)
-                    return status;
-
-                // get new token
-                if ((status = scan(current_token)) != OK) return status;
-
-                // handle ... -> ... T_LCBR
-                if (current_token->type != T_LCBR) return SYNTAX_ERR;
-
-                // get new token
-                if ((status = scan(current_token)) != OK) return status;
-
-                // handle ... -> ... <STAT>
-                if ((status = stat_rule(current_token, scope_state, global_table)) != OK)
-                    return status;
-
-                // update scope
-                scope_state->in_if = false;
-                scope_state->count_if--;
+            // handle ... -> ... <STAT>
+            if ((status = stat_rule(current_token, scope_state, global_table)) !=
+                OK)
+                return status;
         }
 
-        return status;
+        // handle ... -> T_RCBR
+        if (current_token->type == T_RCBR) {
+            // get new token
+            if ((status = scan(current_token)) != OK) return status;
+
+            // handle ... -> ... <STAT>
+            if ((status = stat_rule(current_token, scope_state, global_table)) !=
+                OK)
+                return status;
+        }
+
+        // end + ε
+    return status;
 }
