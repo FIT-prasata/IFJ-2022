@@ -444,3 +444,19 @@ int else_rule(Token_t *current_token, scope_t *scope_state,
 
     return status;
 }
+
+int assign_type_rule(Token_t *current_token, Htab_t *global_table) {
+        int status = OK;
+
+        // handle <ASSIGN_TYPE> -> <FUNC_CALL>
+        if (current_token->type == T_FUNC_ID) {
+            if ((status = func_call_rule(current_token, global_table)) != OK)
+                return status;
+        }
+
+        // handle ... -> <EXPR>
+        if ((status = expr_rule(current_token, global_table)) != OK)
+            return status;
+
+        return status;
+}
