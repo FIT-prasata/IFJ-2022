@@ -114,9 +114,9 @@ int type_rule(Token_t *current_token, Htab_t *global_table);
 
 /**
  * @brief   RULES
- *          <STAT> -> K_IF T_LBR <EXPR> T_LCBR <STAT> <ELSE> LCBR <STAT> TODO: NO ELIF?
+ *          <STAT> -> K_IF T_LBR <EXPR> T_LCBR <STAT> K_ELSE LCBR <STAT> //TODO refactor
  *          <STAT> -> K_WHILE T_LBR <EXPR> T_LCBR <STAT>
- *          <STAT> -> K_RET <EXPR> <STAT>
+ *          <STAT> -> K_RET <EXPR> T_SEM T_RCBR
  *          <STAT> -> T_ID T_ASSIGN <ASSIGN_TYPE> <STAT>
  *          <STAT> -> T_ID <TYPE> <STAT>
  *          <STAT> -> T_SEM <STAT>

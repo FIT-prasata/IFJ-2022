@@ -106,6 +106,8 @@ int def_func_rule(Token_t *token, scope_t *scope_state, Htab_t *global_table) {
 
     // handle <DEFFUNC> -> K_FUNC
     if (token->type != K_FUNC) return SYNTAX_ERR;
+
+    // get token
     if ((status = scan(token)) != OK) return status;
 
     // handle ... -> ... T__FUNC_ID
@@ -162,6 +164,13 @@ int def_func_rule(Token_t *token, scope_t *scope_state, Htab_t *global_table) {
     // handle ... -> ... <STAT>
     if ((status = stat_rule(token, scope_state, global_table)) != OK)
         return status;
+
+    // set function as defined
+    func_ptr->data.type.func.defined = true;
+
+    // update scope
+    scope_state->in_func = false;
+
     return OK;
 }
 
@@ -228,7 +237,7 @@ int type_rule(Token_t *token, Htab_t *global_table) {
         case T_STRING:
         case T_INT:
         case T_FLOAT:
-        case K_NULL:  // TODO: you sure there is type null?
+        case K_NULL:
             return OK;
         default:
             return SYNTAX_ERR;
@@ -274,10 +283,8 @@ int stat_rule(Token_t *current_token, scope_t *scope_state,
         // get new token
         if ((status = scan(current_token)) != OK) return status;
 
-        // handle ... -> ... <ELSE>
-        if ((status = else_rule(current_token, scope_state, global_table)) !=
-            OK)
-            return status;
+        // handle ... -> ... K_ELSE
+        if (current_token->type != K_ELSE) return SYNTAX_ERR;
 
         // get new token
         if ((status = scan(current_token)) != OK) return status;
@@ -294,8 +301,8 @@ int stat_rule(Token_t *current_token, scope_t *scope_state,
             return status;
 
         // update scope
-        scope_state->in_if = false;
         scope_state->count_if--;
+        if (scope_state->count_if == 0) scope_state->in_if = false;
     }
 
     // handle ... -> K_WHILE
@@ -331,8 +338,8 @@ int stat_rule(Token_t *current_token, scope_t *scope_state,
             return status;
 
         // update scope
-        scope_state->in_while = false;
         scope_state->count_while--;
+        if (scope_state->count_while == 0) scope_state->in_while = false;
     }
 
     // handle ... -> K_RET
@@ -347,10 +354,14 @@ int stat_rule(Token_t *current_token, scope_t *scope_state,
         // get new token
         if ((status = scan(current_token)) != OK) return status;
 
-        // handle ... -> ... <STAT>
-        if ((status = stat_rule(current_token, scope_state, global_table)) !=
-            OK)
-            return status;
+        // handle ... -> ... T_SEM
+        if (current_token->type != T_SEM) return SYNTAX_ERR;
+
+        // get new token
+        if ((status = scan(current_token)) != OK) return status;
+
+        // handle ... -> ... T_RCBR
+        if (current_token->type != T_RCBR) return SYNTAX_ERR;
     }
 
     // handle ... -> T_ID
@@ -416,34 +427,6 @@ int stat_rule(Token_t *current_token, scope_t *scope_state,
     return status;
 }
 
-// TODO needs formal definition this was only a quick draft
-int else_rule(Token_t *current_token, scope_t *scope_state,
-              Htab_t *global_table) {
-    int status = OK;
-
-    // handle <ELSE> -> K_ELSE
-    if (current_token->type == K_ELSE) {
-        // get new token
-        if ((status = scan(current_token)) != OK) return status;
-
-        // handle ... -> ... T_LCBR
-        if (current_token->type != T_LCBR) return SYNTAX_ERR;
-
-        // get new token
-        if ((status = scan(current_token)) != OK) return status;
-
-        // handle ... -> ... <STAT>
-        if ((status = stat_rule(current_token, scope_state, global_table)) !=
-            OK)
-            return status;
-    }
-
-    // handle ... -> <STAT>
-    if ((status = stat_rule(current_token, scope_state, global_table)) != OK)
-        return status;
-
-    return status;
-}
 
 int assign_type_rule(Token_t *current_token, Htab_t *global_table) {
     int status = OK;
@@ -475,7 +458,7 @@ int func_call_rule(Token_t *current_token, Htab_t *global_table) {
     if ((status = scan(current_token)) != OK) return status;
 
     // handle ... -> ... <ARG>
-        if ((status = arg_rule(current_token, global_table)) != OK) return status;
+    if ((status = arg_rule(current_token, global_table)) != OK) return status;
 
     return status;
 }
