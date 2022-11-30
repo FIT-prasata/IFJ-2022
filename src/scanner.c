@@ -26,30 +26,89 @@ int is_white(int input)
 int prolog_handler(void){
     char prolog_start[25] = {'\0',};
     int curr;
-    bool is_ok = false;
+    bool is_ok = false, block_comment_end = false;
 
     for(int i = 0; i < 5; i++){
         curr = getchar();
         prolog_start[i] = curr;
     }
     if (strcmp(prolog_start, "<?php") == 0) {
+        // check if there is a white char/newline/comment
         curr = getchar();
-        while(is_white(curr)){
-            curr = getchar();
+        if (is_white(curr) || curr == '\n'){
             is_ok = true;
         }
-        if (!is_ok && curr != '\n'){ // if there is no white space after prolog
+        else if (curr == '/'){
+            // possible comment
+            is_ok = true;
+        }
+        //printf("curr: '%c'\n", curr);
+        if (is_ok){
+            do {
+                //printf("curr: '%c'\n", curr);
+                // comments handling
+                if (curr == '/'){
+                    curr = getchar();
+                    //printf("    curr: '%c'\n", curr);
+                    if (curr == '/'){ // line comment
+                        //printf("haha zmrde\n");
+                        while(curr != '\n'){
+                            curr = getchar();
+                        }
+                    }
+                    else if (curr == '*'){
+                        //printf("haha zmrde2\n");
+                        while(block_comment_end == false){
+                            curr = getchar();
+                            if (curr == EOF){
+                                return 1;
+                            }
+                            if (curr == '*'){
+                                curr = getchar();
+                                if (curr == '/'){
+                                    block_comment_end = true;
+                                }
+                            }
+                            if (curr == '\n'){
+                                line_num++;
+                            }
+                        }
+                        block_comment_end = false;
+                        curr = getchar();
+                        continue;
+                    }
+                    else{ // not a line comment
+                        return 1;
+                    }
+                }
+                else if (is_white(curr)){
+                    curr = getchar();
+                    continue;
+                }
+                // line counting
+                if (curr == '\n'){
+                    line_num++;
+                }
+                else{
+                    printf("now, curr = '%c'\n", curr);
+                    return 1;
+                }
+                curr = getchar();
+            } while (curr != 'd');
+        }
+        else{
             return 1;
         }
-        if (curr == '\n'){ // add line count
-            line_num++;
-            curr = getchar();
-        }
-        for(int i = 0; i < 24; i++){
-            prolog_start[i] = curr;
-            curr = getchar();
-        }
+
+
+
+
+
         ungetc(curr, stdin);
+        for(int i = 0; i < 24; i++){
+            curr = getchar();
+            prolog_start[i] = curr;
+        }
         if (strcmp(prolog_start, "declare(strict_types=1);") == 0){
             return 0;
         } else{
