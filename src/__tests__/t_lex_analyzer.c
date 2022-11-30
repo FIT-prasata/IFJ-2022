@@ -1,18 +1,18 @@
-#include "test_utils.h"
-
+//#define getchar mock_getchar
 #include "../scanner.h"
-
+#include "test_utils.h"
 
 FILE *f;
 // mocked getchar
-int getchar() { 
-    return fgetc(f); 
-    }
 
+ int getchar() {
+     return fgetc(f);
+     }
+//int mock_getchar() { return fgetc(f); }
 
 #define TEST__CODE_DEFAULT \
     "./src/__tests__/t_lex_analyzer_test_cases/test_default/test_default.code"
-#define TEST_CODE_WHITESPACES                                          \
+#define TEST_CODE_WHITESPACES                                     \
     "./src/__tests__/t_lex_analyzer_test_cases/test_whitespaces/" \
     "test_whitespaces.code"
 
