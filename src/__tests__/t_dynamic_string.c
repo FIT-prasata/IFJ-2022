@@ -49,7 +49,7 @@ ENDTEST
 TEST(T_d_string_add_char)
 D_INIT
 ASSERT_TRUE(d_string_add_char(&d_string, 'a') == OK);
-ASSERT_TRUE(strcmp(d_string.str, "a") == 0);
+ASSERT_TRUE(strcmp(d_string.str, "aaaa") == 0);
 ASSERT_TRUE(d_string_add_char(&d_string, 'b') == OK);
 ASSERT_TRUE(strcmp(d_string.str, "ab") == 0);
 D_FREE
