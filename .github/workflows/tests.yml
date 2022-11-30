@@ -1,4 +1,4 @@
-name: Run tests on Eva server
+name: Run tests on Merlin server
 'on': workflow_dispatch
 jobs:
   connect_and_run:
