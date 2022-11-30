@@ -19,7 +19,7 @@
 #include "symtable.h"
 
 int main(void) {
-    Token_t *token = malloc(sizeof(Token_t));
+    /*Token_t *token = malloc(sizeof(Token_t));
     token->attribute.string = "word#\\word";
     token->type = K_NULL;
 
@@ -38,6 +38,16 @@ int main(void) {
     printf("String: %d, %s\n", ret, string.str);
 
     free(token);
-    free(item);
+    free(item);*/
+    FILE *file = fopen("./src/adam-test.out", "w");
+    if (file == NULL) {
+        printf("File not found");
+        return 1;
+    }
+    generate_while_start(WHILE_GEQ, "LF@x", "int@5", 1, file);
+    fprintf(file, "body of while\n");
+    generate_while_end(1, file);
+
+    fclose(file);
     return 0;
 }

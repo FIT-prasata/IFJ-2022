@@ -28,6 +28,38 @@
  */
 typedef enum Frame { GF, LF, TF } Frame_t;
 
+typedef enum Operation {
+    // IF
+    IF_LT,
+    IF_GT,
+    IF_EQ,
+    IF_NEQ,
+    IF_LEQ,
+    IF_GEQ,
+    // WHILE
+    WHILE_LT,
+    WHILE_GT,
+    WHILE_EQ,
+    WHILE_NEQ,
+    WHILE_LEQ,
+    WHILE_GEQ,
+    // ARITHMETIC
+    ADD,
+    SUB,
+    MUL,
+    DIV,
+    IDIV,
+    // LOGICAL
+    AND,
+    OR,
+    NOT,
+
+} Operation_t;
+
+// TODO
+void generate_if_start(Operation_t type, char *var1, char *var2, int label,
+                       FILE *file);
+void generate_else(int label, FILE *file);
 /**
  * @brief Generates code for while loop start
  *
@@ -37,7 +69,7 @@ typedef enum Frame { GF, LF, TF } Frame_t;
  * @param var2 Second variable of the condition
  * @param file File to write the code to
  */
-void generate_while_start(int label, char *condition, char *var1, char *var2,
+void generate_while_start(Operation_t type, char *var1, char *var2, int label,
                           FILE *file);
 
 /**
@@ -57,9 +89,7 @@ void generate_while_end(int label, FILE *file);
  * @param var2 Second variable of the condition
  * @param file File to write the code to
  */
-void generate_if_start(int label, char *condition, char *var1, char *var2,
-                       FILE *file);
-
+// TODO
 /**
  * @brief Generates code for if statement end
  *
