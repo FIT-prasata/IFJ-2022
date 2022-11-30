@@ -1,3 +1,20 @@
+#name: Run tests on Merlin server
+#'on': workflow_dispatch
+#jobs:
+#  connect_and_run:
+#    runs-on: ubuntu-latest
+#    steps:
+#      - uses: actions/checkout@v3
+#      - name: Copy src to Merlin
+#        run: |
+#          sshpass -p ${{ secrets.MERLIN_PASSWORD }} scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -r * ${{ secrets.MERLIN_USER }}@${{ secrets.MERLIN_HOST }}:~/ifj/tmp
+#      # TODO - run tests
+#      - name: Run tests on Merlin
+#        run: |
+#          sshpass -p ${{ secrets.MERLIN_PASSWORD }} ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ${{ secrets.MERLIN_USER }}@${{ secrets.MERLIN_HOST }} "cd ~/ifj/tmp && make run-tests"
+#      # TODO - get results somehow
+#      # TODO - clean up
+
 name: Run tests on Merlin server
 'on': workflow_dispatch
 jobs:
@@ -7,10 +24,10 @@ jobs:
       - uses: actions/checkout@v3
       - name: Copy src to Merlin
         run: |
-          sshpass -p ${{ secrets.MERLIN_PASSWORD }} scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -r * ${{ secrets.MERLIN_USER }}@${{ secrets.MERLIN_HOST }}:~/ifj/tmp
+          sshpass -p ${{ secrets.EVA_PASSWORD }} scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -r * ${{ secrets.EVA_USER }}@${{ secrets.EVA_HOST }}:~/ifj/tmp
       # TODO - run tests
       - name: Run tests on Merlin
         run: |
-          sshpass -p ${{ secrets.MERLIN_PASSWORD }} ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ${{ secrets.MERLIN_USER }}@${{ secrets.MERLIN_HOST }} "cd ~/ifj/tmp && make run-tests"
+          sshpass -p ${{ secrets.EVA_PASSWORD }} ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ${{ secrets.EVA_USER }}@${{ secrets.EVA_HOST }} "cd ~/ifj/tmp && make run-tests"
       # TODO - get results somehow
       # TODO - clean up
