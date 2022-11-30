@@ -30,7 +30,7 @@ extern int line_num;
 // Token types
 typedef enum T_type {
     T_UNDEF,     // undefined type
-    // OPERATORS, ordered from highest precedence to lowest
+    // OPERATORS, ordered from the highest precedence to lowest
     T_LT,  // <
     T_GT,  // >
     T_LEQ,  // <=
