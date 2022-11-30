@@ -535,8 +535,38 @@ int scan(Token_t *token) {
             break;
         }
         else if (curr == EOF && act_state != S_START) {
-            return_type = LEX_ERR; // syntax error in epilog
-            break;
+            // return_type = LEX_ERR; // syntax error in epilog
+            // break;
+            if (act_state == S_KEYWORD){
+                return_type = keyword_handler(&dString, token);
+                ungetc(curr, stdin);
+                break;
+            }
+            if (act_state == S_INT){
+                return_type = int_handler(&dString, token);
+                ungetc(curr, stdin);
+                break;
+            }
+            if (act_state == S_FLOAT){
+                return_type = float_handler(&dString, token);
+                ungetc(curr, stdin);
+                break;
+            }
+            if (act_state == S_ID){
+                return_type = id_handler(&dString, token);
+                ungetc(curr, stdin);
+                break;
+            }
+            if (act_state == S_STRING){
+                return_type = string_handler(&dString, token);
+                ungetc(curr, stdin);
+                break;
+            }
+            if (act_state == S_LC){
+                act_state = S_START;
+                ungetc(curr, stdin);
+                continue;
+            }
         }
         if (curr == '\n'){
             
@@ -562,6 +592,11 @@ int scan(Token_t *token) {
             }
             line_num++;
             if (act_state != S_LC){ // TODO: mozna vracet LEX_ERR kdyz stav neni && S_START nebo ty co listuju nahore
+                continue;
+            }
+            if (act_state == S_STRING){
+                printf("heeere\n");
+                act_state = S_STRING;
                 continue;
             }
         }
