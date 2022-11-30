@@ -68,10 +68,7 @@ int epilog_handler(void){
     if (curr == EOF){
         ungetc(curr, stdin);
         return OK;
-    } else if (curr == '\n' || curr == '\r') {
-        if (curr == '\r'){
-            curr2 = getchar();
-        }
+    } else if (curr == '\n') {
         curr2 = getchar();
         if (curr2 == EOF){
             ungetc(curr2, stdin);
@@ -235,6 +232,9 @@ int string_handler(DString_t *dString, Token_t *token){
 
 // Function for variable IDs hadling
 int id_handler(DString_t *dString, Token_t *token) {
+    if (strcmp(dString->str, "$") == 0) {
+        return LEX_ERR;
+    }
     token->attribute.string = malloc(sizeof(char) * (dString->length + 1));
     if (token->attribute.string == NULL) {
         return INTERNAL_ERR;
@@ -535,8 +535,6 @@ int scan(Token_t *token) {
             break;
         }
         else if (curr == EOF && act_state != S_START) {
-            // return_type = LEX_ERR; // syntax error in epilog
-            // break;
             if (act_state == S_KEYWORD){
                 return_type = keyword_handler(&dString, token);
                 ungetc(curr, stdin);
@@ -557,16 +555,13 @@ int scan(Token_t *token) {
                 ungetc(curr, stdin);
                 break;
             }
-            if (act_state == S_STRING){
-                return_type = string_handler(&dString, token);
-                ungetc(curr, stdin);
-                break;
-            }
             if (act_state == S_LC){
                 act_state = S_START;
                 ungetc(curr, stdin);
                 continue;
             }
+            return_type = LEX_ERR;
+            break;
         }
         if (curr == '\n'){
             
@@ -592,11 +587,6 @@ int scan(Token_t *token) {
             }
             line_num++;
             if (act_state != S_LC){ // TODO: mozna vracet LEX_ERR kdyz stav neni && S_START nebo ty co listuju nahore
-                continue;
-            }
-            if (act_state == S_STRING){
-                printf("heeere\n");
-                act_state = S_STRING;
                 continue;
             }
         }
