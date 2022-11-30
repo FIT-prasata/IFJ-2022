@@ -42,26 +42,21 @@ int prolog_handler(void){
             // possible comment
             is_ok = true;
         }
-        //printf("curr: '%c'\n", curr);
         if (is_ok){
             do {
-                //printf("curr: '%c'\n", curr);
                 // comments handling
                 if (curr == '/'){
                     curr = getchar();
-                    //printf("    curr: '%c'\n", curr);
                     if (curr == '/'){ // line comment
-                        //printf("haha zmrde\n");
                         while(curr != '\n'){
                             curr = getchar();
                         }
                     }
-                    else if (curr == '*'){
-                        //printf("haha zmrde2\n");
+                    else if (curr == '*'){ // block comment
                         while(block_comment_end == false){
                             curr = getchar();
                             if (curr == EOF){
-                                return 1;
+                                return LEX_ERR;
                             }
                             if (curr == '*'){
                                 curr = getchar();
@@ -78,7 +73,7 @@ int prolog_handler(void){
                         continue;
                     }
                     else{ // not a line comment
-                        return 1;
+                        return SYNTAX_ERR;
                     }
                 }
                 else if (is_white(curr)){
@@ -91,31 +86,28 @@ int prolog_handler(void){
                 }
                 else{
                     printf("now, curr = '%c'\n", curr);
-                    return 1;
+                    return SYNTAX_ERR;
                 }
                 curr = getchar();
             } while (curr != 'd');
         }
         else{
-            return 1;
+            return SYNTAX_ERR;
         }
 
-
-
-
-
         ungetc(curr, stdin);
+        // second part of prolog checking
         for(int i = 0; i < 24; i++){
             curr = getchar();
             prolog_start[i] = curr;
         }
         if (strcmp(prolog_start, "declare(strict_types=1);") == 0){
-            return 0;
+            return OK;
         } else{
-            return 1;
+            return SYNTAX_ERR;
         }
     } else {
-        return 1; // prolog is not present/contains some white chars at the start of file
+        return SYNTAX_ERR; // prolog is not present/contains some white chars at the start of file
     }
 }
 
@@ -190,7 +182,7 @@ int string_handler(DString_t *dString, Token_t *token){
         if (curr == '$'){
             continue;
         }
-        if (curr == '\\') {
+        if (curr == '\\') { // escape sequence
             curr = dString->str[++i];
             switch (curr) {
                 case 'n':
@@ -211,6 +203,7 @@ int string_handler(DString_t *dString, Token_t *token){
                 case 'x': // hex case
                     for (int x = 0; x < 2; x++) {
                         curr = dString->str[++i];
+                        // correct format handling
                         if (((x == 1 && oct_hex[0] == '0') ? curr >= '1' : curr >= '0') && curr <= '9') {
                             oct_hex[x] = curr;
                             oct_hex[x + 1] = '\0';
@@ -231,6 +224,7 @@ int string_handler(DString_t *dString, Token_t *token){
                             break;
                         }
                     }
+                    // convert value to int
                     if (num_ok) {
                         d_string_add_char(&dString_local, (char) strtol(oct_hex, &garbage_strtol, 16));
                     }
@@ -246,6 +240,7 @@ int string_handler(DString_t *dString, Token_t *token){
                     oct_hex[0] = dString->str[i];
                     for (int x = 1; x < 3; x++) {
                         curr = dString->str[++i];
+                        // correct format handling
                         if (((x == 2 && oct_hex[0] == '0' && oct_hex[1] == '0') ? curr >= '1' : curr >= '0') && curr <= '7') {
                             oct_hex[x] = curr;
                             oct_hex[x + 1] = '\0';
@@ -259,6 +254,7 @@ int string_handler(DString_t *dString, Token_t *token){
                             break;
                         }
                     }
+                    // convert value to int
                     if (num_ok) {
                         d_string_add_char(&dString_local, (char) strtol(oct_hex, &garbage_strtol, 8));
                     }
@@ -268,6 +264,7 @@ int string_handler(DString_t *dString, Token_t *token){
                     num_ok = true;
                     break;
                 default:
+                    // incorrect escape sequence, add everything to string as it is
                     d_string_add_char(&dString_local, '\\'); // adds '\' to string
                     d_string_add_char(&dString_local, curr); // adds char after '\' to string
             }
@@ -320,7 +317,7 @@ int int_handler(DString_t *dString, Token_t *token){
 
 
 // Function for double handling
-int float_handler(DString_t *dString, Token_t *token){ // TODO: vracet float i do stringu
+int float_handler(DString_t *dString, Token_t *token){
     char *garbage_strtol;
     double decimal = strtod(dString->str, &garbage_strtol);
     token->attribute.dec_value = decimal;
@@ -495,6 +492,7 @@ T_State_t state(T_State_t act, int curr, DString_t *DString){
                 d_string_add_char(DString, curr);
                 return S_INT;
             }
+            // num is float
             else if (curr == '.' || curr == 'e' || curr == 'E'){
                 d_string_add_char(DString, curr);
                 curr = getchar();
@@ -526,6 +524,7 @@ T_State_t state(T_State_t act, int curr, DString_t *DString){
                 d_string_add_char(DString, curr);
                 return S_FLOAT;
             }
+            // exponent
             else if (curr == 'e' || curr == 'E'){
                 d_string_add_char(DString, curr);
                 curr = getchar();
@@ -580,8 +579,12 @@ int scan(Token_t *token) {
 
     // prolog handler
     if (start_of_file) {
-        if (prolog_handler()) {
-            return_type = SYNTAX_ERR; // syntax error in prolog
+        int prol_ret = prolog_handler();
+        if (prol_ret == LEX_ERR) {
+            return_type = LEX_ERR;
+        }
+        else if (prol_ret == SYNTAX_ERR) {
+            return_type = SYNTAX_ERR;
         }
         start_of_file = false;
     }
@@ -594,6 +597,7 @@ int scan(Token_t *token) {
             break;
         }
         else if (curr == EOF && act_state != S_START) {
+            // edge cases if some of these states occur at the end of file
             if (act_state == S_KEYWORD){
                 return_type = keyword_handler(&dString, token);
                 ungetc(curr, stdin);
@@ -623,7 +627,7 @@ int scan(Token_t *token) {
             break;
         }
         if (curr == '\n'){
-            
+            // edge cases if EOL occurs and state is some of the listed
             if (act_state == S_KEYWORD){
                 return_type = keyword_handler(&dString, token);
                 ungetc(curr, stdin);
@@ -645,7 +649,7 @@ int scan(Token_t *token) {
                 break;
             }
             line_num++;
-            if (act_state != S_LC){ // TODO: mozna vracet LEX_ERR kdyz stav neni && S_START nebo ty co listuju nahore
+            if (act_state != S_LC){
                 continue;
             }
         }
@@ -654,7 +658,7 @@ int scan(Token_t *token) {
             continue;
         }
 
-
+        // FSM state determination
         T_State_t next = state(act_state, curr, &dString);
         switch (next){
             // error case

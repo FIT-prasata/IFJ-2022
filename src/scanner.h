@@ -147,14 +147,8 @@ typedef enum T_State{
 
 } T_State_t;
 
-// Token attribute - commented for testing purposes!!!
-// typedef union {
-//     char *string;
-//     int value;
-//     double dec_value;
-// } T_attr_t;
-
-typedef struct { // only for testing purposes!!! change afterwards
+// Token attribute
+typedef struct {
     char *string;
     int value;
     double dec_value;
