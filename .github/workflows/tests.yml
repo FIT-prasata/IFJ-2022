@@ -6,7 +6,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
         with:
-          ref: develop
+          ref: 52-eva-integration
       - name: Copy src to Eva
         run: |
           sshpass -p ${{ secrets.EVA_PASSWORD }} scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -r src ${{ secrets.EVA_USER }}@${{ secrets.EVA_HOST }}:~/ifj/tmp
