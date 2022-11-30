@@ -28,6 +28,6 @@ jobs:
       # TODO - run tests
       - name: Run tests on Merlin
         run: |
-          sshpass -p ${{ secrets.EVA_PASSWORD }} ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ${{ secrets.EVA_USER }}@${{ secrets.EVA_HOST }} "cd ~/ifj/tmp && make run-tests"
+          sshpass -p ${{ secrets.MERLIN_PASSWORD }} ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ${{ secrets.MERLIN_USER }}@${{ secrets.MERLIN_HOST }} "cd ~/ifj/tmp && make run-tests"
       # TODO - get results somehow
       # TODO - clean up
