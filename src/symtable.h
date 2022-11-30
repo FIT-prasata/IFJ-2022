@@ -1,5 +1,8 @@
 #pragma once
 
+#ifndef _SYMTABLE_H_
+#define _SYMTABLE_H_
+
 // Filename: scanner.c
 // IFJ 2022/2023 project
 // TRP variant
@@ -14,6 +17,11 @@
 // LOCAL INCLUDES
 #include "scanner.h"
 #include "stack.h"
+#include <stdint.h>
+
+
+// line counting
+extern int line_num;
 
 // Predeclared types
 typedef struct Htab_item Htab_item_t;

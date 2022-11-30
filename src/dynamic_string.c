@@ -12,6 +12,7 @@
 // LOCAL INCLUDES
 #include "dynamic_string.h"
 
+
 // Clears dynamic string
 int d_string_clear(DString_t *d_string) {
     if (d_string == NULL) {

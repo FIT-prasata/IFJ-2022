@@ -1,5 +1,8 @@
 #pragma once
 
+#ifndef _PARSER_H_
+#define _PARSER_H_
+
 // Filename: parser.h
 // IFJ 2022/2023 project
 // TRP variant
@@ -16,4 +19,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+
+// line counting
+extern int line_num;
+
 // LOCAL INCLUDES
+
+#endif // _PARSER_H_

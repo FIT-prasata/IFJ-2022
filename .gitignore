@@ -7,3 +7,4 @@ src/.vscode/*
 tests
 main
 example.txt
+src/scanner_old.c

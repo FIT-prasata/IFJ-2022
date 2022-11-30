@@ -12,6 +12,7 @@
 // LOCAL INCLUDES
 #include "stack.h"
 
+
 // Initializes stack
 void stack_init(Stack_t *stack) {
     stack->head.type = NO_TYPE;

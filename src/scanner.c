@@ -12,562 +12,861 @@
 // LOCAL INCLUDES
 #include "scanner.h"
 
-char get_non_white() {
-    char tmp = (char)getchar();
-    return (isspace(tmp)) ? get_non_white() : tmp;
+
+
+// Checks if character is a white character (not a newline)
+int is_white(int input)
+{
+    return (input == ' ' || input == '\t' || (input >= 11 && input <= 13));
 }
 
-void set_type(Token_t *token, T_type_t type) { token->type = type; }
 
-// line comment
-char skip_lc() {
-    char curr;
-    while (true) {
+// Function for handling prolog
+int prolog_handler(void){
+    char prolog_start[25] = {'\0',};
+    int curr;
+    bool is_ok = false, block_comment_end = false;
+
+    for(int i = 0; i < 5; i++){
         curr = getchar();
-        if (curr == EOF) {
-            return LC_EOF_ERR;
-        }
-        if (curr == '\n') {
-            return OK;
-        }
+        prolog_start[i] = curr;
     }
-}
-
-// block comment
-int skip_bc() {
-    char prev, curr;
-    while (true) {
+    if (strcmp(prolog_start, "<?php") == 0) {
+        // check if there is a white char/newline/comment
         curr = getchar();
-        if (curr == EOF) {
-            return BC_EOF_ERR;
+        if (is_white(curr) || curr == '\n'){
+            is_ok = true;
         }
-        if (prev == '*' && curr == '/') {
-            return OK;
+        else if (curr == '/'){
+            // possible comment
+            is_ok = true;
         }
-        prev = curr;
-    }
-}
+        if (is_ok){
+            do {
+                // comments handling
+                if (curr == '/'){
+                    curr = getchar();
+                    if (curr == '/'){ // line comment
+                        while(curr != '\n'){
+                            curr = getchar();
+                        }
+                    }
+                    else if (curr == '*'){ // block comment
+                        while(block_comment_end == false){
+                            curr = getchar();
+                            if (curr == EOF){
+                                return LEX_ERR;
+                            }
+                            if (curr == '*'){
+                                curr = getchar();
+                                if (curr == '/'){
+                                    block_comment_end = true;
+                                }
+                            }
+                            if (curr == '\n'){
+                                line_num++;
+                            }
+                        }
+                        block_comment_end = false;
+                        curr = getchar();
+                        continue;
+                    }
+                    else{ // not a line comment
+                        return SYNTAX_ERR;
+                    }
+                }
+                else if (is_white(curr)){
+                    curr = getchar();
+                    continue;
+                }
+                // line counting
+                if (curr == '\n'){
+                    line_num++;
+                }
+                else{
+                    printf("now, curr = '%c'\n", curr);
+                    return SYNTAX_ERR;
+                }
+                curr = getchar();
+            } while (curr != 'd');
+        }
+        else{
+            return SYNTAX_ERR;
+        }
 
-int type_handler(Token_t *token) {
-    char *id_types[] = {"int", "float", "string"};
-    int types[] = {K_INT, K_FLOAT, K_STR};
-    int types_array_size = sizeof(types) / sizeof(types[0]);
-
-    DString_t dString;
-    d_string_init(&dString);
-    char curr = getchar();
-
-    do {
-        if ((curr >= 'A' && curr <= 'Z') || (curr >= 'a' && curr <= 'z') ||
-            (curr >= '0' && curr <= '9') || (curr == '_')) {
+        ungetc(curr, stdin);
+        // second part of prolog checking
+        for(int i = 0; i < 24; i++){
             curr = getchar();
-            d_string_add_char(&dString, curr);
-        } else {
-            break;
+            prolog_start[i] = curr;
         }
-    } while (true);
-
-    for (int i = 0; i < types_array_size; i++) {
-        if (strcmp(id_types[i], dString.str) == 0) {
-            set_type(token, types[i]);
-            d_string_free_and_clear(&dString);
+        if (strcmp(prolog_start, "declare(strict_types=1);") == 0){
             return OK;
+        } else{
+            return SYNTAX_ERR;
         }
+    } else {
+        return SYNTAX_ERR; // prolog is not present/contains some white chars at the start of file
     }
-    strcpy(token->attribute.string, dString.str);
-    d_string_free_and_clear(&dString);
-    return TYPE_ERR;
 }
 
-int keyword_handler(Token_t *token, char *curr) {
+
+// Function for handling epilog
+int epilog_handler(void){
+    int curr = getchar();
+    int curr2;
+    if (curr == EOF){
+        ungetc(curr, stdin);
+        return OK;
+    } else if (curr == '\n') {
+        curr2 = getchar();
+        if (curr2 == EOF){
+            ungetc(curr2, stdin);
+            ungetc(curr, stdin);
+            return OK;
+        } else {
+            ungetc(curr2, stdin);
+            ungetc(curr, stdin);
+            return SYNTAX_ERR;
+        }
+    } else {
+        ungetc(curr, stdin);
+        return SYNTAX_ERR;
+    }
+}
+
+
+// Function for keyword handling
+int keyword_handler(DString_t *dString, Token_t *token){
     char *keywords[] = {"else", "float",  "function", "if",   "int",
-                        "null", "return", "string",   "void", "while"};
+                        "null", "return", "string",   "void", "while", "?int", "?string", "?float"};
     int keyword_types[] = {K_ELSE, K_FLOAT, K_FUNC, K_IF,   K_INT,
-                           K_NULL, K_RET,   K_STR,  K_VOID, K_WHILE};
+                           K_NULL, K_RET,   K_STR,  K_VOID, K_WHILE, K_INT_NULL, K_STR_NULL, K_FLOAT_NULL};
     int keywords_array_size = sizeof(keywords) / sizeof(keywords[0]);
 
-    DString_t dString;
-    d_string_init(&dString);
-
-    do {
-        if ((*curr >= 'A' && *curr <= 'Z') || (*curr >= 'a' && *curr <= 'z') ||
-            (*curr >= '0' && *curr <= '9') || (*curr == '_')) {
-            *curr = getchar();
-            d_string_add_char(&dString, *curr);
-        } else {
-            break;
-        }
-    } while (true);
-
     for (int i = 0; i < keywords_array_size; i++) {
-        if (strcmp(keywords[i], dString.str) == 0) {
-            set_type(token, keyword_types[i]);
-            d_string_free_and_clear(&dString);
-            return T_KEYWORD;
+        if (strcmp(keywords[i], dString->str) == 0) {
+            token->type = keyword_types[i];
+            return OK;
         }
     }
-    set_type(token, T_FUNC_ID);
-    strcpy(token->attribute.string, dString.str);
-    d_string_free_and_clear(&dString);
+    if (dString->str[0] == '?'){
+        return LEX_ERR;
+    }
+    token->type = T_FUNC_ID;
+    token->attribute.string = malloc(sizeof(char) * (dString->length + 1));
+    if (token->attribute.string == NULL) {
+        return INTERNAL_ERR;
+    }
+    strcpy(token->attribute.string, dString->str);
     return OK;
 }
 
-int num_handler(Token_t *token, char *curr) {
-    bool dec_pt = false, exp = false;
-    char last;
 
-    DString_t dString;
-    d_string_init(&dString);
-    d_string_add_char(&dString, *curr);
-    last = *curr;
-    set_type(token, T_INT);
+// Function for string handling
+int string_handler(DString_t *dString, Token_t *token){
 
-    while (true) {
-        *curr = getchar();
-        if (*curr >= '0' && *curr <= '9') {
-            d_string_add_char(&dString, *curr);
-        } else if (*curr == '.' && (dec_pt == false) && (exp == false)) {
-            d_string_add_char(&dString, *curr);
-            dec_pt = true;
-            set_type(token, T_FLOAT);
-        } else if ((*curr == 'e' || *curr == 'E') && (exp == false) &&
-                   (last >= '0') && (last <= '9')) {
-            d_string_add_char(&dString, *curr);
-            exp = true;
-            set_type(token, T_FLOAT);
-        } else if ((*curr == '+' || *curr == '-') &&
-                   (last == 'e' || last == 'E')) {
-            d_string_add_char(&dString, *curr);
-        } else {
-            if (last >= '0' && last <= '9') {
-                break;
-            } else {
-                return NUM_ERR;
-            }
-        }
-        last = *curr;
-    }
-    if (token->type == T_INT) {
-        get_d_string_value_to_integer(&dString, &(token->attribute.value));
-    } else {
-        get_d_string_value_to_double(&dString, &(token->attribute.dec_value));
-    }
-    d_string_free_and_clear(&dString);
-    return OK;
-}
-
-int string_handler(Token_t *token) {
-    char curr, last = '0';
-    char oct_hex[4] = {
-        0,
-    };
-    oct_hex[3] = '\0';
+    int curr;
+    char oct_hex[4] = {0,};
     char *garbage_strtol;
     bool num_ok = true;
-    int decimal = 0;
-    DString_t dString;
-    d_string_init(&dString);
-    set_type(token, T_STRING);
+    DString_t dString_local;
+    d_string_init(&dString_local);
 
-    while (true) {
-        if (last !=
-            '"') {  // should secure that when <\x6"> is the end of string, next
-                    // char (most time ';' or ')') should not be schroustán xd
-            curr = getchar();
-        }
-        if ((curr == '\"' || last == '"') && last != '\\') {
-            break;
-        }
+    for (unsigned int i = 0; i < dString->length; i++) {
+        curr = dString->str[i];
         if (curr >= 0 && curr <= 31) {
-            return STR_ERR;
+            return LEX_ERR;
         }
-        if (curr == '\\') {
-            curr = getchar();
+        if (curr == '$'){
+            continue;
+        }
+        if (curr == '\\') { // escape sequence
+            curr = dString->str[++i];
             switch (curr) {
                 case 'n':
-                    d_string_add_char(&dString, curr);  //??
+                    d_string_add_char(&dString_local, '\n');
                     break;
                 case 't':
-                    d_string_add_char(&dString, curr);  //??
+                    d_string_add_char(&dString_local, '\t');
                     break;
                 case '\"':
-                    d_string_add_char(&dString, curr);
+                    d_string_add_char(&dString_local, curr);
                     break;
                 case '\\':
-                    d_string_add_char(&dString, curr);
+                    d_string_add_char(&dString_local, curr);
                     break;
-                case 'x':
-                    for (int i = 0; i < 2; i++) {
-                        oct_hex[i] =
-                            getchar();  // get next number of octal (2. and 3.)
-                        oct_hex[i + 1] = '\0';  // move string termination char
-                        if (oct_hex[i] ==
-                            '"') {  // pokud je uživatel kokot a dá něco v tomto
-                                    // stylu: ...\x6"    :)
-                            num_ok = false;
-                            curr = '"';
-                        }
-                        if ((oct_hex[i] < '0' || oct_hex[i] > '9') &&
-                            (oct_hex[i] < 'A' || oct_hex[i] > 'F') &&
-                            (oct_hex[i] < 'a' ||
-                             oct_hex[i] > 'f')) {  // check if oct char are in
-                                                   // valid range
-                            d_string_add_char(
-                                &dString, '\\');  // if not, write into string
-                                                  // '\' (by instructions)
-                            d_string_add_char(&dString, 'x');
-                            for (int j = 0;
-                                 oct_hex[j] != '\0' && oct_hex[j] != '"'; j++) {
-                                d_string_add_char(
-                                    &dString,
-                                    oct_hex[j]);  // insert into string rest of
-                                                  // loaded items
+                case '$':
+                    d_string_add_char(&dString_local, curr);
+                    break;
+                case 'x': // hex case
+                    for (int x = 0; x < 2; x++) {
+                        curr = dString->str[++i];
+                        // correct format handling
+                        if (((x == 1 && oct_hex[0] == '0') ? curr >= '1' : curr >= '0') && curr <= '9') {
+                            oct_hex[x] = curr;
+                            oct_hex[x + 1] = '\0';
+                        } else if (curr >= 'a' && curr <= 'f') {
+                            oct_hex[x] = curr;
+                            oct_hex[x + 1] = '\0';
+                        } else if (curr >= 'A' && curr <= 'F') {
+                            oct_hex[x] = curr;
+                            oct_hex[x + 1] = '\0';
+                        } else {
+                            d_string_add_char(&dString_local, '\\');
+                            d_string_add_char(&dString_local, 'x');
+                            for (int j = 0; oct_hex[j] != '\0'; j++) {
+                                d_string_add_char(&dString_local, oct_hex[j]);
                             }
+                            d_string_add_char(&dString_local, curr);
                             num_ok = false;
                             break;
                         }
                     }
-                    if (num_ok == true) {
-                        decimal = strtol(oct_hex, &garbage_strtol, 16);
-                        d_string_add_char(&dString, (char)decimal);
+                    // convert value to int
+                    if (num_ok) {
+                        d_string_add_char(&dString_local, (char) strtol(oct_hex, &garbage_strtol, 16));
                     }
-                    decimal = 0;
+                    for(int j = 0; j < 4; j++){
+                        oct_hex[j] = '\0';
+                    }
                     num_ok = true;
                     break;
                 case '0':
                 case '1':
                 case '2':
-                case '3':
-                    oct_hex[0] = curr;  // get first number of octal (0-3)
-                    for (int i = 1; i < 3; i++) {
-                        oct_hex[i] =
-                            getchar();  // get next number of octal (2. and 3.)
-                        oct_hex[i + 1] = '\0';  // move string termination char
-                        if (oct_hex[i] ==
-                            '"') {  // pokud je uživatel kokot a dá něco v tomto
-                                    // stylu: ...\x6"    :)
-                            num_ok = false;
-                            curr = '"';
-                        }
-                        if (oct_hex[i] < '0' ||
-                            oct_hex[i] >
-                                '7') {  // check if oct char are in valid range
-                            d_string_add_char(
-                                &dString, '\\');  // if not, write into string
-                                                  // '\' (by instructions)
-                            for (int j = 0;
-                                 oct_hex[j] != '\0' && oct_hex[j] != '"'; j++) {
-                                d_string_add_char(
-                                    &dString,
-                                    oct_hex[j]);  // insert into string rest of
-                                                  // loaded items
+                case '3': // oct case
+                    oct_hex[0] = dString->str[i];
+                    for (int x = 1; x < 3; x++) {
+                        curr = dString->str[++i];
+                        // correct format handling
+                        if (((x == 2 && oct_hex[0] == '0' && oct_hex[1] == '0') ? curr >= '1' : curr >= '0') && curr <= '7') {
+                            oct_hex[x] = curr;
+                            oct_hex[x + 1] = '\0';
+                        } else {
+                            d_string_add_char(&dString_local, '\\');
+                            for (int j = 0; oct_hex[j] != '\0'; j++) {
+                                d_string_add_char(&dString_local, oct_hex[j]);
                             }
+                            d_string_add_char(&dString_local, curr);
                             num_ok = false;
                             break;
                         }
                     }
-                    if (num_ok == true) {
-                        decimal = strtol(oct_hex, &garbage_strtol, 8);
-                        d_string_add_char(&dString, (char)decimal);
+                    // convert value to int
+                    if (num_ok) {
+                        d_string_add_char(&dString_local, (char) strtol(oct_hex, &garbage_strtol, 8));
                     }
-                    decimal = 0;
+                    for(int j = 0; j < 4; j++){
+                        oct_hex[j] = '\0';
+                    }
                     num_ok = true;
                     break;
                 default:
-                    return STR_ERR;  // insert into string full loaded
-                                     // statement, '\' included
+                    // incorrect escape sequence, add everything to string as it is
+                    d_string_add_char(&dString_local, '\\'); // adds '\' to string
+                    d_string_add_char(&dString_local, curr); // adds char after '\' to string
             }
         } else {
-            d_string_add_char(&dString, curr);
+            d_string_add_char(&dString_local, curr);
         }
-        last = curr;
     }
-    printf("stringhere: %s\n", dString.str);
-    printf("%d\n", dString.length);
-    token->attribute.string = malloc(sizeof(char) * dString.length + 1);
-    strcpy(token->attribute.string, dString.str);
-    d_string_free_and_clear(&dString);
-    return 0;
+
+
+    // Adds string to token
+    token->attribute.string = malloc(sizeof(char) * (dString_local.length + 1));
+    if (token->attribute.string == NULL) {
+        return INTERNAL_ERR;
+    }
+    strcpy(token->attribute.string, dString_local.str);
+    d_string_free_and_clear(&dString_local);
+    token->type = T_STRING;
+    return OK;
 }
 
-int id_handler(Token_t *token) {
+
+// Function for variable IDs hadling
+int id_handler(DString_t *dString, Token_t *token) {
+    if (strcmp(dString->str, "$") == 0) {
+        return LEX_ERR;
+    }
+    token->attribute.string = malloc(sizeof(char) * (dString->length + 1));
+    if (token->attribute.string == NULL) {
+        return INTERNAL_ERR;
+    }
+    strcpy(token->attribute.string, dString->str);
+    token->type = T_ID;
+    return OK;
+}
+
+
+// Function for integer handling
+int int_handler(DString_t *dString, Token_t *token){
+    char *garbage_strtol;
+    int decimal = (int) strtol(dString->str, &garbage_strtol, 10);
+    token->attribute.string = malloc(sizeof(char) * (dString->length + 1));
+    if (token->attribute.string == NULL) {
+        return INTERNAL_ERR;
+    }
+    strcpy(token->attribute.string, dString->str);
+    token->attribute.value = decimal;
+    token->type = T_INT;
+    return OK;
+}
+
+
+// Function for double handling
+int float_handler(DString_t *dString, Token_t *token){
+    char *garbage_strtol;
+    double decimal = strtod(dString->str, &garbage_strtol);
+    token->attribute.dec_value = decimal;
+    token->type = T_FLOAT;
+    // insert float value into token.attribute.string
+    char output[100] = {0};
+    snprintf(output, 100, "%f", decimal);
+    token->attribute.string = malloc(sizeof(char) * (strlen(output) + 1));
+    if (token->attribute.string == NULL) {
+        return INTERNAL_ERR;
+    }
+    strcpy(token->attribute.string, output);
+    return OK;
+}
+
+
+// Part of FSM implemetation, returns FSM STATE according to current state and input char
+T_State_t state(T_State_t act, int curr, DString_t *DString){
+    switch(act){
+        case S_START:
+            if ((curr >= 'a' && curr <= 'z') || (curr >= 'A' && curr <= 'Z') || (curr == '_')){
+                d_string_add_char(DString, curr);
+                return S_KEYWORD;
+            }
+            if (curr >= '0' && curr <= '9'){
+                d_string_add_char(DString, curr);
+                return S_INT;
+            }
+            if (curr == '?'){
+                d_string_add_char(DString, curr);
+                return QUEST_MARK;
+            }
+            if (curr == '$'){
+                d_string_add_char(DString, curr);
+                curr = getchar();
+                if (curr >= '0' && curr <= '9'){
+                    return S_ERR;
+                }
+                ungetc(curr, stdin);
+                return S_ID;
+            }
+            if (curr == '('){
+                return S_LBR;
+            }
+            if (curr == ')'){
+                return S_RBR;
+            }
+            if (curr == '"'){
+                return S_STRING;
+            }
+            if (curr == ';'){
+                return S_SEM;
+            }
+            if (curr == '/'){
+                return S_DIV;
+            }
+            if (curr == '+'){
+                return S_ADD;
+            }
+            if (curr == '-'){
+                return S_SUB;
+            }
+            if (curr == '*'){
+                return S_MUL;
+            }
+            if (curr == ','){
+                return S_COMMA;
+            }
+            if (curr == '{'){
+                return S_LCBR;
+            }
+            if (curr == '}'){
+                return S_RCBR;
+            }
+            if (curr == ':'){
+                return S_COL;
+            }
+            if (curr == '.'){
+                return S_CONCAT;
+            }
+            if (curr == '<'){
+                return S_LT;
+            }
+            if (curr == '>'){
+                return S_GT;
+            }
+            if (curr == '='){
+                return S_ASSIGN;
+            }
+            if (curr == '!'){
+                return S_NEQ;
+            }
+            return S_ERR;
+        
+        // divison and possible comments
+        case S_DIV:
+            if (curr == '/'){
+                return S_LC;
+            }
+            else if (curr == '*'){
+                return S_BC;
+            }
+            return S_ERR;
+        
+        // possible ===
+        case S_POSS_EQ:
+            if (curr == '='){
+                return S_EQ_OK;
+            }
+            return S_ERR;
+
+        // possible !==
+        case S_POSS_NEQ:
+            if (curr == '='){
+                return S_NEQ_OK;
+            }
+            return S_ERR;
+            
+        //keywords and epilog
+        case S_KEYWORD:
+            if ((curr >= 'a' && curr <= 'z') || (curr >= 'A' && curr <= 'Z') || (curr == '_') || (curr >= '0' && curr <= '9')){
+                d_string_add_char(DString, curr);
+                return S_KEYWORD;
+            }
+            else{
+                ungetc(curr, stdin);
+                return S_KEYWORD_END;
+            }
+        case QUEST_MARK:
+            if (curr == '>'){
+                return S_PROL_END;
+            }
+            else if((curr >= 'a' && curr <= 'z') || (curr >= 'A' && curr <= 'Z') || (curr == '_')){
+                d_string_add_char(DString, curr);
+                return S_KEYWORD;
+            }
+            else{
+                return S_ERR; // ex: ?8 or ?= ...
+            }
+
+        // strings
+        case S_STRING:
+            if (curr == '\\'){
+                d_string_add_char(DString, curr);
+                return S_STRING_ESC;
+            }
+            if (curr != '"'){
+                d_string_add_char(DString, curr);
+                return S_STRING;
+            }
+            else{
+                return S_STRING_END;
+            }
+        case S_STRING_ESC: // \ was in string
+            d_string_add_char(DString, curr);
+            return S_STRING;
+
+        // identificators
+        case S_ID:
+            if ((curr >= 'a' && curr <= 'z') || (curr >= 'A' && curr <= 'Z') || (curr == '_') || (curr >= '0' && curr <= '9')){
+                d_string_add_char(DString, curr);
+                return S_ID;
+            }
+            else{
+                ungetc(curr, stdin);
+                return S_ID_END;
+            }
+
+        // numbers
+        case S_INT:
+            if (curr >= '0' && curr <= '9'){
+                d_string_add_char(DString, curr);
+                return S_INT;
+            }
+            // num is float
+            else if (curr == '.' || curr == 'e' || curr == 'E'){
+                d_string_add_char(DString, curr);
+                curr = getchar();
+                if (curr == '+' || curr == '-'){
+                    d_string_add_char(DString, curr);
+                    curr = getchar();
+                    if (curr >= '0' && curr <= '9'){
+                        ungetc(curr, stdin);
+                        return S_FLOAT;
+                    }
+                    else{
+                        return S_ERR;
+                    }
+                }
+                else if (curr >= '0' && curr <= '9'){
+                    ungetc(curr, stdin);
+                }
+                else{
+                    return S_ERR;
+                }
+                return S_FLOAT;
+            }
+            else{
+                ungetc(curr, stdin);
+                return S_INT_END;
+            }
+        case S_FLOAT:
+            if (curr >= '0' && curr <= '9'){
+                d_string_add_char(DString, curr);
+                return S_FLOAT;
+            }
+            // exponent
+            else if (curr == 'e' || curr == 'E'){
+                d_string_add_char(DString, curr);
+                curr = getchar();
+                if (curr == '+' || curr == '-'){
+                    d_string_add_char(DString, curr);
+                    curr = getchar();
+                    if (curr >= '0' && curr <= '9'){
+                        ungetc(curr, stdin);
+                        return S_FLOAT;
+                    }
+                    else{
+                        return S_ERR;
+                    }
+                }
+                else if (curr >= '0' && curr <= '9'){
+                    ungetc(curr, stdin);
+                }
+                else{
+                    return S_ERR;
+                }
+                return S_FLOAT;
+            }
+            else{
+                ungetc(curr, stdin);
+                return S_FLOAT_END;
+            }
+
+        // comments
+        case S_LC:
+            if (curr != '\n'){
+                return S_LC;
+            }
+            return S_START;
+        case S_BC:
+            if (curr == '*'){
+                return S_POSS_BC_END;
+            }
+            return S_BC;
+        default: // should never happen, unknown state handling (raises LEX_ERR)
+            return S_ERR;
+    }
+}
+
+
+// Function that returns the token through the pointer and returns if the token is valid
+int scan(Token_t *token) {
     DString_t dString;
     d_string_init(&dString);
-    char curr = getchar();
+    int curr, return_type = -1;
+    T_State_t act_state = S_START;
+    static bool start_of_file = true;
 
-    if ((curr >= 'A' && curr <= 'Z') || (curr >= 'a' && curr <= 'z') ||
-        (curr == '_')) {
-        do {
-            if ((curr >= 'A' && curr <= 'Z') || (curr >= 'a' && curr <= 'z') ||
-                (curr >= '0' && curr <= '9') || (curr == '_')) {
-                curr = getchar();
-                d_string_add_char(&dString, curr);
-            } else {
+    // prolog handler
+    if (start_of_file) {
+        int prol_ret = prolog_handler();
+        if (prol_ret == LEX_ERR) {
+            return_type = LEX_ERR;
+        }
+        else if (prol_ret == SYNTAX_ERR) {
+            return_type = SYNTAX_ERR;
+        }
+        start_of_file = false;
+    }
+
+    while(return_type == -1){
+        curr = getchar();
+        if (curr == EOF && act_state == S_START) {
+            token->type = T_EOF;
+            return_type = OK;
+            break;
+        }
+        else if (curr == EOF && act_state != S_START) {
+            // edge cases if some of these states occur at the end of file
+            if (act_state == S_KEYWORD){
+                return_type = keyword_handler(&dString, token);
+                ungetc(curr, stdin);
                 break;
             }
-        } while (true);
+            if (act_state == S_INT){
+                return_type = int_handler(&dString, token);
+                ungetc(curr, stdin);
+                break;
+            }
+            if (act_state == S_FLOAT){
+                return_type = float_handler(&dString, token);
+                ungetc(curr, stdin);
+                break;
+            }
+            if (act_state == S_ID){
+                return_type = id_handler(&dString, token);
+                ungetc(curr, stdin);
+                break;
+            }
+            if (act_state == S_LC){
+                act_state = S_START;
+                ungetc(curr, stdin);
+                continue;
+            }
+            return_type = LEX_ERR;
+            break;
+        }
+        if (curr == '\n'){
+            // edge cases if EOL occurs and state is some of the listed
+            if (act_state == S_KEYWORD){
+                return_type = keyword_handler(&dString, token);
+                ungetc(curr, stdin);
+                break;
+            }
+            if (act_state == S_INT){
+                return_type = int_handler(&dString, token);
+                ungetc(curr, stdin);
+                break;
+            }
+            if (act_state == S_FLOAT){
+                return_type = float_handler(&dString, token);
+                ungetc(curr, stdin);
+                break;
+            }
+            if (act_state == S_ID){
+                return_type = id_handler(&dString, token);
+                ungetc(curr, stdin);
+                break;
+            }
+            line_num++;
+            if (act_state != S_LC){
+                continue;
+            }
+        }
+        // get rid of white chars
+        if (is_white(curr) && act_state == S_START){
+            continue;
+        }
 
-        set_type(token, T_ID);
-        strcpy(token->attribute.string, dString.str);
-        d_string_free_and_clear(&dString);
-        return OK;
-    } else {
-        d_string_free_and_clear(&dString);
-        return ID_ERR;
-    }
-}
+        // FSM state determination
+        T_State_t next = state(act_state, curr, &dString);
+        switch (next){
+            // error case
+            case S_ERR:
+                return_type = LEX_ERR;
+                break;
 
-int scan(Token_t *token) {
-    char curr;
-    static char last;
-    static bool use_last;
-    int ret;
+            case S_START:
+                act_state = S_START;
+                break;
 
-    if (last == EOF) {
-        set_type(token, T_EOF);
+            // one char tokens
+            case S_LBR:
+                token->type = T_LBR;
+                return_type =  OK;
+                break;
+            case S_RBR:
+                token->type = T_RBR;
+                return_type = OK;
+                break;
+            case S_SEM:
+                token->type = T_SEM;
+                return_type = OK;
+                break;
+            case S_ADD:
+                token->type = T_ADD;
+                return_type = OK;
+                break;
+            case S_SUB:
+                token->type = T_SUB;
+                return_type = OK;
+                break;
+            case S_MUL:
+                token->type = T_MUL;
+                return_type = OK;
+                break;
+            case S_COMMA:
+                token->type = T_COMMA;
+                return_type = OK;
+                break;
+            case S_LCBR:
+                token->type = T_LCBR;
+                return_type = OK;
+                break;
+            case S_RCBR:
+                token->type = T_RCBR;
+                return_type = OK;
+                break;
+            case S_COL:
+                token->type = T_COL;
+                return_type = OK;
+                break;
+            case S_CONCAT:
+                token->type = T_CONCAT;
+                return_type = OK;
+                break;
 
-        return NOT_IMPLEMENTED;  // Ultra edge case for calling scan after
-                                 // receiving EOF somehow
-    }
-    if (use_last) {
-        curr = last;
-        use_last = false;
-    } else {
-        curr = get_non_white();
-    }
-
-    while (true) {
-        switch (curr) {
-            case '/':
+            // division and possible comment
+            case S_DIV:
                 curr = getchar();
-                if (curr == '*') {
-                    if (skip_bc()) {
-                        return BC_EOF_ERR;
-                    } else {
-                        curr = get_non_white();
-                        break;
-                    }
-                } else if (curr == '/') {
-                    if (skip_lc()) {
-                        return LC_EOF_ERR;
-                    } else {
-                        curr = get_non_white();
-                        break;
-                    }
-                } else {
-                    last = curr;
-                    if (isspace(curr)) {
-                        last = get_non_white();
-                    }
-                    use_last = true;
-                    set_type(token, T_DIV);
-                    return OK;
+                if (curr == '/'){
+                    ungetc(curr, stdin);
+                    act_state = S_LC;
+                    break;
+                }
+                else if (curr == '*'){
+                    ungetc(curr, stdin);
+                    act_state = S_BC;
+                    break;
+                }
+                ungetc(curr, stdin);
+                token->type = T_DIV;
+                return_type = OK;
+                break;
+            
+            // longer tokens but of known length
+            case S_PROL_END:
+                token->type = T_END_PROLOG;
+                // epilog should be last thing in file
+                return_type = epilog_handler();
+                break;
+            case S_LT:
+                curr = getchar();
+                if (curr == '='){
+                    token->type = T_LEQ;
+                    return_type = OK;
+                }
+                else{
+                    ungetc(curr, stdin);
+                    token->type = T_LT;
+                    return_type = OK;
+                }
+                break;
+            case S_GT:
+                curr = getchar();
+                if (curr == '='){
+                    token->type = T_GEQ;
+                    return_type = OK;
+                }
+                else{
+                    ungetc(curr, stdin);
+                    token->type = T_GT;
+                    return_type = OK;
+                }
+                break;
+            case S_ASSIGN:
+                curr = getchar();
+                if (curr == '='){
+                    act_state = S_POSS_EQ;
+                }
+                else{
+                    ungetc(curr, stdin);
+                    token->type = T_ASSIGN;
+                    return_type = OK;
+                }
+                break;
+            case S_EQ_OK:
+                token->type = T_EQ;
+                return_type = OK;
+                break;
+            case S_NEQ:
+                curr = getchar();
+                if (curr == '='){
+                    act_state = S_POSS_NEQ;
+                }
+                else{ // IFJ22 does not have ! operator (negation) -> error
+                    ungetc(curr, stdin);
+                    return_type = LEX_ERR;
+                }
+                break;
+            case S_NEQ_OK:
+                token->type = T_NEQ;
+                return_type = OK;
+                break;
+
+            // keywords
+            case S_KEYWORD:
+                act_state = next;
+                break;
+            case S_KEYWORD_END:
+                return_type = keyword_handler(&dString, token);
+                break;
+            case QUEST_MARK:
+                act_state = next;
+                break;
+
+            // identificators
+            case S_ID:
+                act_state = next;
+                break;
+            case S_ID_END:
+                return_type = id_handler(&dString, token);
+                break;
+
+            // strings
+            case S_STRING:
+                act_state = next;
+                break;
+            case S_STRING_END:
+                return_type = string_handler(&dString, token);
+                break;
+            case S_STRING_ESC:
+                act_state = next;
+                break;
+
+            // numbers - int
+            case S_INT:
+                act_state = next;
+                break;
+            case S_INT_END:
+                return_type = int_handler(&dString, token);
+                break;
+
+            // numbers - float
+            case S_FLOAT:
+                act_state = next;
+                break;
+            case S_FLOAT_END:
+                return_type = float_handler(&dString, token);
+                token->type = T_FLOAT;
+                break;
+
+            // comments
+            case S_LC:
+                act_state = next;
+                break;
+            case S_BC:
+                act_state = next;
+                break;
+            case S_POSS_BC_END:
+                curr = getchar();
+                if (curr == '/'){
+                    act_state = S_START;
+                    break;
+                }
+                else{
+                    act_state = S_BC;
+                    break;
                 }
 
-            case '\n':
-                last = '\n';
-                set_type(token, T_EOL);
-                break;  // temp break to get rid of warnings
-            case '_':   // 'a' ... 'z' might work for gcc, but too tired
-            case 'a':
-            case 'b':
-            case 'c':
-            case 'd':
-            case 'e':
-            case 'f':
-            case 'g':
-            case 'h':
-            case 'i':
-            case 'j':
-            case 'k':
-            case 'l':
-            case 'm':
-            case 'n':
-            case 'o':
-            case 'p':
-            case 'q':
-            case 'r':
-            case 's':
-            case 't':
-            case 'u':
-            case 'v':
-            case 'w':
-            case 'x':
-            case 'y':
-            case 'z':
-            case 'A':
-            case 'B':
-            case 'C':
-            case 'D':
-            case 'E':
-            case 'F':
-            case 'G':
-            case 'H':
-            case 'I':
-            case 'J':
-            case 'K':
-            case 'L':
-            case 'M':
-            case 'N':
-            case 'O':
-            case 'P':
-            case 'Q':
-            case 'R':
-            case 'S':
-            case 'T':
-            case 'U':
-            case 'V':
-            case 'W':
-            case 'X':
-            case 'Y':
-            case 'Z':
-                if (keyword_handler(token, &curr) == OK) {
-                    last = isspace(curr) ? get_non_white() : curr;
-                    use_last = true;
-                    return OK;
-                } else {
-                    return INTERNAL_ERR;
-                }
-            case '0':
-            case '1':
-            case '2':
-            case '3':
-            case '4':
-            case '5':
-            case '6':
-            case '7':
-            case '8':
-            case '9':
-                if ((ret = num_handler(token, &curr))) {
-                    return ret;
-                } else {
-                    last = isspace(curr) ? get_non_white() : curr;
-                    use_last = true;
-                    return OK;
-                }
-            case '\"':
-                if ((ret = string_handler(token))) {
-                    return ret;
-                }
-                last = '\"';
-                return OK;
-            case '$':
-                if ((ret = id_handler(token))) {
-                    return ret;
-                }
-                return OK;
-            case '<':
-                curr = getchar();
-                last = curr;
-
-                if (curr == '=') {
-                    set_type(token, T_LE);
-                    return OK;
-                } else {
-                    if (isspace(curr)) {
-                        last = get_non_white();
-                    }
-                    use_last = true;
-                    set_type(token, T_LT);
-                    return OK;
-                }
-            case '>':
-                curr = getchar();
-                last = curr;
-
-                if (curr == '=') {
-                    set_type(token, T_GE);
-                    return OK;
-                } else {
-                    if (isspace(curr)) {
-                        last = get_non_white();
-                    }
-                    use_last = true;
-                    set_type(token, T_GT);
-                    return OK;
-                }
-            case '(':
-                last = curr;
-                set_type(token, T_LBR);
-                return OK;
-            case ')':
-                last = curr;
-                set_type(token, T_RBR);
-                return OK;
-            case '{':
-                last = curr;
-                set_type(token, T_LCBR);
-                return OK;
-            case '}':
-                last = curr;
-                set_type(token, T_RCBR);
-                return OK;
-            case '+':
-                last = curr;
-                set_type(token, T_ADD);
-                return OK;
-            case '-':
-                last = curr;
-                set_type(token, T_SUB);
-                return OK;
-            case '*':
-                last = curr;
-                set_type(token, T_MUL);
-                return OK;
-            case ';':
-                last = curr;
-                set_type(token, T_SEM);
-                return OK;
-            case '?':
-                if (type_handler(token) == OK) {
-                    return OK;
-                } else if (type_handler(token) == TYPE_ERR) {
-                    return TYPE_ERR;
-                } else {
-                    return INTERNAL_ERR;
-                }
-            case '=':
-                curr = getchar();
-                if (curr == '=') {
-                    curr = getchar();
-                    if (curr == '=') {
-                        last = curr;
-                        set_type(token, T_EQ);
-                        return OK;
-                    } else {
-                        return EQ_ERR;
-                    }
-                }
-                if (isspace(curr)) {
-                    last = get_non_white();
-                }
-                use_last = true;
-                set_type(token, T_ASSIGN);
-                return OK;
-            case '!':
-                curr = getchar();
-                if (curr == '=') {
-                    curr = getchar();
-                    if (curr == '=') {
-                        last = curr;
-                        set_type(token, T_NE);
-                        return OK;
-                    } else {
-                        return NE_ERR;
-                    }
-                }
-                if (isspace(curr)) {
-                    last = get_non_white();
-                }
-                use_last = true;
-                set_type(token, T_NEG);
-                return OK;
-            case EOF:
-                last = curr;
-                set_type(token, T_EOF);
-                return OK;
+            // unknown return type
             default:
-                return NOT_IMPLEMENTED;
+                return_type = LEX_ERR;
+                break;
+            
         }
     }
+
+    // free dynamic string
+    d_string_free_and_clear(&dString);
+    return return_type;
 }
