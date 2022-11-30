@@ -10,13 +10,7 @@ jobs:
           sshpass -p ${{ secrets.EVA_PASSWORD }} scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -r * ${{ secrets.EVA_USER }}@${{ secrets.EVA_HOST }}:~/ifj/tmp
       # TODO - run tests
       - name: Run tests on eva
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{ secrets.EVA_HOST }}
-          username: ${{ secrets.EVA_USER }}
-          password: ${{ secrets.EVA_PASSWORD }}
-          script: |
-            cd ~/ifj/tmp
-            make run-tests
+        run: |
+          sshpass -p ${{ secrets.EVA_PASSWORD }} ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ${{ secrets.EVA_USER }}@${{ secrets.EVA_HOST }} "cd ~/ifj/tmp && make run-tests"
       # TODO - get results somehow
       # TODO - clean up
