@@ -142,3 +142,5 @@ int htab_clear(Htab_t *table);
  * @return - status code
  */
 int htab_free(Htab_t *table);
+
+#endif // _SYMTABLE_H_
