@@ -20,6 +20,8 @@
 #include <stdint.h>
 
 
+// line counting
+extern int line_num;
 
 // Hashtable key type
 typedef const char *Htab_key_t;

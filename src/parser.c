@@ -11,5 +11,3 @@
 
 // LOCAL INCLUDES
 #include "parser.h"
-
-extern int line_num;

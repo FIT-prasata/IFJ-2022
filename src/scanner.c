@@ -12,7 +12,6 @@
 // LOCAL INCLUDES
 #include "scanner.h"
 
-extern int line_num;
 
 
 // Checks if character is a white character (not a newline)

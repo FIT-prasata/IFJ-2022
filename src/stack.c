@@ -12,7 +12,6 @@
 // LOCAL INCLUDES
 #include "stack.h"
 
-extern int line_num;
 
 // Initializes stack
 void stack_init(Stack_t *stack) {

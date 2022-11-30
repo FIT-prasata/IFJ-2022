@@ -62,7 +62,6 @@ int main(void) {
     "T_ADD",     // +
     "T_SUB",     // -
     "T_ASSIGN",  // =
-    "T_NEG",     // !
 
     // TYPES
     "T_INT",     // integer type

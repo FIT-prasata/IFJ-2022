@@ -22,6 +22,8 @@
 #include "scanner.h"  // for accessing token struct later on
 
 
+// line counting
+extern int line_num;
 
 // DEFINES
 #define EMPTY_STACK INT_MIN

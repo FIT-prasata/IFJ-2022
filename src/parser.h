@@ -20,6 +20,8 @@
 #include <stdlib.h>
 
 
+// line counting
+extern int line_num;
 
 // LOCAL INCLUDES
 

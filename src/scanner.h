@@ -24,7 +24,8 @@
 #include "dynamic_string.h"
 #include "error.h"
 
-
+// line counting
+extern int line_num;
 
 // Token types
 typedef enum T_type {
@@ -67,7 +68,6 @@ typedef enum T_type {
     T_ADD,     // +
     T_SUB,     // -
     T_ASSIGN,  // =
-    T_NEG,     // !
 
     // TYPES
     T_INT,     // integer type

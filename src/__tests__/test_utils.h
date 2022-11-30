@@ -7,6 +7,9 @@
 
 #include "../error.h"
 
+// line counting
+extern int line_num;
+
 typedef enum { PASSED, FAILED } TestResult_t;
 
 #define RED(str) "\x1b[31m" str "\x1b[0m"

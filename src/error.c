@@ -12,7 +12,6 @@
 // LOCAL INCLUDES
 #include "error.h"
 
-extern int line_num;
 
 void error_display(int type, int line_num) {
     switch (type) {

@@ -19,6 +19,8 @@
 #include <stdio.h>
 
 
+// line counting
+extern int line_num;
 
 // Specification defined erros
 #define OK 0
