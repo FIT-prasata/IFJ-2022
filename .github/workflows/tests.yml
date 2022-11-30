@@ -5,11 +5,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - name: Copy src to Eva
+      - name: Copy src to Merlin
         run: |
           sshpass -p ${{ secrets.EVA_PASSWORD }} scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -r * ${{ secrets.EVA_USER }}@${{ secrets.EVA_HOST }}:~/ifj/tmp
       # TODO - run tests
-      - name: Run tests on eva
+      - name: Run tests on Merlin
         run: |
           sshpass -p ${{ secrets.EVA_PASSWORD }} ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ${{ secrets.EVA_USER }}@${{ secrets.EVA_HOST }} "cd ~/ifj/tmp && make run-tests"
       # TODO - get results somehow
