@@ -15,8 +15,19 @@ int getchar() {
 #define TEST_CODE_WHITESPACES                                          \
     "./src/__tests__/t_lex_analyzer_test_cases/test_whitespaces/" \
     "test_whitespaces.code"
+#define TEST_EMPTY_FILE "./src/__tests__/t_lex_analyzer_test_cases/test_prolog/test_empty_file.code"
+#define TEST_NORMAL_PROLOG \
+    "./src/__tests__/t_lex_analyzer_test_cases/test_prolog/test_normal_prolog.code"
+#define TEST_PROLOG_LC \
+    "./src/__tests__/t_lex_analyzer_test_cases/test_prolog/test_prolog_lc.code"
+#define TEST_PROLOG_BC \
+    "./src/__tests__/t_lex_analyzer_test_cases/test_prolog/test_prolog_bc.code"
+#define TEST_WRONG_PROLOG \
+    "./src/__tests__/t_lex_analyzer_test_cases/test_prolog/test_wrong_prolog.code"
+
 
 #define SET_FILE(filepath) f = fopen(filepath, "r");
+#define CLOSE_FILE(f) fclose(f);
 
 int compareFile(char *path1_ref, char *path2, int *line) {
     FILE *fPtr1 = fopen(path1_ref, "r");
@@ -65,17 +76,21 @@ ASSERT_TRUE(getchar() == '<')
 ASSERT_TRUE(getchar() == '?')
 ENDTEST
 
-TEST(t_get_non_white)
-SET_FILE(TEST_CODE_WHITESPACES)
-ASSERT_TRUE(get_non_white() == '<')
-ASSERT_TRUE(get_non_white() == '?')
-ASSERT_TRUE(get_non_white() == '?')
+TEST(t_empty_file)
+Token_t *token = malloc(sizeof(Token_t));
+SET_FILE(TEST_EMPTY_FILE)
+ASSERT_TRUE(scan(token) == SYNTAX_ERR)
+CLOSE_FILE(f)
 ENDTEST
 
 int run_lex_analyzer_tests() {
     int errors = 0;
     printf("\nRunning Lex analyzer complex tests...\n");
     errors += t_mock_getchar();
-    errors += t_get_non_white();
+    errors += t_empty_file();
+    // errors += t_normal_prolog();
+    // errors += t_prolog_lc();
+    // errors += t_prolog_bc();
+    // errors += t_wrong_prolog();
     return errors;
 }
