@@ -1,5 +1,8 @@
 #pragma once
 
+#ifndef TEST_UTILS_H
+#define TEST_UTILS_H
+
 #include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -35,3 +38,5 @@ typedef enum { PASSED, FAILED } TestResult_t;
         printf(RED("Failed assertion in '%s' -> ASSERT_TRUE(%s)\n"), t_name, \
                #CONDITION);                                                  \
     }
+
+#endif // TEST_UTILS_H
