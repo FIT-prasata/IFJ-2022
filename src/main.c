@@ -40,31 +40,32 @@ int main(void) {
     free(token);
     free(item);*/
     FILE *file = fopen("./src/adam-test.out", "w");
-    if (file == NULL) {
-        printf("File not found");
-        return 1;
-    }
+    CHECK_NULL(file);
     Token_t *token1 = malloc(sizeof(Token_t));
+    CHECK_NULL(token1);
     token1->attribute.string = "Zadejte cislo pro vypocet faktorialu\n";
     token1->type = T_STRING;
 
-    Token_t *token2 = malloc(sizeof(Token_t));
-    token2->attribute.string = "int";
-    token2->type = T_INT;
+    CHECK_OK(generate(PROLOG, NULL, NULL, NULL, 0, NO, file));
+    CHECK_OK(generate(WRITE, NULL, token1, NULL, 0, NO, file));
 
-    generate(PROLOG, NULL, NULL, NULL, 0, NO, file);
-    generate(WRITE, token1, NULL, NULL, 0, NO, file);
     token1->attribute.string = "$a";
     token1->type = T_ID;
+    Token_t *token2 = malloc(sizeof(Token_t));
+    CHECK_NULL(token2);
+    token2->attribute.string = "int";
+    token2->type = T_INT;
     generate(READ, token1, token2, NULL, 0, GF, file);
     token2->type = K_NULL;
-    generate(IF_EQ, token1, token2, NULL, 1, NO, file);
+    generate(IF_EQ, NULL, token1, token2, 1, NO, file);
     token1->attribute.string = "Chyba pri nacitani celeho cisla!\n";
     token1->type = T_STRING;
-    generate(WRITE, token1, NULL, NULL, 0, NO, file);
+    generate(WRITE, NULL, token1, NULL, 0, NO, file);
     generate(IF_ELSE, NULL, NULL, NULL, 1, NO, file);
     generate(IF_END, NULL, NULL, NULL, 1, NO, file);
 
+    free(token1);
+    free(token2);
     fclose(file);
-    return 0;
+    return OK;
 }

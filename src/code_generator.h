@@ -27,8 +27,11 @@
  * @param TF - Temporary frame
  */
 
-#define CHECK(_func) \
+#define CHECK_OK(_func) \
     if (_func != OK) return INTERNAL_ERR
+
+#define CHECK_NULL(_func) \
+    if (_func == NULL) return INTERNAL_ERR
 
 typedef enum Frame { GF, LF, TF, NO } Frame_t;
 
@@ -509,5 +512,5 @@ int string_convert(Token_t *token, DString_t *converted_str);
  *
  * @todo not implemented yet
  */
-int generate(Operation_t operation, Token_t *in1, Token_t *in2, Token_t *in3,
-             int label, Frame_t frame, FILE *file);
+int generate(Operation_t operation, Token_t *dest_in, Token_t *var_in_1,
+             Token_t *var_in_2, int label, Frame_t frame, FILE *file);

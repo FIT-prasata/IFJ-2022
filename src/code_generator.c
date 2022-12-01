@@ -369,42 +369,51 @@ void generate_dprint(char *var, FILE *file) {
     fprintf(file, "DPRINT %s\n", var);
 }
 
-int generate(Operation_t operation, Token_t *dest_in, Token_t *var_in_1, Token_t *var_in_2,
-             int label, Frame_t frame, FILE *file) {
+int generate(Operation_t operation, Token_t *dest_in, Token_t *var_in_1,
+             Token_t *var_in_2, int label, Frame_t frame, FILE *file) {
     DString_t var1, var2, dest;
+    d_string_init(&var1);
+    d_string_init(&var2);
+    d_string_init(&dest);
     if (dest_in != NULL) {
         if (dest_in->type == T_ID) {
-            CHECK(variable_convert(dest_in->attribute.string, frame, &dest));
+            CHECK_OK(variable_convert(dest_in->attribute.string, frame, &dest));
         } else if (dest_in->type == T_FUNC_ID) {
             // TODO: research if Functions need some conversion in IFJcode22
         } else {
-            CHECK(const_convert(dest_in, &dest));
+            CHECK_OK(const_convert(dest_in, &dest));
         }
     }
     if (var_in_1 != NULL) {
         if (var_in_1->type == T_ID) {
-            CHECK(variable_convert(var_in_1->attribute.string, frame, &var1));
+            CHECK_OK(
+                variable_convert(var_in_1->attribute.string, frame, &var1));
         } else if (var_in_1->type == T_FUNC_ID) {
             // TODO: research if Functions need some conversion in IFJcode22
         } else {
-            CHECK(const_convert(var_in_1, &var1));
+            CHECK_OK(const_convert(var_in_1, &var1));
         }
     }
     if (var_in_2 != NULL) {
         if (var_in_2->type == T_ID) {
-            CHECK(variable_convert(var_in_2->attribute.string, frame, &var2));
+            CHECK_OK(
+                variable_convert(var_in_2->attribute.string, frame, &var2));
         } else if (var_in_2->type == T_FUNC_ID) {
             // TODO: research if Functions need some conversion in IFJcode22
         } else {
-            CHECK(const_convert(var_in_2, &var2));
+            CHECK_OK(const_convert(var_in_2, &var2));
         }
     }
 
     // TODO: need refactor, this is no go
-
     switch (operation) {
-        //IF CASES
-        case IF_LT: case IF_GT: case IF_EQ: case IF_GEQ: case IF_LEQ: case IF_NEQ:
+        // IF CASES
+        case IF_LT:
+        case IF_GT:
+        case IF_EQ:
+        case IF_GEQ:
+        case IF_LEQ:
+        case IF_NEQ:
             generate_if_start(operation, var1.str, var2.str, label, file);
             break;
         case IF_ELSE:
@@ -414,7 +423,12 @@ int generate(Operation_t operation, Token_t *dest_in, Token_t *var_in_1, Token_t
             generate_if_end(label, file);
             break;
         // WHILE CASES
-        case WHILE_LT: case WHILE_GT: case WHILE_EQ: case WHILE_GEQ: case WHILE_LEQ: case WHILE_NEQ:
+        case WHILE_LT:
+        case WHILE_GT:
+        case WHILE_EQ:
+        case WHILE_GEQ:
+        case WHILE_LEQ:
+        case WHILE_NEQ:
             generate_while_start(operation, var1.str, var2.str, label, file);
             break;
         case WHILE_END:
@@ -422,7 +436,8 @@ int generate(Operation_t operation, Token_t *dest_in, Token_t *var_in_1, Token_t
             break;
         // ARITHMETIC CASES
         case ADD:
-            generate_add(var1.str, var2.str, dest.str, file);            break;
+            generate_add(var1.str, var2.str, dest.str, file);
+            break;
         case SUB:
             generate_sub(var1.str, var2.str, dest.str, file);
             break;
@@ -449,7 +464,7 @@ int generate(Operation_t operation, Token_t *dest_in, Token_t *var_in_1, Token_t
             generate_write(var1.str, file);
             break;
         case READ:
-            generate_read(var1.str, var2.str, file);
+            generate_read(dest.str, var1.str, file);
             break;
         default:
             return INTERNAL_ERR;
@@ -462,56 +477,52 @@ int variable_convert(char *str, Frame_t frame, DString_t *converted_var) {
         return INTERNAL_ERR;
     }
     DString_t string;
-    CHECK(d_string_init(&string));
+    CHECK_OK(d_string_init(&string));
 
     switch (frame) {
         case GF:
-            CHECK(d_string_add_str(&string, "GF@"));
+            CHECK_OK(d_string_add_str(&string, "GF@"));
             break;
         case LF:
-            CHECK(d_string_add_str(&string, "LF@"));
+            CHECK_OK(d_string_add_str(&string, "LF@"));
             break;
         case TF:
-            CHECK(d_string_add_str(&string, "TF@"));
+            CHECK_OK(d_string_add_str(&string, "TF@"));
         case NO:
             return OK;
         default:
             break;
     }
-    CHECK(d_string_add_str(&string, str));
-    CHECK(d_string_copy(&string, converted_var));
+    CHECK_OK(d_string_add_str(&string, str));
+    CHECK_OK(d_string_copy(&string, converted_var));
     return OK;
 }
 
 int const_convert(Token_t *token, DString_t *converted_const) {
-    if (token == NULL) {
-        return INTERNAL_ERR;
-    }
+    CHECK_NULL(token);
     DString_t string;
-    CHECK(d_string_init(&string));
+    CHECK_OK(d_string_init(&string));
     if (token->type == T_INT) {
-        CHECK(d_string_add_str(&string, "int@"));
-        CHECK(d_string_add_str(&string, token->attribute.string));
+        CHECK_OK(d_string_add_str(&string, "int@"));
+        CHECK_OK(d_string_add_str(&string, token->attribute.string));
     } else if (token->type == T_FLOAT) {
-        CHECK(d_string_add_str(&string, "float@"));
-        CHECK(d_string_add_str(&string, token->attribute.string));
+        CHECK_OK(d_string_add_str(&string, "float@"));
+        CHECK_OK(d_string_add_str(&string, token->attribute.string));
     } else if (token->type == T_STRING) {
-        CHECK(string_convert(token, converted_const));
+        CHECK_OK(string_convert(token, converted_const));
         return OK;
     } else if (token->type == K_NULL) {
-        CHECK(d_string_add_str(&string, "nil@nil"));
+        CHECK_OK(d_string_add_str(&string, "nil@nil"));
     } else {
         return INTERNAL_ERR;
     }
-    CHECK(d_string_copy(&string, converted_const));
+    CHECK_OK(d_string_copy(&string, converted_const));
     return OK;
 }
 
 int string_convert(Token_t *token, DString_t *converted_str) {
-    DString_t string;
-    CHECK(d_string_init(&string));
     char code[5];
-    CHECK(d_string_add_str(&string, "string@"));
+    CHECK_OK(d_string_add_str(converted_str, "string@"));
     int len = (int)strlen(token->attribute.string);
     for (int i = 0; i < len; i++) {
         if ((token->attribute.string[i] >= 0 &&
@@ -519,11 +530,11 @@ int string_convert(Token_t *token, DString_t *converted_str) {
             token->attribute.string[i] == 35 ||
             token->attribute.string[i] == 92) {
             sprintf(code, "\\%03d", token->attribute.string[i]);
-            CHECK(d_string_add_str(&string, code));
+            CHECK_OK(d_string_add_str(converted_str, code));
         } else {
-            CHECK(d_string_add_char(&string, token->attribute.string[i]));
+            CHECK_OK(
+                d_string_add_char(converted_str, token->attribute.string[i]));
         }
     }
-    CHECK(d_string_copy(&string, converted_str));
     return OK;
 }
