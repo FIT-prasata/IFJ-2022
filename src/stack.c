@@ -48,6 +48,6 @@ int token_stack_pop(Token_stack_t *t_stack) {
 }
 
 // Clears whole stack
-void tokne_stack_clear(Token_stack_t *t_stack) {
-    while (stack_pop(t_stack) != EMPTY_STACK);
+void token_stack_clear(Token_stack_t *t_stack) {
+    while (token_stack_pop(t_stack) != EMPTY_STACK);
 }
