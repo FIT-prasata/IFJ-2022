@@ -26,7 +26,11 @@
  * @param LF - Local frame
  * @param TF - Temporary frame
  */
-typedef enum Frame { GF, LF, TF } Frame_t;
+
+#define CHECK(_func) \
+    if (_func != OK) return INTERNAL_ERR
+
+typedef enum Frame { GF, LF, TF, NO } Frame_t;
 
 typedef enum Operation {
     // IF
@@ -36,6 +40,8 @@ typedef enum Operation {
     IF_NEQ,
     IF_LEQ,
     IF_GEQ,
+    IF_ELSE,
+    IF_END,
     // WHILE
     WHILE_LT,
     WHILE_GT,
@@ -43,6 +49,7 @@ typedef enum Operation {
     WHILE_NEQ,
     WHILE_LEQ,
     WHILE_GEQ,
+    WHILE_END,
     // ARITHMETIC
     ADD,
     SUB,
@@ -53,6 +60,13 @@ typedef enum Operation {
     AND,
     OR,
     NOT,
+    // BUILD-IN FUNCTIONS
+    WRITE,
+    READ,
+
+    DEFVAR,
+    ASSIGN,
+    PROLOG,
 
 } Operation_t;
 
@@ -460,8 +474,7 @@ void generate_dprint(char *var, FILE *file);
  *
  * @return status code
  */
-int variable_convert(Htab_item_t *item, Frame_t frame,
-                     DString_t *converted_var);
+int variable_convert(char *item, Frame_t frame, DString_t *converted_var);
 
 /**
  * @brief Converts constant from IFJ22 to IFJcode22 format
@@ -496,5 +509,5 @@ int string_convert(Token_t *token, DString_t *converted_str);
  *
  * @todo not implemented yet
  */
-/*int generate(T_type_t operation, char *var1, char *var2, char *destination,
-             FILE *file);*/
+int generate(Operation_t operation, Token_t *in1, Token_t *in2, Token_t *in3,
+             int label, Frame_t frame, FILE *file);

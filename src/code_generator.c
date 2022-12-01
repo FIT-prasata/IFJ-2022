@@ -114,10 +114,8 @@ void generate_while_start(Operation_t type, char *var1, char *var2, int label,
             fprintf(file, "LABEL .while_body_%d\n", label);
             break;
         default:
-            // TODO: return INTERNAL_ERR;
             break;
     }
-    // TODO: return OK;
 }
 
 void generate_while_end(int label, FILE *file) {
@@ -127,7 +125,6 @@ void generate_while_end(int label, FILE *file) {
 
 void generate_if_start(Operation_t type, char *var1, char *var2, int label,
                        FILE *file) {
-    // TODO: change to int type for returning status code
     switch (type) {
         case IF_LT:
             fprintf(file, "PUSHS %s\n", var2);
@@ -221,10 +218,8 @@ void generate_if_start(Operation_t type, char *var1, char *var2, int label,
             fprintf(file, "LABEL .if_start_%d\n", label);
             break;
         default:
-            // TODO: return INTERNAL_ERR;
             break;
     }
-    // TODO: return OK;
 }
 
 void generate_else(int label, FILE *file) {
@@ -374,44 +369,117 @@ void generate_dprint(char *var, FILE *file) {
     fprintf(file, "DPRINT %s\n", var);
 }
 
-int generate(Operation_t operation, char *var1, char *var2, char *destination,
-             FILE *file) {
-    // TODO maybe operation type should be something else
-    return 0;
+int generate(Operation_t operation, Token_t *dest_in, Token_t *var_in_1, Token_t *var_in_2,
+             int label, Frame_t frame, FILE *file) {
+    DString_t var1, var2, dest;
+    if (dest_in != NULL) {
+        if (dest_in->type == T_ID) {
+            CHECK(variable_convert(dest_in->attribute.string, frame, &dest));
+        } else if (dest_in->type == T_FUNC_ID) {
+            // TODO: research if Functions need some conversion in IFJcode22
+        } else {
+            CHECK(const_convert(dest_in, &dest));
+        }
+    }
+    if (var_in_1 != NULL) {
+        if (var_in_1->type == T_ID) {
+            CHECK(variable_convert(var_in_1->attribute.string, frame, &var1));
+        } else if (var_in_1->type == T_FUNC_ID) {
+            // TODO: research if Functions need some conversion in IFJcode22
+        } else {
+            CHECK(const_convert(var_in_1, &var1));
+        }
+    }
+    if (var_in_2 != NULL) {
+        if (var_in_2->type == T_ID) {
+            CHECK(variable_convert(var_in_2->attribute.string, frame, &var2));
+        } else if (var_in_2->type == T_FUNC_ID) {
+            // TODO: research if Functions need some conversion in IFJcode22
+        } else {
+            CHECK(const_convert(var_in_2, &var2));
+        }
+    }
+
+    // TODO: need refactor, this is no go
+
+    switch (operation) {
+        //IF CASES
+        case IF_LT: case IF_GT: case IF_EQ: case IF_GEQ: case IF_LEQ: case IF_NEQ:
+            generate_if_start(operation, var1.str, var2.str, label, file);
+            break;
+        case IF_ELSE:
+            generate_else(label, file);
+            break;
+        case IF_END:
+            generate_if_end(label, file);
+            break;
+        // WHILE CASES
+        case WHILE_LT: case WHILE_GT: case WHILE_EQ: case WHILE_GEQ: case WHILE_LEQ: case WHILE_NEQ:
+            generate_while_start(operation, var1.str, var2.str, label, file);
+            break;
+        case WHILE_END:
+            generate_while_end(label, file);
+            break;
+        // ARITHMETIC CASES
+        case ADD:
+            generate_add(var1.str, var2.str, dest.str, file);            break;
+        case SUB:
+            generate_sub(var1.str, var2.str, dest.str, file);
+            break;
+        case MUL:
+            generate_mul(var1.str, var2.str, dest.str, file);
+            break;
+        case DIV:
+            generate_div(var1.str, var2.str, dest.str, file);
+            break;
+        case IDIV:
+            generate_idiv(var1.str, var2.str, dest.str, file);
+            break;
+
+        case ASSIGN:
+            generate_move(var1.str, dest.str, file);
+            break;
+        case DEFVAR:
+            generate_defvar(var1.str, file);
+            break;
+        case PROLOG:
+            generate_prolog(file);
+            break;
+        case WRITE:
+            generate_write(var1.str, file);
+            break;
+        case READ:
+            generate_read(var1.str, var2.str, file);
+            break;
+        default:
+            return INTERNAL_ERR;
+    }
+    return OK;
 }
 
-int variable_convert(Htab_item_t *item, Frame_t frame,
-                     DString_t *converted_var) {
-    if (item == NULL || frame > 2) {
+int variable_convert(char *str, Frame_t frame, DString_t *converted_var) {
+    if (str == NULL || frame > 3) {
         return INTERNAL_ERR;
     }
     DString_t string;
-    if (d_string_init(&string) != OK) {
-        return INTERNAL_ERR;
-    }
+    CHECK(d_string_init(&string));
+
     switch (frame) {
         case GF:
-            if (d_string_add_str(&string, "GF@") != OK) {
-                return INTERNAL_ERR;
-            }
+            CHECK(d_string_add_str(&string, "GF@"));
             break;
         case LF:
-            if (d_string_add_str(&string, "LF@") != OK) {
-                return INTERNAL_ERR;
-            }
+            CHECK(d_string_add_str(&string, "LF@"));
             break;
         case TF:
-            if (d_string_add_str(&string, "TF@") != OK) {
-                return INTERNAL_ERR;
-            }
+            CHECK(d_string_add_str(&string, "TF@"));
+        case NO:
+            return OK;
+        default:
             break;
     }
-    if (d_string_add_str(&string, item->data.name) != OK) {
-        return INTERNAL_ERR;
-    }
-    if (d_string_copy(&string, converted_var) != OK) {
-        return INTERNAL_ERR;
-    }
+    CHECK(d_string_add_str(&string, str));
+    CHECK(d_string_copy(&string, converted_var));
     return OK;
 }
 
@@ -420,68 +488,42 @@ int const_convert(Token_t *token, DString_t *converted_const) {
         return INTERNAL_ERR;
     }
     DString_t string;
-    if (d_string_init(&string) != OK) {
-        return INTERNAL_ERR;
-    }
+    CHECK(d_string_init(&string));
     if (token->type == T_INT) {
-        if (d_string_add_str(&string, "int@") != OK) {
-            return INTERNAL_ERR;
-        }
-        if (d_string_add_str(&string, token->attribute.string) != OK) {
-            return INTERNAL_ERR;
-        }
+        CHECK(d_string_add_str(&string, "int@"));
+        CHECK(d_string_add_str(&string, token->attribute.string));
     } else if (token->type == T_FLOAT) {
-        if (d_string_add_str(&string, "float@") != OK) {
-            return INTERNAL_ERR;
-        }
-        if (d_string_add_str(&string, token->attribute.string) != OK) {
-            return INTERNAL_ERR;
-        }
+        CHECK(d_string_add_str(&string, "float@"));
+        CHECK(d_string_add_str(&string, token->attribute.string));
     } else if (token->type == T_STRING) {
-        if (string_convert(token, converted_const) != OK) {
-            return INTERNAL_ERR;
-        }
+        CHECK(string_convert(token, converted_const));
         return OK;
     } else if (token->type == K_NULL) {
-        if (d_string_add_str(&string, "nil@nil") != OK) {
-            return INTERNAL_ERR;
-        }
+        CHECK(d_string_add_str(&string, "nil@nil"));
     } else {
         return INTERNAL_ERR;
     }
-    if (d_string_copy(&string, converted_const) != OK) {
-        return INTERNAL_ERR;
-    }
+    CHECK(d_string_copy(&string, converted_const));
     return OK;
 }
 
 int string_convert(Token_t *token, DString_t *converted_str) {
     DString_t string;
-    if (d_string_init(&string) != OK) {
-        return INTERNAL_ERR;
-    }
+    CHECK(d_string_init(&string));
     char code[5];
-    if (d_string_add_str(&string, "string@") != OK) {
-        return INTERNAL_ERR;
-    }
-    int len = strlen(token->attribute.string);
+    CHECK(d_string_add_str(&string, "string@"));
+    int len = (int)strlen(token->attribute.string);
     for (int i = 0; i < len; i++) {
         if ((token->attribute.string[i] >= 0 &&
              token->attribute.string[i] <= 32) ||
             token->attribute.string[i] == 35 ||
             token->attribute.string[i] == 92) {
             sprintf(code, "\\%03d", token->attribute.string[i]);
-            if (d_string_add_str(&string, code) != OK) {
-                return INTERNAL_ERR;
-            }
+            CHECK(d_string_add_str(&string, code));
         } else {
-            if (d_string_add_char(&string, token->attribute.string[i]) != OK) {
-                return INTERNAL_ERR;
-            }
+            CHECK(d_string_add_char(&string, token->attribute.string[i]));
         }
     }
-    if (d_string_copy(&string, converted_str) != OK) {
-        return INTERNAL_ERR;
-    }
+    CHECK(d_string_copy(&string, converted_str));
     return OK;
 }
