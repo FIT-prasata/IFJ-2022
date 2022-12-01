@@ -20,7 +20,7 @@
 
 // LOCAL INCLUDES
 #include "scanner.h"  // for accessing token struct later on
-
+#include "error.h"    // for status codes
 
 // line counting
 extern int line_num;
@@ -29,17 +29,17 @@ extern int line_num;
 #define EMPTY_STACK INT_MIN
 #define NO_TYPE INT_MAX
 
-typedef struct Stack Stack_t;
+typedef struct Token_stack Token_stack_t;
 
-typedef struct Stack {
-    Token_t head;   // last pushed token (top of stack)
-    Stack_t *next;  // pointer to next token
-} Stack_t;
+typedef struct Token_stack {
+    Token_t head;         // last pushed token (top of stack)
+    Token_stack_t *next;  // pointer to next token
+} Token_stack_t;
 
-void stack_init(Stack_t *stack);
-Token_t stack_get_head(Stack_t *stack);
-void stack_push(Stack_t *stack, Token_t token);
-int stack_pop(Stack_t *stack);
-void stack_clear(Stack_t *stack);
+int token_stack_init(Token_stack_t *t_stack);
+Token_t token_stack_get_head(Token_stack_t *t_stack);
+void token_stack_push(Token_stack_t *t_stack, Token_t token);
+int token_stack_pop(Token_stack_t *t_stack);
+void token_stack_clear(Token_stack_t *t_stack);
 
 #endif // _STACK_H_
