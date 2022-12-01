@@ -16,14 +16,6 @@ int getchar() {
     "./src/__tests__/t_lex_analyzer_test_cases/test_whitespaces/" \
     "test_whitespaces.code"
 #define TEST_EMPTY_FILE "./src/__tests__/t_lex_analyzer_test_cases/test_prolog/test_empty_file.code"
-#define TEST_NORMAL_PROLOG \
-    "./src/__tests__/t_lex_analyzer_test_cases/test_prolog/test_normal_prolog.code"
-#define TEST_PROLOG_LC \
-    "./src/__tests__/t_lex_analyzer_test_cases/test_prolog/test_prolog_lc.code"
-#define TEST_PROLOG_BC \
-    "./src/__tests__/t_lex_analyzer_test_cases/test_prolog/test_prolog_bc.code"
-#define TEST_WRONG_PROLOG \
-    "./src/__tests__/t_lex_analyzer_test_cases/test_prolog/test_wrong_prolog.code"
 
 
 #define SET_FILE(filepath) f = fopen(filepath, "r");
@@ -88,9 +80,5 @@ int run_lex_analyzer_tests() {
     printf("\nRunning Lex analyzer complex tests...\n");
     errors += t_mock_getchar();
     errors += t_empty_file();
-    // errors += t_normal_prolog();
-    // errors += t_prolog_lc();
-    // errors += t_prolog_bc();
-    // errors += t_wrong_prolog();
     return errors;
 }
