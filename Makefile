@@ -48,7 +48,7 @@ dynamic_string.o: src/dynamic_string.c
 	$(CC) $(CFLAGS) $< -c -o $@
 
 code_generator.o: src/code_generator.c
-  	$(CC) $(CFLAGS) $< -c -o $@
+	$(CC) $(CFLAGS) $< -c -o $@
 
 expr.o: src/expr.c
 	$(CC) $(CFLAGS) $< -c -o $@
