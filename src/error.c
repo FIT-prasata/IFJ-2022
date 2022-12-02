@@ -12,6 +12,7 @@
 // LOCAL INCLUDES
 #include "error.h"
 
+
 void error_display(int type, int line_num) {
     switch (type) {
         // Custom errors will be added with more detailed description and return
@@ -56,7 +57,7 @@ void error_display(int type, int line_num) {
 
 void try(int code) {
     if (code != OK) {
-        error_display(code, 0);  // TODO we need line num!!
+        error_display(code, line_num);
     }
 }
 

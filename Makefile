@@ -11,7 +11,8 @@
 
 CC=gcc
 CFLAGS=-g -std=c11 -pedantic -Wall -Wextra
-MODULES=error.o parser.o scanner.o stack.o symtable.o dynamic_string.o code_generator.o
+
+MODULES=error.o parser.o scanner.o stack.o symtable.o dynamic_string.o expr.o code_generator.o
 
 
 all: main
@@ -47,6 +48,9 @@ dynamic_string.o: src/dynamic_string.c
 	$(CC) $(CFLAGS) $< -c -o $@
 
 code_generator.o: src/code_generator.c
+  $(CC) $(CFLAGS) $< -c -o $@
+
+expr.o: src/expr.c
 	$(CC) $(CFLAGS) $< -c -o $@
 
 # Formatting
@@ -54,7 +58,6 @@ lint:
 	clang-format -i src/*.c & clang-format -i src/*.h
 
 # Cleaning
-
 clean:
 	rm *.o
 
@@ -67,7 +70,6 @@ win-delete:
 delete:
 	rm main
 
-# For Skleny :)
 win-compile :
 	make & make win-clean
 
@@ -82,7 +84,7 @@ win-compile-and-run-clion :
 	make lint & make & make win-clean
 
 # tests
-MODULES_TEST=error.o parser.o scanner.o stack.o symtable.o dynamic_string.o
+MODULES_TEST=error.o parser.o scanner.o stack.o symtable.o dynamic_string.o expr.o code_generator.o
 tests.o: src/__tests__/tests.c
 	$(CC) $(CFLAGS) $< -c -o $@
 

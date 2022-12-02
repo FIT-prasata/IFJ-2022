@@ -1,5 +1,8 @@
 #pragma once
 
+#ifndef _DYNAMIC_STRING_H_
+#define _DYNAMIC_STRING_H_
+
 // Filename: dynamic_string.h
 // IFJ 2022/2023 project
 // TRP variant
@@ -11,9 +14,16 @@
 // Author: <xzavad20> - Lukáš Zavadil
 // Author: <xsvetl07> - Adam Světlík
 
-#include "errno.h"
+// EXTERNAL INCLUDES
+#include <errno.h>
+#include <string.h>
+
+// LOCAL INCLUDES
 #include "error.h"
-#include "string.h"
+
+
+// line counting
+extern int line_num;
 
 #define DYNAMIC_STRING_INIT_SIZE 8
 
@@ -80,3 +90,12 @@ int get_d_string_value_to_integer(DString_t *d_string, int *value);
 // @param d_string - pointer to dynamic string
 // @param value - pointer to double variable
 int get_d_string_value_to_double(DString_t *d_string, double *value);
+
+// replace current string with new (const) string
+// @param d_string - pointer to dynamic string
+// @param c_str - string to be replaced with
+// @return - status code
+int d_string_replace_str(DString_t *d_string, const char *c_str);
+
+
+#endif // _DYNAMIC_STRING_H_

@@ -1,11 +1,17 @@
 #pragma once
 
+#ifndef TEST_UTILS_H
+#define TEST_UTILS_H
+
 #include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
 #include "../error.h"
+
+// line counting
+extern int line_num;
 
 typedef enum { PASSED, FAILED } TestResult_t;
 
@@ -32,3 +38,5 @@ typedef enum { PASSED, FAILED } TestResult_t;
         printf(RED("Failed assertion in '%s' -> ASSERT_TRUE(%s)\n"), t_name, \
                #CONDITION);                                                  \
     }
+
+#endif // TEST_UTILS_H

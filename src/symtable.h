@@ -13,9 +13,17 @@
  *          <xsvetl07> - Adam Světlík
  */
 
-// Local includes
+#ifndef _SYMTABLE_H_
+#define _SYMTABLE_H_
+
+// LOCAL INCLUDES
 #include "scanner.h"
 #include "stack.h"
+#include <stdint.h>
+
+
+// line counting
+extern int line_num;
 
 /**
  * @brief Predeclared types
@@ -40,6 +48,7 @@ typedef enum { INT, STRING, BOOL, FLOAT, NONE } Var_type_t;
 typedef struct Var {
     Var_type_t type;
     bool asigned;
+    // TODO dString scope - main/func name
 } Var_t;
 
 /**
@@ -197,3 +206,5 @@ int htab_clear(Htab_t *table);
  * @return - status code
  */
 int htab_free(Htab_t *table);
+
+#endif // _SYMTABLE_H_

@@ -12,38 +12,42 @@
 // LOCAL INCLUDES
 #include "stack.h"
 
+
 // Initializes stack
-void stack_init(Stack_t *stack) {
-    stack->head.type = NO_TYPE;
-    stack->next = NULL;
+int token_stack_init(Token_stack_t *t_stack) {
+    if (t_stack == NULL) {
+        return INTERNAL_ERR;
+    }
+    t_stack->head.type = NO_TYPE;
+    t_stack->next = NULL;
+    return OK;
 }
 
 // Returns token that is currently on top of the stack
-Token_t stack_get_head(Stack_t *stack) { return stack->head; }
+Token_t token_stack_get_head(Token_stack_t *t_stack) { return t_stack->head; }
 
 // Pushes token into the stack
-void stack_push(Stack_t *stack, Token_t token) {
-    Stack_t *tmp = (Stack_t *)malloc(sizeof(Stack_t));
+void token_stack_push(Token_stack_t *t_stack, Token_t token) {
+    Token_stack_t *tmp = (Token_stack_t *)malloc(sizeof(Token_stack_t));
     if (tmp == NULL) return;
-    tmp->head = stack->head;
-    tmp->next = stack->next;
-    stack->head = token;
-    stack->next = tmp;
+    tmp->head = t_stack->head;
+    tmp->next = t_stack->next;
+    t_stack->head = token;
+    t_stack->next = tmp;
 }
 
 // Pops token from the stack
-int stack_pop(Stack_t *stack) {
-    if (stack == NULL || stack->head.type == NO_TYPE) return EMPTY_STACK;
-    int result = stack->head.type;
-    Stack_t *tmp = stack->next;
-    stack->head = stack->next->head;
-    stack->next = stack->next->next;
+int token_stack_pop(Token_stack_t *t_stack) {
+    if (t_stack == NULL || t_stack->head.type == NO_TYPE) return EMPTY_STACK;
+    int result = t_stack->head.type;
+    Token_stack_t *tmp = t_stack->next;
+    t_stack->head = t_stack->next->head;
+    t_stack->next = t_stack->next->next;
     free(tmp);
     return result;
 }
 
 // Clears whole stack
-void stack_clear(Stack_t *stack) {
-    while (stack_pop(stack) != EMPTY_STACK)
-        ;
+void token_stack_clear(Token_stack_t *t_stack) {
+    while (token_stack_pop(t_stack) != EMPTY_STACK);
 }

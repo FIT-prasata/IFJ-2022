@@ -12,6 +12,7 @@
 // LOCAL INCLUDES
 #include "dynamic_string.h"
 
+
 // Clears dynamic string
 int d_string_clear(DString_t *d_string) {
     if (d_string == NULL) {
@@ -140,6 +141,19 @@ int get_d_string_value_to_double(DString_t *d_string, double *value) {
     // Check if conversion was successful
     if (e == d_string->str || *e != '\0' || errno == ERANGE) {
         *value = 0;
+        return INTERNAL_ERR;
+    }
+    return OK;
+}
+
+int d_string_replace_str(DString_t *d_string, const char *c_str) {
+    if (d_string == NULL || c_str == NULL) {
+        return INTERNAL_ERR;
+    }
+    if (d_string_clear(d_string) == INTERNAL_ERR) {
+        return INTERNAL_ERR;
+    }
+    if (d_string_add_str(d_string, c_str) == INTERNAL_ERR) {
         return INTERNAL_ERR;
     }
     return OK;

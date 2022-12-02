@@ -14,9 +14,6 @@
 // LOCAL INCLUDES
 #include "symtable.h"
 
-#include <stdint.h>
-
-#include "string.h"
 
 // Hashtable constructor - initializes hashtable
 Htab_t *htab_init(size_t size) {
