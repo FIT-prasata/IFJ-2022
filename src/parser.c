@@ -73,7 +73,7 @@ int program_rule(Token_t *token, scope_t *scope_state, Htab_t *global_table) {
     if ((status = scan(token)) != OK) return status;
 
     // handle
-    // <PROGRAM> -> <DEFFUNC>>
+    // <PROGRAM> -> <DEFFUNC>
     // <PROGRAM> -> <STAT>
     // <PROGRAM> -> EOF
     switch (token->type) {
@@ -210,8 +210,8 @@ int arg_list_rule(Token_t *current_token, Htab_t *global_table) {
     // get new token
     if ((status = scan(current_token)) != OK) return status;
 
-    // handle ... -> ... <PARAM>
-    if ((status = param_rule(current_token, global_table)) != OK) return status;
+    // handle ... -> ... <ARG>
+    if ((status = arg_rule(current_token, global_table)) != OK) return status;
 
     // get new token
     if ((status = scan(current_token)) != OK) return status;
@@ -223,9 +223,42 @@ int arg_list_rule(Token_t *current_token, Htab_t *global_table) {
     return status;
 }
 
-// TODO: conversation needed
 int param_rule(Token_t *token, Htab_t *global_table) {
     int status = OK;
+    // handle <PARAM> -> <CONST>
+    if (const_rule(token, global_table) == OK) return OK;
+
+    // handle <PARAM> -> T_ID
+    if (token->type != T_ID) return SYNTAX_ERR;
+
+    // get/set id
+    Htab_item_t *id_ptr = htab_lookup_add(global_table, token);
+    if (id_ptr == NULL) return INTERNAL_ERR;
+
+    return status;
+}
+
+int param_list_rule(Token_t *current_token, Htab_t *global_table) {
+    int status = OK;
+
+    // handle <PARAMLIST> -> T_RBR (end of parameters)
+    if (current_token->type == T_RBR) return OK;
+
+    // handle ... -> T_COMMA
+    if (current_token->type != T_COMMA) return SYNTAX_ERR;
+
+    // get new token
+    if ((status = scan(current_token)) != OK) return status;
+
+    // handle ... -> ... <PARAM>
+    if ((status = param_rule(current_token, global_table)) != OK) return status;
+
+    // get new token
+    if ((status = scan(current_token)) != OK) return status;
+
+    // handle ... -> ... <PARAM_LIST>
+    if ((status = param_list_rule(current_token, global_table)) != OK)
+        return status;
 
     return status;
 }
@@ -234,9 +267,26 @@ int type_rule(Token_t *token, Htab_t *global_table) {
     int status = OK;
 
     switch (token->type) {
-        case T_STRING:
+        case K_STR:
+        case K_INT:
+        case K_FLOAT:
+        case K_FLOAT_NULL:
+        case K_INT_NULL:
+        case K_STR_NULL:
+        case K_NULL:
+            return OK;
+        default:
+            return SYNTAX_ERR;
+    }
+}
+
+int const_rule(Token_t *token, Htab_t *global_table) {
+    int status = OK;
+
+    switch (token->type) {
         case T_INT:
         case T_FLOAT:
+        case T_STRING:
         case K_NULL:
             return OK;
         default:
@@ -360,8 +410,13 @@ int stat_rule(Token_t *current_token, scope_t *scope_state,
         // get new token
         if ((status = scan(current_token)) != OK) return status;
 
-        // handle ... -> ... T_RCBR
-        if (current_token->type != T_RCBR) return SYNTAX_ERR;
+        // handle ... -> ... <STAT>
+        if ((status = stat_rule(current_token, scope_state, global_table)) !=
+            OK)
+            return status;
+
+        //        // handle ... -> ... T_RCBR
+        //        if (current_token->type != T_RCBR) return SYNTAX_ERR;
     }
 
     // handle ... -> T_ID
@@ -394,22 +449,17 @@ int stat_rule(Token_t *current_token, scope_t *scope_state,
             // get new token
             if ((status = scan(current_token)) != OK) return status;
 
+            // handle .. -> ... T_SEM
+            if (current_token->type != T_SEM) return SYNTAX_ERR;
+
+            // get new token
+            if ((status = scan(current_token)) != OK) return status;
+
             // handle ... -> ... <STAT>
             if ((status =
                      stat_rule(current_token, scope_state, global_table)) != OK)
                 ;
         }
-    }
-
-    // handle ... -> T_SEM
-    if (current_token->type == T_SEM) {
-        // get new token
-        if ((status = scan(current_token)) != OK) return status;
-
-        // handle ... -> ... <STAT>
-        if ((status = stat_rule(current_token, scope_state, global_table)) !=
-            OK)
-            return status;
     }
 
     // handle ... -> T_RCBR
@@ -426,7 +476,6 @@ int stat_rule(Token_t *current_token, scope_t *scope_state,
     // end + ε
     return status;
 }
-
 
 int assign_type_rule(Token_t *current_token, Htab_t *global_table) {
     int status = OK;
@@ -457,8 +506,15 @@ int func_call_rule(Token_t *current_token, Htab_t *global_table) {
     // get new token
     if ((status = scan(current_token)) != OK) return status;
 
-    // handle ... -> ... <ARG>
-    if ((status = arg_rule(current_token, global_table)) != OK) return status;
+    // handle ... -> ... <PARAM>
+    if ((status = param_rule(current_token, global_table)) != OK) return status;
+
+    // get new token
+    if ((status = scan(current_token)) != OK) return status;
+
+    // handle ... -> ... <PARAM_LIST>
+    if ((status = param_list_rule(current_token, global_table)) != OK)
+        return status;
 
     return status;
 }

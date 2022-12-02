@@ -19,7 +19,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-
 // line counting
 extern int line_num;
 
@@ -78,6 +77,7 @@ int def_func_rule(Token_t *current_token, scope_t *scope_state,
 /**
  * @brief   RULES
  *          <ARG> -> <TYPE> <PARAM> <ARGLIST>
+ *          TODO: still can have const in funcdef :((
  *          <ARG> -> T_RBR
  *
  * @param current_token
@@ -88,7 +88,7 @@ int arg_rule(Token_t *current_token, Htab_t *global_table);
 
 /**
  * @brief   RULES
- *          ARGLIST -> T_COMMA <PARAM> <ARGLIST>
+ *          ARGLIST -> T_COMMA <ARG> <ARGLIST>
  *          ARGLIST -> T_RBR
  *
  * @param current_token
@@ -100,8 +100,7 @@ int arg_list_rule(Token_t *current_token, Htab_t *global_table);
 /**
  * @brief   RULES
  *          <PARAM> -> T_ID
- *          <PARAM> -> <TYPE> only be ID
- *          TODO: shouldn't be <TYPE> T_ID?
+ *          <PARAM> -> <CONST>
  *
  * @param current_token
  * @param global_table
@@ -111,7 +110,18 @@ int param_rule(Token_t *current_token, Htab_t *global_table);
 
 /**
  * @brief   RULES
- *          <TYPE> -> T_STRING | T_INT | T_FLOAT | K_NULL
+ *         <PARAM_LIST> -> T_COMMA <PARAM> <PARAM_LIST>
+ *         <PARAM_LIST> -> T_RBR
+ * @param current_token
+ * @param global_table
+ * @return
+ */
+int param_list_rule(Token_t *current_token, Htab_t *global_table);
+
+
+/**
+ * @brief   RULES
+ *          <TYPE> -> K_STRING | K_INT | K_FLOAT | K_NULL
  *
  * @param current_token
  * @param global_table
@@ -121,12 +131,23 @@ int type_rule(Token_t *current_token, Htab_t *global_table);
 
 /**
  * @brief   RULES
- *          <STAT> -> K_IF T_LBR <EXPR> T_LCBR <STAT> K_ELSE LCBR <STAT> //TODO refactor
+ *      <CONST> -> T_INT | T_FLOAT | T_STRING | T_NULL
+ * @param current_token
+ * @param global_table
+ * @return
+ */
+int const_rule(Token_t *current_token, Htab_t *global_table);
+
+/**
+ * @brief   RULES
+ *          <STAT> -> K_IF T_LBR <EXPR> T_LCBR <STAT> K_ELSE LCBR <STAT>
  *          <STAT> -> K_WHILE T_LBR <EXPR> T_LCBR <STAT>
- *          <STAT> -> K_RET <EXPR> T_SEM T_RCBR
+ *          <STAT> -> K_RET <EXPR> T_SEM <STAT>
+ *          TODO isn't here '{' missing?
+ *
  *          <STAT> -> T_ID T_ASSIGN <ASSIGN_TYPE> <STAT>
- *          <STAT> -> T_ID <TYPE> <STAT>
- *          <STAT> -> T_SEM <STAT>
+ *          <STAT> -> T_ID <TYPE> T_SEM <STAT>
+ *          <STAT> -> <FUNC_CALL> T_SEM <STAT>
  *          <STAT> -> T_RCBR
  *          <STAT> -> ε
  *
@@ -135,10 +156,6 @@ int type_rule(Token_t *current_token, Htab_t *global_table);
  * @return
  */
 int stat_rule(Token_t *current_token, scope_t *scope_state,
-              Htab_t *global_table);
-
-// TODO
-int else_rule(Token_t *current_token, scope_t *scope_state,
               Htab_t *global_table);
 
 /**
@@ -154,7 +171,7 @@ int assign_type_rule(Token_t *current_token, Htab_t *global_table);
 
 /**
  * @brief   RULES
- *          <FUNC_CALL> -> T_FUNC_ID T_LBR <ARG>
+ *          <FUNC_CALL> -> T_FUNC_ID T_LBR <PARAM> <PARAM_LIST>
  *
  * @param current_token
  * @param global_table
@@ -171,4 +188,4 @@ int func_call_rule(Token_t *current_token, Htab_t *global_table);
  */
 int expr_rule(Token_t *current_token, Htab_t *global_table);
 
-#endif // _PARSER_H_
+#endif  // _PARSER_H_
