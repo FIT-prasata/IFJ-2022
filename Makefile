@@ -11,7 +11,8 @@
 
 CC=gcc
 CFLAGS=-g -std=c11 -pedantic -Wall -Wextra
-MODULES=error.o parser.o scanner.o stack.o symtable.o dynamic_string.o expr.o
+
+MODULES=error.o parser.o scanner.o stack.o symtable.o dynamic_string.o expr.o code_generator.o
 
 
 all: main
@@ -44,6 +45,9 @@ symtable.o: src/symtable.c
 	$(CC) $(CFLAGS) $< -c -o $@
 
 dynamic_string.o: src/dynamic_string.c
+	$(CC) $(CFLAGS) $< -c -o $@
+
+code_generator.o: src/code_generator.c
 	$(CC) $(CFLAGS) $< -c -o $@
 
 expr.o: src/expr.c
@@ -80,7 +84,7 @@ win-compile-and-run-clion :
 	make lint & make & make win-clean
 
 # tests
-MODULES_TEST=error.o parser.o scanner.o stack.o symtable.o dynamic_string.o expr.o
+MODULES_TEST=error.o parser.o scanner.o stack.o symtable.o dynamic_string.o expr.o code_generator.o
 tests.o: src/__tests__/tests.c
 	$(CC) $(CFLAGS) $< -c -o $@
 
