@@ -32,16 +32,17 @@ typedef enum { INT, STRING, BOOL, FLOAT, NONE } Var_type_t;
 
 // Variable structure
 typedef struct Var {
-    Var_type_t type; // Type of the variable
-    bool asigned;    // true if variable has been asigned
+    Var_type_t type;  // Type of the variable
+    bool asigned;     // true if variable has been asigned
+    // TODO dString scope - main/func name
 } Var_t;
 
 // Function structure
 typedef struct Function {
-    int argc;               // Number of arguments
-    Var_type_t *argv;       // Array of argument types
-    Var_type_t return_type; // Return type
-    bool defined;           // true if function is defined, false if only declared
+    int argc;                // Number of arguments
+    Var_type_t *argv;        // Array of argument types
+    Var_type_t return_type;  // Return type
+    bool defined;  // true if function is defined, false if only called
 } Func_t;
 
 // Symbol types
@@ -52,12 +53,11 @@ typedef union {
 
 // Symbol structure
 typedef struct Symbol {
-    const char *name;   // Name of the symbol
-    Symbol_type_t type; // Variable or function
-    bool used;          // for unused variable warning
-    Symbol_t *next;     // Pointer to the next symbol
+    const char *name;    // Name of the symbol
+    Symbol_type_t type;  // Variable or function
+    bool used;           // for unused variable warning
+    Symbol_t *next;      // Pointer to the next symbol
 } Symbol_t;
-
 
 // Hashtable key type
 typedef const char *Htab_key_t;
@@ -70,12 +70,10 @@ typedef struct Htab_item {
 
 // Hashtable structure
 typedef struct Hashtable {
-    size_t size;           // number of items in the table
-    size_t arr_size;       // size of the array
-    Htab_item_t **arr_ptr; // pointer to the array
+    size_t size;            // number of items in the table
+    size_t arr_size;        // size of the array
+    Htab_item_t **arr_ptr;  // pointer to the array
 } Htab_t;
-
-
 
 /**
  * Hashtable constructor - initializes hashtable

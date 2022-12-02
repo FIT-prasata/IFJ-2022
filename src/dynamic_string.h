@@ -91,4 +91,11 @@ int get_d_string_value_to_integer(DString_t *d_string, int *value);
 // @param value - pointer to double variable
 int get_d_string_value_to_double(DString_t *d_string, double *value);
 
+// replace current string with new (const) string
+// @param d_string - pointer to dynamic string
+// @param c_str - string to be replaced with
+// @return - status code
+int d_string_replace_str(DString_t *d_string, const char *c_str);
+
+
 #endif // _DYNAMIC_STRING_H_
