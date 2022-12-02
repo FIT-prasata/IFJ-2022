@@ -368,7 +368,7 @@ void generate_break(FILE *file) { fprintf(file, "BREAK\n"); }
 void generate_dprint(char *var, FILE *file) {
     fprintf(file, "DPRINT %s\n", var);
 }
-
+// TODO: rename maybe to generate_instruction
 int generate(Operation_t operation, Token_t *dest_in, Token_t *var_in_1,
              Token_t *var_in_2, int label, Frame_t frame, FILE *file) {
     DString_t var1, var2, dest;
@@ -405,7 +405,8 @@ int generate(Operation_t operation, Token_t *dest_in, Token_t *var_in_1,
         }
     }
 
-    // TODO: need refactor, this is no go
+    // TODO: frame maybe as a parameter of token, not as a parameter of function
+    // generate
     switch (operation) {
         // IF CASES
         case IF_LT:
@@ -464,7 +465,8 @@ int generate(Operation_t operation, Token_t *dest_in, Token_t *var_in_1,
             generate_write(var1.str, file);
             break;
         case READ:
-            generate_read(dest.str, var1.str, file);
+            // TODO: refactor this - should not use attribute.string
+            generate_read(dest.str, var_in_1->attribute.string, file);
             break;
         default:
             return INTERNAL_ERR;
