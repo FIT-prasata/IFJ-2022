@@ -1,5 +1,8 @@
 #pragma once
 
+#ifndef _CODEGEN_H_
+#define _CODEGEN_H_
+
 /**
  * @headerfile code_generator.h
  * @project IFJ 2022/2023
@@ -514,3 +517,5 @@ int string_convert(Token_t *token, DString_t *converted_str);
  */
 int generate(Operation_t operation, Token_t *dest_in, Token_t *var_in_1,
              Token_t *var_in_2, int label, Frame_t frame, FILE *file);
+
+#endif
