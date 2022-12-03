@@ -49,7 +49,7 @@ int token_stack_init(Token_stack_t *t_stack);
 Token_t token_stack_get_head(Token_stack_t *t_stack);
 
 // Pushes token into the stack
-int token_stack_push(Token_stack_t *t_stack, Token_t token);
+int token_stack_push(Token_stack_t *t_stack, Token_t *token);
 
 // Pops token from the stack
 int token_stack_pop(Token_stack_t *t_stack);
@@ -82,7 +82,7 @@ int char_stack_pop(Char_stack_t *c_stack);
 void char_stack_clear(Char_stack_t *c_stack);
 
 // Get the closest terminal on top of the character stack
-char char_stack_get_closest_terminal(Char_stack_t *c_stack);
+ptable_symbol_t char_stack_get_closest_terminal(Char_stack_t *c_stack);
 
 // Pushes '[' character into the character stack to the right of the closest terminal
 int char_stack_push_shift(Char_stack_t *c_stack);

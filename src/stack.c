@@ -90,7 +90,7 @@ void char_stack_clear(Char_stack_t *c_stack) {
     while (char_stack_pop(c_stack) != EMPTY_STACK);
 }
 
-char char_stack_get_closest_terminal(Char_stack_t *c_stack) {
+ptable_symbol_t char_stack_get_closest_terminal(Char_stack_t *c_stack) {
     while (c_stack->char_head != '\0') {
         for (int i = 0; i < TERMINALS_NUM; i++) {
             if (c_stack->char_head == all_terminals[i]) {

@@ -16,6 +16,8 @@
 
 #define P_TABLE_SIZE 15 // Size of precedence table
 #define EOEXPR 999      // End of expression
+#define RULES_NUM 13    // Number of rules
+#define MAX_RULE_LEN 4  // Maximum length of rule (in chars)
 
 // Deciding what precedence table operation is next
 typedef enum {
@@ -59,7 +61,7 @@ char ptable_get_char_from_symbol(ptable_symbol_t symbol);
 // 1. Push '[' char on top of the closest terminal on stack - TODO Luke -> stack for expressions
 // 2. Push input char on top of the stack
 // 3. Return status code
-int expr_shift(/* TODO - ADD stack */ char c);
+int expr_shift(Char_stack_t *c_stack, char character);
 
 // Reduce operation
 // 1. Get top terminal on stack
@@ -70,33 +72,30 @@ int expr_shift(/* TODO - ADD stack */ char c);
 // 6. Check if the string matches any of the rules
 // 7. Push the left hand side of the rule on top of the stack ('E')
 // 8. Return status code
-int expr_reduce(/* TODO - ADD both stacks and token */);
+int expr_reduce(Char_stack_t *c_stack, Token_stack_t *t_stack, Token_t *token);
 
 // Special shift operation
 // 1. Push terminal on stack
 // 2. Return status code
-int expr_special_shift(/* TODO - ADD stack */ char c);
+int expr_special_shift(Char_stack_t *c_stack, char character);
 
 // Compares right hand side of expression rules with given string (rule)
 // 1. Loop over 2D array of rules and see if any of them matches input string
 // 2. Return status code
-int is_valid_rule(/* TODO - ADD dynamic string */);
-
-// Loads the whole expression and push its tokens to token stack
-int expr_load(/* TODO - ADD symbtable, token and possibly other parameters*/);
+int is_valid_rule(DString_t *d_string);
 
 // Main function for expression parsing
 // 1. Initialize stacks
 // 2. Load expression -> expr_load()
 // 3. Parse loaded expression -> expr_parse()
 // 4. Generate code based on the location of expression -> switch case statement
-int expr_main(/* TODO - ADD symtable, token and possibly other needed parameters*/);
+int expr_main(Htab_t *table, Token_t *token /* int location */); // WE NEED CONTEXT FOR DECISION MAKING
 
 // Parses loaded expression
 // 1. Map token type to precedence table symbol enum
 // 2. Get terminal terminal from top of the stack and call ptable_get_symbol_from_char()
 // 3. Call ptable_get_next_move() with result symbol from function call as its input
 // 4. Based on the result of the function call, call expr_shift(), expr_reduce(), expr_special_shift()
-int expr_parse(/* TODO - ADD both stacks, token and possibly other needed parameters*/);
+int expr_parse(Char_stack_t *c_stack, Token_stack_t *t_stack, Token_t *token);
 
 #endif
