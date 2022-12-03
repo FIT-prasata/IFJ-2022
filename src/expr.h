@@ -14,6 +14,11 @@
 // Author: <xzavad20> - Lukáš Zavadil
 // Author: <xsvetl07> - Adam Světlík
 
+// LOCAL INCLUDES
+#include "stack.h"
+#include "scanner.h"
+#include "symtable.h"
+
 #define P_TABLE_SIZE 15 // Size of precedence table
 #define EOEXPR 999      // End of expression
 #define RULES_NUM 13    // Number of rules
