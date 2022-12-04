@@ -19,7 +19,9 @@ int line_num = 1;
 #include "code_generator.h"
 #include "dynamic_string.h"
 #include "stack.h"
+#include "expr.h"
 #include "scanner.h"
+#include "parser.h"
 #include "symtable.h"
 
 

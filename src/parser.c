@@ -18,7 +18,7 @@ int param_number;
 Token_t *init_token(void) {
     Token_t *token = (Token_t *)malloc(sizeof(Token_t));
     if (token == NULL) return NULL;
-    token->type = NO_TYPE;
+    token->type = T_UNDEF;
     token->attribute.string = NULL;
     return token;
 }

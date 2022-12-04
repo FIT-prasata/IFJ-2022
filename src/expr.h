@@ -18,6 +18,9 @@
 #include "stack.h"
 #include "scanner.h"
 #include "symtable.h"
+#include "parser.h"
+#include "dynamic_string.h"
+
 
 #define P_TABLE_SIZE 15 // Size of precedence table
 #define EOEXPR 999      // End of expression
@@ -31,25 +34,6 @@ typedef enum {
     EXPR_SPECIAL_SHIFT,
     EXPR_ERROR
 } ptable_move_t;
-
-// Precedence table navigation 
-typedef enum {
-    EXPR_STACK_BOTTOM, // Stack bottom '$'
-    EXPR_ID,           // Identifier 'i'
-    EXPR_ADD,          // Addition '+'
-    EXPR_SUB,          // Subtraction '-'
-    EXPR_MUL,          // Multiplication '*'
-    EXPR_DIV,          // Division '/'
-    EXPR_DOT,          // Dot '.'
-    EXPR_EQ,           // Equality '==='
-    EXPR_NEQ,          // Inequality '!=='
-    EXPR_LT,           // Less than '<'
-    EXPR_GT,           // Greater than '>'
-    EXPR_LE,           // Less than or equal '<='
-    EXPR_GE,           // Greater than or equal '>='
-    EXPR_LBR,          // Left bracket '('
-    EXPR_RBR           // Right bracket ')'
-} ptable_symbol_t;
 
 // Evaluates next move from precedence table based on top terminal on stack and current input symbol
 // 1. Check if both indexes are in the boundaries of the precedence table
