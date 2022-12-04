@@ -269,8 +269,31 @@ void generate_break(FILE *file) { fprintf(file, "BREAK\n"); }
 void generate_dprint(char *var, FILE *file) {
     fprintf(file, "DPRINT %s\n", var);
 }
-// TODO: rename maybe to generate_instruction
-int generate(Operation_t operation, Symbol_t *dest_in, Symbol_t *var_in_1,
+
+void generate_def_func(Symbol_t *func, FILE *file) { // TODO: convention for arguments
+    fprintf(file, "LABEL .%s\n", func->attribute);
+    fprintf(file, "PUSHFRAME\n");
+    fprintf(file, "CREATEFRAME\n");
+    for (int i = 0; i < func->func->argc; i++) {
+        fprintf(file, "DEFVAR LF@%s\n", func->func->argv[i].attribute);
+        fprintf(file, "POPS LF@%s\n", func->func->argv[i].attribute);
+    }
+}
+
+void generate_end_func(FILE *file) { // TODO: not sure if this is correct
+    fprintf(file, "POPFRAME\n");
+    fprintf(file, "RETURN\n");
+}
+
+void generate_func_call(Symbol_t *func, FILE *file) { // TODO: convention for arguments
+    for (int i = 0; i < func->func->argc; i++) {
+        fprintf(file, "PUSHS LF@%s\n", func->func->argv[i].attribute);
+    }
+    fprintf(file, "CALL .%s\n", func->attribute);
+}
+
+    // TODO: rename maybe to generate_instruction
+int generate_instruction(Operation_t operation, Symbol_t *dest_in, Symbol_t *var_in_1,
              Symbol_t *var_in_2, int label, FILE *file) {
     DString_t var1, var2, dest;
     d_string_init(&var1);
@@ -365,13 +388,16 @@ int generate(Operation_t operation, Symbol_t *dest_in, Symbol_t *var_in_1,
         case READ:  // when reading, variable type is always in
                     // var_in_1->const_type
             // TODO: make this note in function description
-            if (var_in_1->const_type == INT) { // readi function
+            if (var_in_1->const_type == INT) { // readi() function
                 generate_read(dest.str, "int", file);
-            } else if (var_in_1->const_type == FLOAT) { // readf function
+            } else if (var_in_1->const_type == FLOAT) { // readf() function
                 generate_read(dest.str, "float", file);
-            } else if (var_in_1->const_type == STRING) { // reads function
+            } else if (var_in_1->const_type == STRING) { // reads() function
                 generate_read(dest.str, "string", file);
             }
+            break;
+        case DEF_FUNC:
+
             break;
         default:
             return INTERNAL_ERR;

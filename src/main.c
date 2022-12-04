@@ -118,12 +118,12 @@ int main(void) {
     symbol2->var = NULL;
     symbol2->func = NULL;
 
-    CHECK_OK(generate(IF_LT, NULL, symbol1, symbol2, 1, file));
-    CHECK_OK(generate(IF_GT, NULL, symbol1, symbol2, 2, file));
-    CHECK_OK(generate(IF_LEQ, NULL, symbol1, symbol2, 3, file));
-    CHECK_OK(generate(IF_GEQ, NULL, symbol1, symbol2, 4, file));
-    CHECK_OK(generate(IF_EQ, NULL, symbol1, symbol2, 5, file));
-    CHECK_OK(generate(IF_NEQ, NULL, symbol1, symbol2, 6, file));
+    CHECK_OK(generate_instruction(IF_LT, NULL, symbol1, symbol2, 1, file));
+    CHECK_OK(generate_instruction(IF_GT, NULL, symbol1, symbol2, 2, file));
+    CHECK_OK(generate_instruction(IF_LEQ, NULL, symbol1, symbol2, 3, file));
+    CHECK_OK(generate_instruction(IF_GEQ, NULL, symbol1, symbol2, 4, file));
+    CHECK_OK(generate_instruction(IF_EQ, NULL, symbol1, symbol2, 5, file));
+    CHECK_OK(generate_instruction(IF_NEQ, NULL, symbol1, symbol2, 6, file));
 
 
     free(symbol1);
