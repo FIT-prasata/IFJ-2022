@@ -67,7 +67,7 @@ typedef struct Var {
  */
 typedef struct Function {
     int argc;
-    Value_type_t *argv_types;
+    Symbol_t *argv;
     Value_type_t return_type;
     bool defined;
     bool used;

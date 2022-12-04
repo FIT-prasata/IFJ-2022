@@ -94,7 +94,7 @@ int main(void) {
     free(token2);
     fclose(file);*/
 
-    FILE *file = fopen("./src/adam-test-while2.out", "w");
+    FILE *file = fopen("./src/adam-test-if2.out", "w");
     CHECK_NULL(file);
 
     Symbol_t *symbol1 = malloc(sizeof(Symbol_t));
@@ -118,7 +118,14 @@ int main(void) {
     symbol2->var = NULL;
     symbol2->func = NULL;
 
-    CHECK_OK(generate(WHILE_LT, NULL, symbol1, symbol2, 1, file));
+    CHECK_OK(generate(IF_LT, NULL, symbol1, symbol2, 1, file));
+    CHECK_OK(generate(IF_GT, NULL, symbol1, symbol2, 2, file));
+    CHECK_OK(generate(IF_LEQ, NULL, symbol1, symbol2, 3, file));
+    CHECK_OK(generate(IF_GEQ, NULL, symbol1, symbol2, 4, file));
+    CHECK_OK(generate(IF_EQ, NULL, symbol1, symbol2, 5, file));
+    CHECK_OK(generate(IF_NEQ, NULL, symbol1, symbol2, 6, file));
+
+
     free(symbol1);
     free(symbol2);
     fclose(file);

@@ -64,108 +64,6 @@ void generate_while_start(Operation_t type, char *var1, char *var2, int label,
     if (type == WHILE_LT || type == WHILE_GT || type == WHILE_LEQ || type ==
     WHILE_GEQ) { fprintf(file, "POPFRAME\n");
     }
-
-    /*switch (type) {
-        case WHILE_LT:
-            fprintf(file, "LABEL .while_start_%d\n", label);
-            fprintf(file, "PUSHS %s\n", var2);
-            fprintf(file, "PUSHS %s\n", var1);
-            fprintf(file, "PUSHFRAME\n");
-            fprintf(file, "CREATEFRAME\n");
-            fprintf(file, "DEFVAR LF@var1\n");
-            fprintf(file, "DEFVAR LF@var2\n");
-            fprintf(file, "POPS LF@var1\n");
-            fprintf(file, "POPS LF@var2\n");
-            fprintf(file, "DEFVAR LF@var_ret\n");
-            fprintf(file, "LT LF@var_ret LF@var1 LF@var2\n");
-            fprintf(file, "JUMPIFEQ .while_body_%d LF@var_ret bool@true\n",
-                    label);
-            fprintf(file, "POPFRAME\n");
-            fprintf(file, "JUMP .while_end_%d\n", label);
-            fprintf(file, "LABEL .while_body_%d\n", label);
-            fprintf(file, "POPFRAME\n");
-            break;
-        case WHILE_GT:
-            fprintf(file, "LABEL .while_start_%d\n", label);
-            fprintf(file, "PUSHS %s\n", var2);
-            fprintf(file, "PUSHS %s\n", var1);
-            fprintf(file, "PUSHFRAME\n");
-            fprintf(file, "CREATEFRAME\n");
-            fprintf(file, "DEFVAR LF@var1\n");
-            fprintf(file, "DEFVAR LF@var2\n");
-            fprintf(file, "POPS LF@var1\n");
-            fprintf(file, "POPS LF@var2\n");
-            fprintf(file, "DEFVAR LF@var_ret\n");
-            fprintf(file, "GT LF@var_ret LF@var1 LF@var2\n");
-            fprintf(file, "JUMPIFEQ .while_body_%d LF@var_ret bool@true\n",
-                    label);
-            fprintf(file, "POPFRAME\n");
-            fprintf(file, "JUMP .while_end_%d\n", label);
-            fprintf(file, "LABEL .while_body_%d\n", label);
-            fprintf(file, "POPFRAME\n");
-            break;
-        case WHILE_LEQ:
-            fprintf(file, "LABEL .while_start_%d\n", label);
-            fprintf(file, "PUSHS %s\n", var2);
-            fprintf(file, "PUSHS %s\n", var1);
-            fprintf(file, "PUSHFRAME\n");
-            fprintf(file, "CREATEFRAME\n");
-            fprintf(file, "DEFVAR LF@var1\n");
-            fprintf(file, "DEFVAR LF@var2\n");
-            fprintf(file, "POPS LF@var1\n");
-            fprintf(file, "POPS LF@var2\n");
-            fprintf(file, "DEFVAR LF@var_ret\n");
-            fprintf(file, "DEFVAR LF@tmp1\n");
-            fprintf(file, "DEFVAR LF@tmp2\n");
-            fprintf(file, "LT LF@tmp1 LF@var1 LF@var2\n");
-            fprintf(file, "EQ LF@tmp2 LF@var1 LF@var2\n");
-            fprintf(file, "OR LF@var_ret LF@tmp1 LF@tmp2\n");
-            fprintf(file, "JUMPIFEQ .while_body_%d LF@var_ret bool@true\n",
-                    label);
-            fprintf(file, "POPFRAME\n");
-            fprintf(file, "JUMP .while_end_%d\n", label);
-            fprintf(file, "LABEL .while_body_%d\n", label);
-            fprintf(file, "POPFRAME\n");
-            break;
-        case WHILE_GEQ:
-            fprintf(file, "LABEL .while_start_%d\n", label);
-            fprintf(file, "PUSHS %s\n", var2);
-            fprintf(file, "PUSHS %s\n", var1);
-            fprintf(file, "PUSHFRAME\n");
-            fprintf(file, "CREATEFRAME\n");
-            fprintf(file, "DEFVAR LF@var1\n");
-            fprintf(file, "DEFVAR LF@var2\n");
-            fprintf(file, "POPS LF@var1\n");
-            fprintf(file, "POPS LF@var2\n");
-            fprintf(file, "DEFVAR LF@var_ret\n");
-            fprintf(file, "DEFVAR LF@tmp1\n");
-            fprintf(file, "DEFVAR LF@tmp2\n");
-            fprintf(file, "GT LF@tmp1 LF@var1 LF@var2\n");
-            fprintf(file, "EQ LF@tmp2 LF@var1 LF@var2\n");
-            fprintf(file, "OR LF@var_ret LF@tmp1 LF@tmp2\n");
-            fprintf(file, "JUMPIFEQ .while_body_%d LF@var_ret bool@true\n",
-                    label);
-            fprintf(file, "POPFRAME\n");
-            fprintf(file, "JUMP .while_end_%d\n", label);
-            fprintf(file, "LABEL .while_body_%d\n", label);
-            fprintf(file, "POPFRAME\n");
-            break;
-        case WHILE_EQ:
-            fprintf(file, "LABEL .while_start_%d\n", label);
-            fprintf(file, "JUMPIFEQ %s, %s, .while_body_%d\n", var1, var2,
-                    label);
-            fprintf(file, "JUMP .while_end_%d\n", label);
-            fprintf(file, "LABEL .while_body_%d\n", label);
-            break;
-        case WHILE_NEQ:
-            fprintf(file, "JUMPIFNEQ %s, %s, .while_body_%d\n", var1, var2,
-                    label);
-            fprintf(file, "JUMP .while_end_%d\n", label);
-            fprintf(file, "LABEL .while_body_%d\n", label);
-            break;
-        default:
-            break;
-    }*/
 }
 
 void generate_while_end(int label, FILE *file) {
@@ -176,64 +74,16 @@ void generate_while_end(int label, FILE *file) {
 void generate_if_start(Operation_t type, char *var1, char *var2, int label,
                        FILE *file) {
     switch (type) {
+        case IF_EQ:
+            fprintf(file, "JUMPIFEQ %s, %s, .if_start_%d\n", var1, var2,
+                    label);
+            break;
+        case IF_NEQ:
+            fprintf(file, "JUMPIFNEQ %s, %s, .if_start_%d\n", var1, var2, label);
+            break;
         case IF_LT:
-            fprintf(file, "PUSHS %s\n", var2);
-            fprintf(file, "PUSHS %s\n", var1);
-            fprintf(file, "PUSHFRAME\n");
-            fprintf(file, "CREATEFRAME\n");
-            fprintf(file, "DEFVAR LF@var1\n");
-            fprintf(file, "DEFVAR LF@var2\n");
-            fprintf(file, "POPS LF@var1\n");
-            fprintf(file, "POPS LF@var2\n");
-            fprintf(file, "DEFVAR LF@var_ret\n");
-            fprintf(file, "LT LF@var_ret LF@var1 LF@var2\n");
-            fprintf(file, "JUMPIFEQ .if_start_%d LF@var_ret bool@true\n",
-                    label);
-            fprintf(file, "POPFRAME\n");
-            fprintf(file, "JUMP .if_else_%d\n", label);
-            fprintf(file, "LABEL .if_start_%d\n", label);
-            fprintf(file, "POPFRAME\n");
-            break;
         case IF_GT:
-            fprintf(file, "PUSHS %s\n", var2);
-            fprintf(file, "PUSHS %s\n", var1);
-            fprintf(file, "PUSHFRAME\n");
-            fprintf(file, "CREATEFRAME\n");
-            fprintf(file, "DEFVAR LF@var1\n");
-            fprintf(file, "DEFVAR LF@var2\n");
-            fprintf(file, "POPS LF@var1\n");
-            fprintf(file, "POPS LF@var2\n");
-            fprintf(file, "DEFVAR LF@var_ret\n");
-            fprintf(file, "GT LF@var_ret LF@var1 LF@var2\n");
-            fprintf(file, "JUMPIFEQ .if_start_%d LF@var_ret bool@true\n",
-                    label);
-            fprintf(file, "POPFRAME\n");
-            fprintf(file, "JUMP .if_else_%d\n", label);
-            fprintf(file, "LABEL .if_start_%d\n", label);
-            fprintf(file, "POPFRAME\n");
-            break;
         case IF_LEQ:
-            fprintf(file, "PUSHS %s\n", var2);
-            fprintf(file, "PUSHS %s\n", var1);
-            fprintf(file, "PUSHFRAME\n");
-            fprintf(file, "CREATEFRAME\n");
-            fprintf(file, "DEFVAR LF@var1\n");
-            fprintf(file, "DEFVAR LF@var2\n");
-            fprintf(file, "POPS LF@var1\n");
-            fprintf(file, "POPS LF@var2\n");
-            fprintf(file, "DEFVAR LF@var_ret\n");
-            fprintf(file, "DEFVAR LF@tmp1\n");
-            fprintf(file, "DEFVAR LF@tmp2\n");
-            fprintf(file, "LT LF@tmp1 LF@var1 LF@var2\n");
-            fprintf(file, "EQ LF@tmp2 LF@var1 LF@var2\n");
-            fprintf(file, "OR LF@var_ret LF@tmp1 LF@tmp2\n");
-            fprintf(file, "JUMPIFEQ .if_start_%d LF@var_ret bool@true\n",
-                    label);
-            fprintf(file, "POPFRAME\n");
-            fprintf(file, "JUMP .if_else_%d\n", label);
-            fprintf(file, "LABEL .if_start_%d\n", label);
-            fprintf(file, "POPFRAME\n");
-            break;
         case IF_GEQ:
             fprintf(file, "PUSHS %s\n", var2);
             fprintf(file, "PUSHS %s\n", var1);
@@ -244,31 +94,32 @@ void generate_if_start(Operation_t type, char *var1, char *var2, int label,
             fprintf(file, "POPS LF@var1\n");
             fprintf(file, "POPS LF@var2\n");
             fprintf(file, "DEFVAR LF@var_ret\n");
-            fprintf(file, "DEFVAR LF@tmp1\n");
-            fprintf(file, "DEFVAR LF@tmp2\n");
-            fprintf(file, "GT LF@tmp1 LF@var1 LF@var2\n");
-            fprintf(file, "EQ LF@tmp2 LF@var1 LF@var2\n");
-            fprintf(file, "OR LF@var_ret LF@tmp1 LF@tmp2\n");
+            if (type == IF_LT) {
+                fprintf(file, "LT LF@var_ret LF@var1 LF@var2\n");
+            } else if (type == IF_GT) {
+                fprintf(file, "GT LF@var_ret LF@var1 LF@var2\n");
+            } else {
+                fprintf(file, "DEFVAR LF@tmp1\n");
+                fprintf(file, "DEFVAR LF@tmp2\n");
+                if (type == IF_LEQ) {
+                    fprintf(file, "LT LF@tmp1 LF@var1 LF@var2\n");
+
+                } else {
+                    fprintf(file, "GT LF@tmp1 LF@var1 LF@var2\n");
+                }
+                fprintf(file, "EQ LF@tmp2 LF@var1 LF@var2\n");
+                fprintf(file, "OR LF@var_ret LF@tmp1 LF@tmp2\n");
+            }
             fprintf(file, "JUMPIFEQ .if_start_%d LF@var_ret bool@true\n",
-                    label);
-            fprintf(file, "POPFRAME\n");
-            fprintf(file, "JUMP .if_else_%d\n", label);
-            fprintf(file, "LABEL .if_start_%d\n", label);
-            fprintf(file, "POPFRAME\n");
-            break;
-        case IF_EQ:
-            fprintf(file, "JUMPIFEQ %s, %s, .if_start_%d\n", var1, var2, label);
-            fprintf(file, "JUMP .if_else_%d\n", label);
-            fprintf(file, "LABEL .if_start_%d\n", label);
-            break;
-        case IF_NEQ:
-            fprintf(file, "JUMPIFNEQ %s, %s, .if_start_%d\n", var1, var2,
-                    label);
-            fprintf(file, "JUMP .if_else_%d\n", label);
-            fprintf(file, "LABEL .if_start_%d\n", label);
-            break;
-        default:
-            break;
+                    label); break; default: break;
+    }
+    if (type == IF_LT || type == IF_GT || type == IF_LEQ || type == IF_GEQ) {
+        fprintf(file, "POPFRAME\n");
+    }
+    fprintf(file, "JUMP .if_else_%d\n", label);
+    fprintf(file, "LABEL .if_start_%d\n", label);
+    if (type == IF_LT || type == IF_GT || type == IF_LEQ || type == IF_GEQ) {
+        fprintf(file, "POPFRAME\n");
     }
 }
 
