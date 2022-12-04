@@ -18,7 +18,8 @@ void generate_while_start(Operation_t type, char *var1, char *var2, int label,
     fprintf(file, "LABEL .while_start_%d\n", label);
     switch (type) {
         case WHILE_EQ:
-            fprintf(file, "JUMPIFEQ %s, %s, .while_body_%d\n", var1, var2, label);
+            fprintf(file, "JUMPIFEQ %s, %s, .while_body_%d\n", var1, var2,
+    label);
             break;
         case WHILE_NEQ:
             fprintf(file, "JUMPIFNEQ %s, %s, .while_body_%d\n", var1, var2, label);
@@ -27,7 +28,6 @@ void generate_while_start(Operation_t type, char *var1, char *var2, int label,
         case WHILE_GT:
         case WHILE_LEQ:
         case WHILE_GEQ:
-            fprintf(file, "LABEL .while_start_%d\n", label);
             fprintf(file, "PUSHS %s\n", var2);
             fprintf(file, "PUSHS %s\n", var1);
             fprintf(file, "PUSHFRAME\n");
@@ -53,13 +53,19 @@ void generate_while_start(Operation_t type, char *var1, char *var2, int label,
                 fprintf(file, "EQ LF@tmp2 LF@var1 LF@var2\n");
                 fprintf(file, "OR LF@var_ret LF@tmp1 LF@tmp2\n");
             }
-            fprintf(file, "JUMPIFEQ .while_body_%d LF@var_ret bool@true\n", label);
+            fprintf(file, "JUMPIFEQ .while_body_%d LF@var_ret bool@true\n",
+    label); break; default: break;
+    }
+    if (type == WHILE_LT || type == WHILE_GT || type == WHILE_LEQ || type ==
+    WHILE_GEQ) { fprintf(file, "POPFRAME\n");
+        }
+    fprintf(file, "JUMP .while_end_%d\n", label);
+    fprintf(file, "LABEL .while_body_%d\n", label);
+    if (type == WHILE_LT || type == WHILE_GT || type == WHILE_LEQ || type ==
+    WHILE_GEQ) { fprintf(file, "POPFRAME\n");
     }
 
-
-
-
-    switch (type) {
+    /*switch (type) {
         case WHILE_LT:
             fprintf(file, "LABEL .while_start_%d\n", label);
             fprintf(file, "PUSHS %s\n", var2);
@@ -159,7 +165,7 @@ void generate_while_start(Operation_t type, char *var1, char *var2, int label,
             break;
         default:
             break;
-    }
+    }*/
 }
 
 void generate_while_end(int label, FILE *file) {
@@ -420,34 +426,33 @@ int generate(Operation_t operation, Symbol_t *dest_in, Symbol_t *var_in_1,
     d_string_init(&var2);
     d_string_init(&dest);
     if (dest_in != NULL) {
-        if (dest_in->symbol_type == VARIBLE) {
+        if (dest_in->symbol_type == VARIABLE) {
             CHECK_OK(variable_convert(dest_in, &dest));
         } else if (dest_in->symbol_type == CONSTANT) {
             CHECK_OK(const_convert(dest_in, &dest));
-        } else { // FUNCTION
+        } else {  // FUNCTION
             // TODO: research if Functions need some conversion in IFJcode22
         }
     }
     if (var_in_1 != NULL) {
-        if (var_in_1->symbol_type == VARIBLE) {
+        if (var_in_1->symbol_type == VARIABLE) {
             CHECK_OK(variable_convert(var_in_1, &var1));
         } else if (var_in_1->symbol_type == CONSTANT) {
             CHECK_OK(const_convert(var_in_1, &var1));
-        } else { // FUNCTION
+        } else {  // FUNCTION
             // TODO: research if Functions need some conversion in IFJcode22
         }
     }
     if (var_in_2 != NULL) {
-        if (var_in_2->symbol_type == VARIBLE) {
+        if (var_in_2->symbol_type == VARIABLE) {
             CHECK_OK(variable_convert(var_in_2, &var2));
         } else if (var_in_2->symbol_type == CONSTANT) {
             CHECK_OK(const_convert(var_in_2, &var2));
-        } else { // FUNCTION
+        } else {  // FUNCTION
             // TODO: research if Functions need some conversion in IFJcode22
         }
     }
 
-    // TODO: frame maybe as a parameter of token, not as a parameter of function
     // generate
     switch (operation) {
         // IF CASES
@@ -506,13 +511,14 @@ int generate(Operation_t operation, Symbol_t *dest_in, Symbol_t *var_in_1,
         case WRITE:
             generate_write(var1.str, file);
             break;
-        case READ: // when reading, variable type is always in var_in_1->const_type
+        case READ:  // when reading, variable type is always in
+                    // var_in_1->const_type
             // TODO: make this note in function description
-            if (var_in_1->const_type == INT) {
+            if (var_in_1->const_type == INT) { // readi function
                 generate_read(dest.str, "int", file);
-            } else if (var_in_1->const_type == FLOAT) {
+            } else if (var_in_1->const_type == FLOAT) { // readf function
                 generate_read(dest.str, "float", file);
-            } else if (var_in_1->const_type == STRING) {
+            } else if (var_in_1->const_type == STRING) { // reads function
                 generate_read(dest.str, "string", file);
             }
             break;
@@ -574,15 +580,12 @@ int string_convert(Symbol_t *string, DString_t *converted_str) {
     CHECK_OK(d_string_add_str(converted_str, "string@"));
     int len = (int)strlen(string->attribute);
     for (int i = 0; i < len; i++) {
-        if ((string->attribute[i] >= 0 &&
-             string->attribute[i] <= 32) ||
-            string->attribute[i] == 35 ||
-            string->attribute[i] == 92) {
+        if ((string->attribute[i] >= 0 && string->attribute[i] <= 32) ||
+            string->attribute[i] == 35 || string->attribute[i] == 92) {
             sprintf(code, "\\%03d", string->attribute[i]);
             CHECK_OK(d_string_add_str(converted_str, code));
         } else {
-            CHECK_OK(
-                d_string_add_char(converted_str, string->attribute[i]));
+            CHECK_OK(d_string_add_char(converted_str, string->attribute[i]));
         }
     }
     return OK;

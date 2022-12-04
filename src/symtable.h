@@ -17,10 +17,10 @@
 #define _SYMTABLE_H_
 
 // LOCAL INCLUDES
-#include "scanner.h"
-#include "stack.h"
 #include <stdint.h>
 
+#include "scanner.h"
+#include "stack.h"
 
 // line counting
 extern int line_num;
@@ -39,7 +39,6 @@ typedef enum Value_type { INT, STRING, BOOL, FLOAT, NIL } Value_type_t;
 
 // TODO: add comment to frame + update symbol_t comment
 typedef enum Frame { GF, LF, TF, UNDEF } Frame_t;
-
 
 /**
  * @brief Variable structure
@@ -80,12 +79,7 @@ typedef struct Function {
  * @param var Variable0
  * @param func Function
  */
-typedef enum Symbol_type{
-    VARIBLE,
-    FUNCTION,
-    CONSTANT
-} Symbol_type_t;
-
+typedef enum Symbol_type { VARIABLE, FUNCTION, CONSTANT } Symbol_type_t;
 
 /**
  * @brief Symbol structure
@@ -98,7 +92,7 @@ typedef enum Symbol_type{
  * @note Used in Htab_item_t
  */
 typedef struct Symbol {
-    const char *attribute;
+    char *attribute;
     Symbol_type_t symbol_type;
     Var_t *var;
     Func_t *func;
@@ -217,4 +211,4 @@ int htab_clear(Htab_t *table);
  */
 int htab_free(Htab_t *table);
 
-#endif // _SYMTABLE_H_
+#endif  // _SYMTABLE_H_

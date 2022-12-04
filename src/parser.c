@@ -118,7 +118,7 @@ int def_func_rule(Token_t *token, scope_t *scope_state, Htab_t *global_table) {
     if (func_ptr == NULL) return INTERNAL_ERR;
 
     // check if function wasn't already defined
-    if (func_ptr->data.type.func.defined == true) return UNDEF_FUNC_ERR;
+    if (func_ptr->data.func->defined == true) return UNDEF_FUNC_ERR;
 
     // store key of function in global variable
     if ((status =
@@ -166,7 +166,7 @@ int def_func_rule(Token_t *token, scope_t *scope_state, Htab_t *global_table) {
         return status;
 
     // set function as defined
-    func_ptr->data.type.func.defined = true;
+    func_ptr->data.func->defined = true;
 
     // update scope
     scope_state->in_func = false;

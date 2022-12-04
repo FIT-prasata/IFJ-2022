@@ -15,16 +15,15 @@
 int line_num = 1;
 
 // LOCAL INCLUDES - tohletoto legacy code nechat v tomto poradi plsky
-#include "error.h"
 #include "code_generator.h"
 #include "dynamic_string.h"
-#include "stack.h"
+#include "error.h"
 #include "scanner.h"
+#include "stack.h"
 #include "symtable.h"
 
-
 int main(void) {
-    FILE *file = fopen("./src/adam-test.out", "w");
+    /*FILE *file = fopen("./src/adam-test.out", "w");
     CHECK_NULL(file);
     Token_t *token1 = malloc(sizeof(Token_t));
     CHECK_NULL(token1);
@@ -93,7 +92,35 @@ int main(void) {
 
     free(token1);
     free(token2);
+    fclose(file);*/
+
+    FILE *file = fopen("./src/adam-test-while2.out", "w");
+    CHECK_NULL(file);
+
+    Symbol_t *symbol1 = malloc(sizeof(Symbol_t));
+    CHECK_NULL(symbol1);
+    symbol1->attribute = calloc(3, sizeof(char));
+    CHECK_NULL(symbol1->attribute);
+    strcpy(symbol1->attribute, "$a");
+    symbol1->symbol_type = VARIABLE;
+    symbol1->var = malloc(sizeof(Var_t));
+    CHECK_NULL(symbol1->var);
+    symbol1->var->frame = GF;
+    symbol1->func = NULL;
+
+    Symbol_t *symbol2 = malloc(sizeof(Symbol_t));
+    CHECK_NULL(symbol2);
+    symbol2->attribute = calloc(3, sizeof(char));
+    CHECK_NULL(symbol2->attribute);
+    strcpy(symbol2->attribute, "5");
+    symbol2->symbol_type = CONSTANT;
+    symbol2->const_type = INT;
+    symbol2->var = NULL;
+    symbol2->func = NULL;
+
+    CHECK_OK(generate(WHILE_LT, NULL, symbol1, symbol2, 1, file));
+    free(symbol1);
+    free(symbol2);
     fclose(file);
-    // TODO: frame maybe as a parameter of token
     return OK;
 }

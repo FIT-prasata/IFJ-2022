@@ -33,8 +33,6 @@
 #define CHECK_NULL(_func) \
     if (_func == NULL) return INTERNAL_ERR
 
-
-
 typedef enum Operation {
     // IF
     IF_LT,

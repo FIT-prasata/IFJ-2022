@@ -12,115 +12,107 @@
 // LOCAL INCLUDES
 #include "scanner.h"
 
-
-
 // Checks if character is a white character (not a newline)
-int is_white(int input)
-{
+int is_white(int input) {
     return (input == ' ' || input == '\t' || (input >= 11 && input <= 13));
 }
 
-
 // Function for handling prolog
-int prolog_handler(void){
-    char prolog_start[25] = {'\0',};
+int prolog_handler(void) {
+    char prolog_start[25] = {
+        '\0',
+    };
     int curr;
     bool is_ok = false, block_comment_end = false;
 
-    for(int i = 0; i < 5; i++){
+    for (int i = 0; i < 5; i++) {
         curr = getchar();
         prolog_start[i] = curr;
     }
     if (strcmp(prolog_start, "<?php") == 0) {
         // check if there is a white char/newline/comment
         curr = getchar();
-        if (is_white(curr) || curr == '\n'){
+        if (is_white(curr) || curr == '\n') {
             is_ok = true;
-        }
-        else if (curr == '/'){
+        } else if (curr == '/') {
             // possible comment
             is_ok = true;
         }
-        if (is_ok){
+        if (is_ok) {
             do {
                 // comments handling
-                if (curr == '/'){
+                if (curr == '/') {
                     curr = getchar();
-                    if (curr == '/'){ // line comment
-                        while(curr != '\n'){
+                    if (curr == '/') {  // line comment
+                        while (curr != '\n') {
                             curr = getchar();
                         }
-                    }
-                    else if (curr == '*'){ // block comment
-                        while(block_comment_end == false){
+                    } else if (curr == '*') {  // block comment
+                        while (block_comment_end == false) {
                             curr = getchar();
-                            if (curr == EOF){
+                            if (curr == EOF) {
                                 return LEX_ERR;
                             }
-                            if (curr == '*'){
+                            if (curr == '*') {
                                 curr = getchar();
-                                if (curr == '/'){
+                                if (curr == '/') {
                                     block_comment_end = true;
                                 }
                             }
-                            if (curr == '\n'){
+                            if (curr == '\n') {
                                 line_num++;
                             }
                         }
                         block_comment_end = false;
                         curr = getchar();
                         continue;
-                    }
-                    else{ // not a line comment
+                    } else {  // not a line comment
                         return SYNTAX_ERR;
                     }
-                }
-                else if (is_white(curr)){
+                } else if (is_white(curr)) {
                     curr = getchar();
                     continue;
                 }
                 // line counting
-                if (curr == '\n'){
+                if (curr == '\n') {
                     line_num++;
-                }
-                else{
+                } else {
                     printf("now, curr = '%c'\n", curr);
                     return SYNTAX_ERR;
                 }
                 curr = getchar();
             } while (curr != 'd');
-        }
-        else{
+        } else {
             return SYNTAX_ERR;
         }
 
         ungetc(curr, stdin);
         // second part of prolog checking
-        for(int i = 0; i < 24; i++){
+        for (int i = 0; i < 24; i++) {
             curr = getchar();
             prolog_start[i] = curr;
         }
-        if (strcmp(prolog_start, "declare(strict_types=1);") == 0){
+        if (strcmp(prolog_start, "declare(strict_types=1);") == 0) {
             return OK;
-        } else{
+        } else {
             return SYNTAX_ERR;
         }
     } else {
-        return SYNTAX_ERR; // prolog is not present/contains some white chars at the start of file
+        return SYNTAX_ERR;  // prolog is not present/contains some white chars
+                            // at the start of file
     }
 }
 
-
 // Function for handling epilog
-int epilog_handler(void){
+int epilog_handler(void) {
     int curr = getchar();
     int curr2;
-    if (curr == EOF){
+    if (curr == EOF) {
         ungetc(curr, stdin);
         return OK;
     } else if (curr == '\n') {
         curr2 = getchar();
-        if (curr2 == EOF){
+        if (curr2 == EOF) {
             ungetc(curr2, stdin);
             ungetc(curr, stdin);
             return OK;
@@ -135,13 +127,14 @@ int epilog_handler(void){
     }
 }
 
-
 // Function for keyword handling
-int keyword_handler(DString_t *dString, Token_t *token){
-    char *keywords[] = {"else", "float",  "function", "if",   "int",
-                        "null", "return", "string",   "void", "while", "?int", "?string", "?float"};
-    int keyword_types[] = {K_ELSE, K_FLOAT, K_FUNC, K_IF,   K_INT,
-                           K_NULL, K_RET,   K_STR,  K_VOID, K_WHILE, K_INT_NULL, K_STR_NULL, K_FLOAT_NULL};
+int keyword_handler(DString_t *dString, Token_t *token) {
+    char *keywords[] = {"else", "float",   "function", "if",   "int",
+                        "null", "return",  "string",   "void", "while",
+                        "?int", "?string", "?float"};
+    int keyword_types[] = {K_ELSE,     K_FLOAT,    K_FUNC,      K_IF,   K_INT,
+                           K_NULL,     K_RET,      K_STR,       K_VOID, K_WHILE,
+                           K_INT_NULL, K_STR_NULL, K_FLOAT_NULL};
     int keywords_array_size = sizeof(keywords) / sizeof(keywords[0]);
 
     for (int i = 0; i < keywords_array_size; i++) {
@@ -150,7 +143,7 @@ int keyword_handler(DString_t *dString, Token_t *token){
             return OK;
         }
     }
-    if (dString->str[0] == '?'){
+    if (dString->str[0] == '?') {
         return LEX_ERR;
     }
     token->type = T_FUNC_ID;
@@ -162,12 +155,12 @@ int keyword_handler(DString_t *dString, Token_t *token){
     return OK;
 }
 
-
 // Function for string handling
-int string_handler(DString_t *dString, Token_t *token){
-
+int string_handler(DString_t *dString, Token_t *token) {
     int curr;
-    char oct_hex[4] = {0,};
+    char oct_hex[4] = {
+        0,
+    };
     char *garbage_strtol;
     bool num_ok = true;
     DString_t dString_local;
@@ -178,10 +171,10 @@ int string_handler(DString_t *dString, Token_t *token){
         if (curr >= 0 && curr <= 31) {
             return LEX_ERR;
         }
-        if (curr == '$'){
+        if (curr == '$') {
             continue;
         }
-        if (curr == '\\') { // escape sequence
+        if (curr == '\\') {  // escape sequence
             curr = dString->str[++i];
             switch (curr) {
                 case 'n':
@@ -199,11 +192,13 @@ int string_handler(DString_t *dString, Token_t *token){
                 case '$':
                     d_string_add_char(&dString_local, curr);
                     break;
-                case 'x': // hex case
+                case 'x':  // hex case
                     for (int x = 0; x < 2; x++) {
                         curr = dString->str[++i];
                         // correct format handling
-                        if (((x == 1 && oct_hex[0] == '0') ? curr >= '1' : curr >= '0') && curr <= '9') {
+                        if (((x == 1 && oct_hex[0] == '0') ? curr >= '1'
+                                                           : curr >= '0') &&
+                            curr <= '9') {
                             oct_hex[x] = curr;
                             oct_hex[x + 1] = '\0';
                         } else if (curr >= 'a' && curr <= 'f') {
@@ -225,9 +220,11 @@ int string_handler(DString_t *dString, Token_t *token){
                     }
                     // convert value to int
                     if (num_ok) {
-                        d_string_add_char(&dString_local, (char) strtol(oct_hex, &garbage_strtol, 16));
+                        d_string_add_char(
+                            &dString_local,
+                            (char)strtol(oct_hex, &garbage_strtol, 16));
                     }
-                    for(int j = 0; j < 4; j++){
+                    for (int j = 0; j < 4; j++) {
                         oct_hex[j] = '\0';
                     }
                     num_ok = true;
@@ -235,12 +232,15 @@ int string_handler(DString_t *dString, Token_t *token){
                 case '0':
                 case '1':
                 case '2':
-                case '3': // oct case
+                case '3':  // oct case
                     oct_hex[0] = dString->str[i];
                     for (int x = 1; x < 3; x++) {
                         curr = dString->str[++i];
                         // correct format handling
-                        if (((x == 2 && oct_hex[0] == '0' && oct_hex[1] == '0') ? curr >= '1' : curr >= '0') && curr <= '7') {
+                        if (((x == 2 && oct_hex[0] == '0' && oct_hex[1] == '0')
+                                 ? curr >= '1'
+                                 : curr >= '0') &&
+                            curr <= '7') {
                             oct_hex[x] = curr;
                             oct_hex[x + 1] = '\0';
                         } else {
@@ -255,23 +255,27 @@ int string_handler(DString_t *dString, Token_t *token){
                     }
                     // convert value to int
                     if (num_ok) {
-                        d_string_add_char(&dString_local, (char) strtol(oct_hex, &garbage_strtol, 8));
+                        d_string_add_char(
+                            &dString_local,
+                            (char)strtol(oct_hex, &garbage_strtol, 8));
                     }
-                    for(int j = 0; j < 4; j++){
+                    for (int j = 0; j < 4; j++) {
                         oct_hex[j] = '\0';
                     }
                     num_ok = true;
                     break;
                 default:
-                    // incorrect escape sequence, add everything to string as it is
-                    d_string_add_char(&dString_local, '\\'); // adds '\' to string
-                    d_string_add_char(&dString_local, curr); // adds char after '\' to string
+                    // incorrect escape sequence, add everything to string as it
+                    // is
+                    d_string_add_char(&dString_local,
+                                      '\\');  // adds '\' to string
+                    d_string_add_char(&dString_local,
+                                      curr);  // adds char after '\' to string
             }
         } else {
             d_string_add_char(&dString_local, curr);
         }
     }
-
 
     // Adds string to token
     token->attribute.string = malloc(sizeof(char) * (dString_local.length + 1));
@@ -283,7 +287,6 @@ int string_handler(DString_t *dString, Token_t *token){
     token->type = T_STRING;
     return OK;
 }
-
 
 // Function for variable IDs hadling
 int id_handler(DString_t *dString, Token_t *token) {
@@ -299,11 +302,10 @@ int id_handler(DString_t *dString, Token_t *token) {
     return OK;
 }
 
-
 // Function for integer handling
-int int_handler(DString_t *dString, Token_t *token){
+int int_handler(DString_t *dString, Token_t *token) {
     char *garbage_strtol;
-    int decimal = (int) strtol(dString->str, &garbage_strtol, 10);
+    int decimal = (int)strtol(dString->str, &garbage_strtol, 10);
     token->attribute.string = malloc(sizeof(char) * (dString->length + 1));
     if (token->attribute.string == NULL) {
         return INTERNAL_ERR;
@@ -314,9 +316,8 @@ int int_handler(DString_t *dString, Token_t *token){
     return OK;
 }
 
-
 // Function for double handling
-int float_handler(DString_t *dString, Token_t *token){
+int float_handler(DString_t *dString, Token_t *token) {
     char *garbage_strtol;
     double decimal = strtod(dString->str, &garbage_strtol);
     token->attribute.dec_value = decimal;
@@ -332,243 +333,234 @@ int float_handler(DString_t *dString, Token_t *token){
     return OK;
 }
 
-
-// Part of FSM implemetation, returns FSM STATE according to current state and input char
-T_State_t state(T_State_t act, int curr, DString_t *DString){
-    switch(act){
+// Part of FSM implemetation, returns FSM STATE according to current state and
+// input char
+T_State_t state(T_State_t act, int curr, DString_t *DString) {
+    switch (act) {
         case S_START:
-            if ((curr >= 'a' && curr <= 'z') || (curr >= 'A' && curr <= 'Z') || (curr == '_')){
+            if ((curr >= 'a' && curr <= 'z') || (curr >= 'A' && curr <= 'Z') ||
+                (curr == '_')) {
                 d_string_add_char(DString, curr);
                 return S_KEYWORD;
             }
-            if (curr >= '0' && curr <= '9'){
+            if (curr >= '0' && curr <= '9') {
                 d_string_add_char(DString, curr);
                 return S_INT;
             }
-            if (curr == '?'){
+            if (curr == '?') {
                 d_string_add_char(DString, curr);
                 return QUEST_MARK;
             }
-            if (curr == '$'){
+            if (curr == '$') {
                 d_string_add_char(DString, curr);
                 curr = getchar();
-                if (curr >= '0' && curr <= '9'){
+                if (curr >= '0' && curr <= '9') {
                     return S_ERR;
                 }
                 ungetc(curr, stdin);
                 return S_ID;
             }
-            if (curr == '('){
+            if (curr == '(') {
                 return S_LBR;
             }
-            if (curr == ')'){
+            if (curr == ')') {
                 return S_RBR;
             }
-            if (curr == '"'){
+            if (curr == '"') {
                 return S_STRING;
             }
-            if (curr == ';'){
+            if (curr == ';') {
                 return S_SEM;
             }
-            if (curr == '/'){
+            if (curr == '/') {
                 return S_DIV;
             }
-            if (curr == '+'){
+            if (curr == '+') {
                 return S_ADD;
             }
-            if (curr == '-'){
+            if (curr == '-') {
                 return S_SUB;
             }
-            if (curr == '*'){
+            if (curr == '*') {
                 return S_MUL;
             }
-            if (curr == ','){
+            if (curr == ',') {
                 return S_COMMA;
             }
-            if (curr == '{'){
+            if (curr == '{') {
                 return S_LCBR;
             }
-            if (curr == '}'){
+            if (curr == '}') {
                 return S_RCBR;
             }
-            if (curr == ':'){
+            if (curr == ':') {
                 return S_COL;
             }
-            if (curr == '.'){
+            if (curr == '.') {
                 return S_CONCAT;
             }
-            if (curr == '<'){
+            if (curr == '<') {
                 return S_LT;
             }
-            if (curr == '>'){
+            if (curr == '>') {
                 return S_GT;
             }
-            if (curr == '='){
+            if (curr == '=') {
                 return S_ASSIGN;
             }
-            if (curr == '!'){
+            if (curr == '!') {
                 return S_NEQ;
             }
             return S_ERR;
-        
+
         // divison and possible comments
         case S_DIV:
-            if (curr == '/'){
+            if (curr == '/') {
                 return S_LC;
-            }
-            else if (curr == '*'){
+            } else if (curr == '*') {
                 return S_BC;
             }
             return S_ERR;
-        
+
         // possible ===
         case S_POSS_EQ:
-            if (curr == '='){
+            if (curr == '=') {
                 return S_EQ_OK;
             }
             return S_ERR;
 
         // possible !==
         case S_POSS_NEQ:
-            if (curr == '='){
+            if (curr == '=') {
                 return S_NEQ_OK;
             }
             return S_ERR;
-            
-        //keywords and epilog
+
+        // keywords and epilog
         case S_KEYWORD:
-            if ((curr >= 'a' && curr <= 'z') || (curr >= 'A' && curr <= 'Z') || (curr == '_') || (curr >= '0' && curr <= '9')){
+            if ((curr >= 'a' && curr <= 'z') || (curr >= 'A' && curr <= 'Z') ||
+                (curr == '_') || (curr >= '0' && curr <= '9')) {
                 d_string_add_char(DString, curr);
                 return S_KEYWORD;
-            }
-            else{
+            } else {
                 ungetc(curr, stdin);
                 return S_KEYWORD_END;
             }
         case QUEST_MARK:
-            if (curr == '>'){
+            if (curr == '>') {
                 return S_PROL_END;
-            }
-            else if((curr >= 'a' && curr <= 'z') || (curr >= 'A' && curr <= 'Z') || (curr == '_')){
+            } else if ((curr >= 'a' && curr <= 'z') ||
+                       (curr >= 'A' && curr <= 'Z') || (curr == '_')) {
                 d_string_add_char(DString, curr);
                 return S_KEYWORD;
-            }
-            else{
-                return S_ERR; // ex: ?8 or ?= ...
+            } else {
+                return S_ERR;  // ex: ?8 or ?= ...
             }
 
         // strings
         case S_STRING:
-            if (curr == '\\'){
+            if (curr == '\\') {
                 d_string_add_char(DString, curr);
                 return S_STRING_ESC;
             }
-            if (curr != '"'){
+            if (curr != '"') {
                 d_string_add_char(DString, curr);
                 return S_STRING;
-            }
-            else{
+            } else {
                 return S_STRING_END;
             }
-        case S_STRING_ESC: // \ was in string
+        case S_STRING_ESC:  // \ was in string
             d_string_add_char(DString, curr);
             return S_STRING;
 
         // identificators
         case S_ID:
-            if ((curr >= 'a' && curr <= 'z') || (curr >= 'A' && curr <= 'Z') || (curr == '_') || (curr >= '0' && curr <= '9')){
+            if ((curr >= 'a' && curr <= 'z') || (curr >= 'A' && curr <= 'Z') ||
+                (curr == '_') || (curr >= '0' && curr <= '9')) {
                 d_string_add_char(DString, curr);
                 return S_ID;
-            }
-            else{
+            } else {
                 ungetc(curr, stdin);
                 return S_ID_END;
             }
 
         // numbers
         case S_INT:
-            if (curr >= '0' && curr <= '9'){
+            if (curr >= '0' && curr <= '9') {
                 d_string_add_char(DString, curr);
                 return S_INT;
             }
             // num is float
-            else if (curr == '.' || curr == 'e' || curr == 'E'){
+            else if (curr == '.' || curr == 'e' || curr == 'E') {
                 d_string_add_char(DString, curr);
                 curr = getchar();
-                if (curr == '+' || curr == '-'){
+                if (curr == '+' || curr == '-') {
                     d_string_add_char(DString, curr);
                     curr = getchar();
-                    if (curr >= '0' && curr <= '9'){
+                    if (curr >= '0' && curr <= '9') {
                         ungetc(curr, stdin);
                         return S_FLOAT;
-                    }
-                    else{
+                    } else {
                         return S_ERR;
                     }
-                }
-                else if (curr >= '0' && curr <= '9'){
+                } else if (curr >= '0' && curr <= '9') {
                     ungetc(curr, stdin);
-                }
-                else{
+                } else {
                     return S_ERR;
                 }
                 return S_FLOAT;
-            }
-            else{
+            } else {
                 ungetc(curr, stdin);
                 return S_INT_END;
             }
         case S_FLOAT:
-            if (curr >= '0' && curr <= '9'){
+            if (curr >= '0' && curr <= '9') {
                 d_string_add_char(DString, curr);
                 return S_FLOAT;
             }
             // exponent
-            else if (curr == 'e' || curr == 'E'){
+            else if (curr == 'e' || curr == 'E') {
                 d_string_add_char(DString, curr);
                 curr = getchar();
-                if (curr == '+' || curr == '-'){
+                if (curr == '+' || curr == '-') {
                     d_string_add_char(DString, curr);
                     curr = getchar();
-                    if (curr >= '0' && curr <= '9'){
+                    if (curr >= '0' && curr <= '9') {
                         ungetc(curr, stdin);
                         return S_FLOAT;
-                    }
-                    else{
+                    } else {
                         return S_ERR;
                     }
-                }
-                else if (curr >= '0' && curr <= '9'){
+                } else if (curr >= '0' && curr <= '9') {
                     ungetc(curr, stdin);
-                }
-                else{
+                } else {
                     return S_ERR;
                 }
                 return S_FLOAT;
-            }
-            else{
+            } else {
                 ungetc(curr, stdin);
                 return S_FLOAT_END;
             }
 
         // comments
         case S_LC:
-            if (curr != '\n'){
+            if (curr != '\n') {
                 return S_LC;
             }
             return S_START;
         case S_BC:
-            if (curr == '*'){
+            if (curr == '*') {
                 return S_POSS_BC_END;
             }
             return S_BC;
-        default: // should never happen, unknown state handling (raises LEX_ERR)
+        default
+            :  // should never happen, unknown state handling (raises LEX_ERR)
             return S_ERR;
     }
 }
 
-
-// Function that returns the token through the pointer and returns if the token is valid
+// Function that returns the token through the pointer and returns if the token
+// is valid
 int scan(Token_t *token) {
     DString_t dString;
     d_string_init(&dString);
@@ -581,43 +573,41 @@ int scan(Token_t *token) {
         int prol_ret = prolog_handler();
         if (prol_ret == LEX_ERR) {
             return_type = LEX_ERR;
-        }
-        else if (prol_ret == SYNTAX_ERR) {
+        } else if (prol_ret == SYNTAX_ERR) {
             return_type = SYNTAX_ERR;
         }
         start_of_file = false;
     }
 
-    while(return_type == -1){
+    while (return_type == -1) {
         curr = getchar();
         if (curr == EOF && act_state == S_START) {
             token->type = T_EOF;
             return_type = OK;
             break;
-        }
-        else if (curr == EOF && act_state != S_START) {
+        } else if (curr == EOF && act_state != S_START) {
             // edge cases if some of these states occur at the end of file
-            if (act_state == S_KEYWORD){
+            if (act_state == S_KEYWORD) {
                 return_type = keyword_handler(&dString, token);
                 ungetc(curr, stdin);
                 break;
             }
-            if (act_state == S_INT){
+            if (act_state == S_INT) {
                 return_type = int_handler(&dString, token);
                 ungetc(curr, stdin);
                 break;
             }
-            if (act_state == S_FLOAT){
+            if (act_state == S_FLOAT) {
                 return_type = float_handler(&dString, token);
                 ungetc(curr, stdin);
                 break;
             }
-            if (act_state == S_ID){
+            if (act_state == S_ID) {
                 return_type = id_handler(&dString, token);
                 ungetc(curr, stdin);
                 break;
             }
-            if (act_state == S_LC){
+            if (act_state == S_LC) {
                 act_state = S_START;
                 ungetc(curr, stdin);
                 continue;
@@ -625,41 +615,41 @@ int scan(Token_t *token) {
             return_type = LEX_ERR;
             break;
         }
-        if (curr == '\n'){
+        if (curr == '\n') {
             // edge cases if EOL occurs and state is some of the listed
-            if (act_state == S_KEYWORD){
+            if (act_state == S_KEYWORD) {
                 return_type = keyword_handler(&dString, token);
                 ungetc(curr, stdin);
                 break;
             }
-            if (act_state == S_INT){
+            if (act_state == S_INT) {
                 return_type = int_handler(&dString, token);
                 ungetc(curr, stdin);
                 break;
             }
-            if (act_state == S_FLOAT){
+            if (act_state == S_FLOAT) {
                 return_type = float_handler(&dString, token);
                 ungetc(curr, stdin);
                 break;
             }
-            if (act_state == S_ID){
+            if (act_state == S_ID) {
                 return_type = id_handler(&dString, token);
                 ungetc(curr, stdin);
                 break;
             }
             line_num++;
-            if (act_state != S_LC){
+            if (act_state != S_LC) {
                 continue;
             }
         }
         // get rid of white chars
-        if (is_white(curr) && act_state == S_START){
+        if (is_white(curr) && act_state == S_START) {
             continue;
         }
 
         // FSM state determination
         T_State_t next = state(act_state, curr, &dString);
-        switch (next){
+        switch (next) {
             // error case
             case S_ERR:
                 return_type = LEX_ERR;
@@ -672,7 +662,7 @@ int scan(Token_t *token) {
             // one char tokens
             case S_LBR:
                 token->type = T_LBR;
-                return_type =  OK;
+                return_type = OK;
                 break;
             case S_RBR:
                 token->type = T_RBR;
@@ -718,12 +708,11 @@ int scan(Token_t *token) {
             // division and possible comment
             case S_DIV:
                 curr = getchar();
-                if (curr == '/'){
+                if (curr == '/') {
                     ungetc(curr, stdin);
                     act_state = S_LC;
                     break;
-                }
-                else if (curr == '*'){
+                } else if (curr == '*') {
                     ungetc(curr, stdin);
                     act_state = S_BC;
                     break;
@@ -732,7 +721,7 @@ int scan(Token_t *token) {
                 token->type = T_DIV;
                 return_type = OK;
                 break;
-            
+
             // longer tokens but of known length
             case S_PROL_END:
                 token->type = T_END_PROLOG;
@@ -741,11 +730,10 @@ int scan(Token_t *token) {
                 break;
             case S_LT:
                 curr = getchar();
-                if (curr == '='){
+                if (curr == '=') {
                     token->type = T_LEQ;
                     return_type = OK;
-                }
-                else{
+                } else {
                     ungetc(curr, stdin);
                     token->type = T_LT;
                     return_type = OK;
@@ -753,11 +741,10 @@ int scan(Token_t *token) {
                 break;
             case S_GT:
                 curr = getchar();
-                if (curr == '='){
+                if (curr == '=') {
                     token->type = T_GEQ;
                     return_type = OK;
-                }
-                else{
+                } else {
                     ungetc(curr, stdin);
                     token->type = T_GT;
                     return_type = OK;
@@ -765,10 +752,9 @@ int scan(Token_t *token) {
                 break;
             case S_ASSIGN:
                 curr = getchar();
-                if (curr == '='){
+                if (curr == '=') {
                     act_state = S_POSS_EQ;
-                }
-                else{
+                } else {
                     ungetc(curr, stdin);
                     token->type = T_ASSIGN;
                     return_type = OK;
@@ -780,10 +766,9 @@ int scan(Token_t *token) {
                 break;
             case S_NEQ:
                 curr = getchar();
-                if (curr == '='){
+                if (curr == '=') {
                     act_state = S_POSS_NEQ;
-                }
-                else{ // IFJ22 does not have ! operator (negation) -> error
+                } else {  // IFJ22 does not have ! operator (negation) -> error
                     ungetc(curr, stdin);
                     return_type = LEX_ERR;
                 }
@@ -849,11 +834,10 @@ int scan(Token_t *token) {
                 break;
             case S_POSS_BC_END:
                 curr = getchar();
-                if (curr == '/'){
+                if (curr == '/') {
                     act_state = S_START;
                     break;
-                }
-                else{
+                } else {
                     act_state = S_BC;
                     break;
                 }
@@ -862,7 +846,6 @@ int scan(Token_t *token) {
             default:
                 return_type = LEX_ERR;
                 break;
-            
         }
     }
 

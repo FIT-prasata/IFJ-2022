@@ -21,7 +21,6 @@
 // LOCAL INCLUDES
 #include "error.h"
 
-
 // line counting
 extern int line_num;
 
@@ -97,5 +96,4 @@ int get_d_string_value_to_double(DString_t *d_string, double *value);
 // @return - status code
 int d_string_replace_str(DString_t *d_string, const char *c_str);
 
-
-#endif // _DYNAMIC_STRING_H_
+#endif  // _DYNAMIC_STRING_H_

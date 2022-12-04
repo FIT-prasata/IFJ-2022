@@ -14,7 +14,6 @@
 // LOCAL INCLUDES
 #include "symtable.h"
 
-
 // Hashtable constructor - initializes hashtable
 Htab_t *htab_init(size_t size) {
     if (size < 1) {
@@ -62,9 +61,9 @@ int htab_insert_item(Htab_t *table, Token_t *token) {
         return INTERNAL_ERR;
     }
     item->data.next = NULL;
-    item->data.attribute = key;
+    item->data.attribute = key; // TODO: rework to strcpy
     if (token->type == T_ID) {
-        item->data.symbol_type = VARIBLE;
+        item->data.symbol_type = VARIABLE;
         item->data.var->var_type = NIL;
         item->data.var->asigned = false;
         item->data.var->frame = UNDEF;
