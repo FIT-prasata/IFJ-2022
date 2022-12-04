@@ -24,7 +24,7 @@ int token_stack_init(Token_stack_t *t_stack) {
 }
 
 Token_t token_stack_get_head(Token_stack_t *t_stack) { return t_stack->token_head; }
-int token_stack_push(Token_stack_t *t_stack, Token_t *token);
+
 int token_stack_push(Token_stack_t *t_stack, Token_t *token) {
     Token_stack_t *tmp = (Token_stack_t *)malloc(sizeof(Token_stack_t));
     if (tmp == NULL) return INTERNAL_ERR;

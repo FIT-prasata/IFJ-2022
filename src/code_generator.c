@@ -490,6 +490,7 @@ int variable_convert(char *str, Frame_t frame, DString_t *converted_var) {
             break;
         case TF:
             CHECK_OK(d_string_add_str(&string, "TF@"));
+            break;
         case NO:
             return OK;
         default:

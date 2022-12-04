@@ -57,7 +57,7 @@ char grammar_rules[RULES_NUM][MAX_RULE_LEN] = {
 };
 
 ptable_move_t ptable_get_next_move(ptable_symbol_t stack, ptable_symbol_t input) {
-  if (stack < P_TABLE_SIZE && stack >= 0 && input < P_TABLE_SIZE || input >= 0) {
+  if ((stack < P_TABLE_SIZE && stack >= 0 && input < P_TABLE_SIZE) || input >= 0) {
     switch (ptable[stack][input]) {
       case '[':
         return EXPR_SHIFT;
@@ -99,16 +99,16 @@ int expr_reduce(Char_stack_t *c_stack, Token_stack_t *t_stack, Token_t *token) {
   // Reduction of expression
   char head_char = char_stack_pop(c_stack);
   while (head_char != CHAR_STACK_BOTTOM && head_char != '[') {
-    if (d_string_add_char(&d_string, head_char) == INTERNAL_ERR) {
-      d_string_free_and_clear(&d_string);
+    if (d_string_add_char(d_string, head_char) == INTERNAL_ERR) {
+      d_string_free_and_clear(d_string);
       return INTERNAL_ERR;
     }
     head_char = char_stack_pop(c_stack);
-    if (is_valid_rule(&d_string) == INTERNAL_ERR) {
-      d_string_free_and_clear(&d_string);
+    if (is_valid_rule(d_string) == INTERNAL_ERR) {
+      d_string_free_and_clear(d_string);
       return INTERNAL_ERR;
     }
-    d_string_free_and_clear(&d_string);
+    d_string_free_and_clear(d_string);
 
     // Pushing left hand side of rule
     if (char_stack_push(c_stack, 'E') == INTERNAL_ERR) {
@@ -116,6 +116,8 @@ int expr_reduce(Char_stack_t *c_stack, Token_stack_t *t_stack, Token_t *token) {
     }
     return OK;
   }
+
+  return INTERNAL_ERR; // IDK CO SEM, just to get rid of errors
 
 
 }
@@ -129,7 +131,7 @@ int expr_special_shift(Char_stack_t *c_stack, char character) {
 
 int is_valid_rule(DString_t *d_string) {
   for (int i = 0; i < RULES_NUM; i++) {
-    if (d_string_cmp(&d_string, grammar_rules[i]) == 0) {
+    if (d_string_cmp(d_string, grammar_rules[i]) == 0) {
       return OK;
     }
   }
@@ -199,7 +201,7 @@ int expr_parse(Char_stack_t *c_stack, Token_stack_t *t_stack, Token_t *token) {
     case T_FLOAT:
     case T_STRING: // This may be way more complicated because of '.' operator ...
       input = EXPR_ID;
-      token_stack_push(&t_stack, &token);
+      token_stack_push(t_stack, token);
       break;
     case T_SEM:
       // Check context, if inside return or assignment return EOEXPR
@@ -214,7 +216,7 @@ int expr_parse(Char_stack_t *c_stack, Token_stack_t *t_stack, Token_t *token) {
       break;
   }
 
-  ptable_symbol_t stack = stackGetTerminal(c_stack);
+  ptable_symbol_t stack = char_stack_get_closest_terminal(c_stack); // TOTO JE KURVA ZLE
   ptable_move_t next_move = ptable_get_next_move(stack, input);
 
   switch (next_move) {
@@ -274,4 +276,5 @@ int expr_main(Htab_t *table, Token_t *token) {
     // TODO: handle
   }
   // Too tired... will finish tomorrow
+  return INTERNAL_ERR; // Not sure which error type to choose TODO, just to get rid of warningss
 }
