@@ -8,3 +8,4 @@ tests
 main
 example.txt
 src/scanner_old.c
+__pycache__/
