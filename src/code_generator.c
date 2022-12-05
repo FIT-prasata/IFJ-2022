@@ -176,8 +176,6 @@ void generate_call(char *label, FILE *file) {
     fprintf(file, "CALL %s\n", label);
 }
 
-void generate_return(FILE *file) { fprintf(file, "RETURN\n"); }
-
 void generate_pushs(char *var, FILE *file) { fprintf(file, "PUSHS %s\n", var); }
 
 void generate_pops(char *var, FILE *file) { fprintf(file, "POPS %s\n", var); }
@@ -250,29 +248,37 @@ void generate_dprint(char *var, FILE *file) {
     fprintf(file, "DPRINT %s\n", var);
 }
 
-void generate_def_func(Symbol_t *func, FILE *file) { // TODO: convention for arguments
+void generate_def_func(Symbol_t *func, FILE *file) {
+    fprintf(file, "JUMP .end_%s\n", func->attribute);
     fprintf(file, "LABEL .%s\n", func->attribute);
-    fprintf(file, "PUSHFRAME\n");
     fprintf(file, "CREATEFRAME\n");
+    fprintf(file, "PUSHFRAME\n");
     for (int i = 0; i < func->func->argc; i++) {
         fprintf(file, "DEFVAR LF@%s\n", func->func->argv[i].attribute);
         fprintf(file, "POPS LF@%s\n", func->func->argv[i].attribute);
     }
 }
 
-void generate_end_func(FILE *file) { // TODO: not sure if this is correct
+void generate_return(FILE *file) { // TODO: not sure if this is correct
     fprintf(file, "POPFRAME\n");
     fprintf(file, "RETURN\n");
 }
 
-void generate_func_call(Symbol_t *func, FILE *file) { // TODO: convention for arguments
-    for (int i = 0; i < func->func->argc; i++) {
-        fprintf(file, "PUSHS LF@%s\n", func->func->argv[i].attribute);
+void generate_func_call(Symbol_t *func, FILE *file) {
+    for (int i = func->func->argc; i > 0; i--) {
+        fprintf(file, "PUSHS LF@%s\n", func->func->argv[i - 1].attribute);
     }
     fprintf(file, "CALL .%s\n", func->attribute);
 }
 
-    // TODO: rename maybe to generate_instruction
+void generate_func_call_assign(char *destination, Symbol_t *func, FILE *file) {
+        for (int i = func->func->argc; i > 0; i--) {
+        fprintf(file, "PUSHS LF@%s\n", func->func->argv[i - 1].attribute);
+    }
+    fprintf(file, "CALL .%s\n", func->attribute);
+    fprintf(file, "POPS %s\n", destination);
+}
+
 int generate_instruction(Operation_t operation, Symbol_t *dest_in, Symbol_t *var_in_1,
              Symbol_t *var_in_2, int label, FILE *file) {
     DString_t var1, var2, dest;
@@ -284,8 +290,10 @@ int generate_instruction(Operation_t operation, Symbol_t *dest_in, Symbol_t *var
             CHECK_OK(variable_convert(dest_in, &dest));
         } else if (dest_in->symbol_type == CONSTANT) {
             CHECK_OK(const_convert(dest_in, &dest));
-        } else {  // FUNCTION
-            // TODO: research if Functions need some conversion in IFJcode22
+        } else if (dest_in->symbol_type == INTERN_VAR) {
+            char tmp[INTERN_VAR_LEN + 1];
+            sprintf(tmp, "GF@%%tmp%d", tmp_var_count++);
+            CHECK_OK(d_string_add_str(&dest, tmp));
         }
     }
     if (var_in_1 != NULL) {
@@ -293,8 +301,6 @@ int generate_instruction(Operation_t operation, Symbol_t *dest_in, Symbol_t *var
             CHECK_OK(variable_convert(var_in_1, &var1));
         } else if (var_in_1->symbol_type == CONSTANT) {
             CHECK_OK(const_convert(var_in_1, &var1));
-        } else {  // FUNCTION
-            // TODO: research if Functions need some conversion in IFJcode22
         }
     }
     if (var_in_2 != NULL) {
@@ -302,8 +308,6 @@ int generate_instruction(Operation_t operation, Symbol_t *dest_in, Symbol_t *var
             CHECK_OK(variable_convert(var_in_2, &var2));
         } else if (var_in_2->symbol_type == CONSTANT) {
             CHECK_OK(const_convert(var_in_2, &var2));
-        } else {  // FUNCTION
-            // TODO: research if Functions need some conversion in IFJcode22
         }
     }
 
@@ -376,8 +380,11 @@ int generate_instruction(Operation_t operation, Symbol_t *dest_in, Symbol_t *var
                 generate_read(dest.str, "string", file);
             }
             break;
-        case DEF_FUNC:
-
+        case CALL_FUNC:
+            generate_func_call(var_in_1, file);
+            break;
+        case CALL_FUNC_ASSIGN:
+            generate_func_call_assign(dest.str, var_in_1, file);
             break;
         default:
             return INTERNAL_ERR;

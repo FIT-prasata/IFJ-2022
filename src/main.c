@@ -112,11 +112,44 @@ int main(void) {
     CHECK_NULL(symbol2);
     symbol2->attribute = calloc(3, sizeof(char));
     CHECK_NULL(symbol2->attribute);
-    strcpy(symbol2->attribute, "5");
-    symbol2->symbol_type = CONSTANT;
-    symbol2->const_type = INT;
+    strcpy(symbol2->attribute, "f");
+    symbol2->symbol_type = FUNCTION;
     symbol2->var = NULL;
-    symbol2->func = NULL;
+    symbol2->func->argc = 3;
+    symbol2->func->argv = malloc(3 * sizeof(Symbol_t));
+    CHECK_NULL(symbol2->func->argv);
+
+    symbol2->func->argv[0].attribute = calloc(3, sizeof(char));
+    CHECK_NULL(symbol1->attribute);
+    strcpy(symbol1->attribute, "$a");
+    symbol1->symbol_type = VARIABLE;
+    symbol1->var = malloc(sizeof(Var_t));
+    CHECK_NULL(symbol1->var);
+    symbol1->var->frame = GF;
+    symbol1->func = NULL;
+
+    symbol2->func->argv[1].attribute = calloc(3, sizeof(char));
+    CHECK_NULL(symbol1->attribute);
+    strcpy(symbol1->attribute, "$b");
+    symbol1->symbol_type = VARIABLE;
+    symbol1->var = malloc(sizeof(Var_t));
+    CHECK_NULL(symbol1->var);
+    symbol1->var->frame = GF;
+    symbol1->func = NULL;
+
+    symbol2->func->argv[2].attribute = calloc(3, sizeof(char));
+    CHECK_NULL(symbol1->attribute);
+    strcpy(symbol1->attribute, "$c");
+    symbol1->symbol_type = VARIABLE;
+    symbol1->var = malloc(sizeof(Var_t));
+    CHECK_NULL(symbol1->var);
+    symbol1->var->frame = GF;
+    symbol1->func = NULL;
+
+
+
+
+
 
     Symbol_t *symbol3 = malloc(sizeof(Symbol_t));
     CHECK_NULL(symbol3);
@@ -138,16 +171,7 @@ int main(void) {
     symbol4->var = NULL;
     symbol4->func = NULL;
 
-    CHECK_OK(generate_instruction(PROLOG, NULL, NULL, NULL, 0, file));
-    CHECK_OK(generate_instruction(DEFVAR, NULL, symbol1, NULL, 0, file));
-    CHECK_OK(generate_instruction(ASSIGN, symbol1, symbol2, NULL, 0, file));
-    strcpy(symbol2->attribute, "10");
-
-    CHECK_OK(generate_instruction(WHILE_LEQ, NULL, symbol1, symbol2, 1, file));
-        CHECK_OK(generate_instruction(WRITE, NULL, symbol1, NULL, 0, file));
-        strcpy(symbol2->attribute, "1");
-        CHECK_OK(generate_instruction(ADD, symbol1, symbol1, symbol2, 0, file));
-    CHECK_OK(generate_instruction(WHILE_END, NULL, NULL, NULL, 1, file));
+    CHECK_OK(generate_instruction(CALL_FUNC, NULL, symbol2, NULL, 0, file));
 
 
     free(symbol1);

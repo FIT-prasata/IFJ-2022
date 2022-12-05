@@ -79,7 +79,7 @@ typedef struct Function {
  * @param var Variable0
  * @param func Function
  */
-typedef enum Symbol_type { VARIABLE, FUNCTION, CONSTANT } Symbol_type_t;
+typedef enum Symbol_type { VARIABLE, FUNCTION, CONSTANT, INTERN_VAR } Symbol_type_t;
 
 /**
  * @brief Symbol structure

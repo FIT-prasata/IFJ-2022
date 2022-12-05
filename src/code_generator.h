@@ -14,6 +14,7 @@
  */
 
 extern int tmp_var_count;
+#define INTERN_VAR_LEN 100
 
 
 // Local includes
@@ -72,6 +73,7 @@ typedef enum Operation {
     ASSIGN,
     PROLOG,
     CALL_FUNC,
+    CALL_FUNC_ASSIGN,
     DEF_FUNC,
 
 } Operation_t;
