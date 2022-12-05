@@ -23,8 +23,8 @@
 #include "error.h"    // for status codes
 
 // DEFINES
-#define EMPTY_STACK INT_MIN
 #define NO_TYPE INT_MAX
+#define EMPTY_STACK INT_MAX-1
 #define CHAR_STACK_BOTTOM '$'
 #define CHAR_STACK_NO_MATCH -1
 #define TERMINALS_NUM 16

@@ -67,26 +67,35 @@ int char_stack_init(Char_stack_t *c_stack) {
     if (c_stack == NULL) {
         return INTERNAL_ERR;
     }
-    c_stack->char_head = '\0';
+    c_stack->char_head = CHAR_STACK_BOTTOM;
     c_stack->next_char = NULL;
     return OK;
 }
 
-char char_stack_get_head(Char_stack_t *c_stack) { return c_stack->char_head; }
+char char_stack_get_head(Char_stack_t *c_stack) {
+    if (c_stack == NULL) {
+        return INTERNAL_ERR;
+    }
+    return c_stack->char_head;
+}
 
 int char_stack_push(Char_stack_t *c_stack, char character) {
     Char_stack_t *tmp = (Char_stack_t *) malloc(sizeof(Char_stack_t));
-    if (tmp == NULL) return INTERNAL_ERR;
+    if (tmp == NULL || c_stack == NULL) return INTERNAL_ERR;
     tmp->char_head = c_stack->char_head;
     tmp->next_char = c_stack->next_char;
     c_stack->char_head = character;
     c_stack->next_char = tmp;
-    free(tmp);
     return OK;
 }
 
 int char_stack_pop(Char_stack_t *c_stack) {
-    if (c_stack == NULL || c_stack->char_head == '\0') return EMPTY_STACK;
+    if (c_stack == NULL) {
+        return INTERNAL_ERR;
+    }
+    if (c_stack->char_head == CHAR_STACK_BOTTOM) {
+        return EMPTY_STACK;
+    }
     char result = c_stack->char_head;
     Char_stack_t *tmp = c_stack->next_char;
     c_stack->char_head = c_stack->next_char->char_head;

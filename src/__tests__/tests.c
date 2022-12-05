@@ -12,7 +12,6 @@ int main(void) {
     errors += run_d_string_tests();
     printf("\n");
     errors += run_symtable_tests();
-    printf("\n");
     errors += run_lex_analyzer_tests();
     printf("\n");
     errors += run_stack_tests();
