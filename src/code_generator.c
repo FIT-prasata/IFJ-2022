@@ -259,9 +259,20 @@ void generate_def_func(Symbol_t *func, FILE *file) {
     }
 }
 
-void generate_return(FILE *file) { // TODO: not sure if this is correct
+void generate_return(Symbol_t *func, Symbol_type_t type, char *attribute, FILE *file) {
+    // TODO: need to pass func->attribute from PARSER to write end label of function
+    if (attribute != NULL) {
+        if (type == VARIABLE) {
+            fprintf(file, "PUSHS %s\n", attribute);
+        } else if (type == CONSTANT) {
+            fprintf(file, "PUSHS %s\n", attribute);
+        } else if (type == INTERN_VAR) {
+            fprintf(file, "PUSHS %%tmp%d\n", tmp_var_count - 1);
+        }
+    }
     fprintf(file, "POPFRAME\n");
     fprintf(file, "RETURN\n");
+    fprintf(file, "LABEL .end_%s\n", func->attribute);
 }
 
 void generate_func_call(Symbol_t *func, FILE *file) {
@@ -286,14 +297,10 @@ int generate_instruction(Operation_t operation, Symbol_t *dest_in, Symbol_t *var
     d_string_init(&var2);
     d_string_init(&dest);
     if (dest_in != NULL) {
-        if (dest_in->symbol_type == VARIABLE) {
+        if (dest_in->symbol_type == VARIABLE || dest_in->symbol_type == INTERN_VAR) {
             CHECK_OK(variable_convert(dest_in, &dest));
         } else if (dest_in->symbol_type == CONSTANT) {
             CHECK_OK(const_convert(dest_in, &dest));
-        } else if (dest_in->symbol_type == INTERN_VAR) {
-            char tmp[INTERN_VAR_LEN + 1];
-            sprintf(tmp, "GF@%%tmp%d", tmp_var_count++);
-            CHECK_OK(d_string_add_str(&dest, tmp));
         }
     }
     if (var_in_1 != NULL) {
@@ -386,6 +393,18 @@ int generate_instruction(Operation_t operation, Symbol_t *dest_in, Symbol_t *var
         case CALL_FUNC_ASSIGN:
             generate_func_call_assign(dest.str, var_in_1, file);
             break;
+        case DEF_FUNC:
+            generate_def_func(var_in_1, file);
+            break;
+        case RETURN:
+            if (var_in_1 != NULL) {
+                // TODO: need to pass func->attribute from PARSER to write end label of function
+                generate_return(var_in_2, var_in_1->symbol_type, var1.str, file);
+            } else {
+                // TODO: need to pass func->attribute from PARSER to write end label of function
+                generate_return(var_in_2, 0, NULL, file);
+            }
+            break;
         default:
             return INTERNAL_ERR;
     }
@@ -396,7 +415,12 @@ int variable_convert(Symbol_t *variable, DString_t *converted_var) {
     CHECK_NULL(variable);
     DString_t string;
     CHECK_OK(d_string_init(&string));
-
+    if (variable->symbol_type == INTERN_VAR) {
+        char tmp[INTERN_VAR_LEN + 1];
+        sprintf(tmp, "GF@%%tmp%d", tmp_var_count++);
+        CHECK_OK(d_string_add_str(&string, tmp));
+        return OK;
+    }
     switch (variable->var->frame) {
         case GF:
             CHECK_OK(d_string_add_str(&string, "GF@"));
