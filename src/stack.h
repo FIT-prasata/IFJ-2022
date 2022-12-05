@@ -24,8 +24,9 @@
 
 // DEFINES
 #define NO_TYPE INT_MAX
-#define EMPTY_STACK INT_MAX-1
+#define TOKEN_EMPTY_STACK INT_MAX-1
 #define CHAR_STACK_BOTTOM '$'
+#define CHAR_STACK_POP_ERR '\0'
 #define CHAR_STACK_NO_MATCH -1
 #define TERMINALS_NUM 16
 
@@ -96,7 +97,7 @@ char char_stack_get_head(Char_stack_t *c_stack);
 int char_stack_push(Char_stack_t *c_stack, char character);
 
 // Pops character from the character stack
-int char_stack_pop(Char_stack_t *c_stack);
+char char_stack_pop(Char_stack_t *c_stack);
 
 // Might be useful for debugging
 void char_stack_clear(Char_stack_t *c_stack);

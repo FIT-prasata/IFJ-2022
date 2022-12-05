@@ -105,7 +105,7 @@ ENDTEST
 
 TEST(T_token_stack_pop_empty_stack)
 T_STACK_INIT
-ASSERT_TRUE(token_stack_pop(&test_token_stack) == EMPTY_STACK)
+ASSERT_TRUE(token_stack_pop(&test_token_stack) == TOKEN_EMPTY_STACK)
 T_STACK_FREE
 ENDTEST
 
@@ -189,12 +189,12 @@ C_STACK_FREE
 ENDTEST
 
 TEST(T_char_stack_pop_null_stack)
-ASSERT_TRUE(char_stack_pop(NULL) == INTERNAL_ERR)
+ASSERT_TRUE(char_stack_pop(NULL) == CHAR_STACK_POP_ERR)
 ENDTEST
 
 TEST(T_char_stack_pop_empty_stack)
 C_STACK_INIT
-ASSERT_TRUE(char_stack_pop(&test_char_stack) == EMPTY_STACK)
+ASSERT_TRUE(char_stack_pop(&test_char_stack) == CHAR_STACK_POP_ERR)
 C_STACK_FREE
 ENDTEST
 
@@ -210,6 +210,65 @@ ASSERT_TRUE(char_stack_push(&test_char_stack, EXPR_ID) == OK)
 ASSERT_TRUE(char_stack_pop(&test_char_stack) == EXPR_ID)
 ASSERT_TRUE(char_stack_get_head(&test_char_stack) == EXPR_ADD)
 C_STACK_FREE
+ENDTEST
+
+TEST(T_char_stack_get_closest_terminal)
+C_STACK_INIT
+ASSERT_TRUE(char_stack_push(&test_char_stack, 'E') == OK)
+ASSERT_TRUE(char_stack_push(&test_char_stack, EXPR_ID) == OK)
+ASSERT_TRUE(char_stack_push(&test_char_stack, 'E') == OK)
+ASSERT_TRUE(char_stack_push(&test_char_stack, EXPR_MUL) == OK)
+ASSERT_TRUE(char_stack_push(&test_char_stack, 'E') == OK)
+ASSERT_TRUE(char_stack_get_closest_terminal(&test_char_stack) == EXPR_MUL)
+C_STACK_FREE
+ENDTEST
+
+TEST(T_char_stack_get_closest_terminal_stack_bottom)
+C_STACK_INIT
+ASSERT_TRUE(char_stack_push(&test_char_stack, 'E') == OK)
+ASSERT_TRUE(char_stack_push(&test_char_stack, 'E') == OK)
+ASSERT_TRUE(char_stack_get_closest_terminal(&test_char_stack) == CHAR_STACK_BOTTOM)
+C_STACK_FREE
+ENDTEST
+
+TEST(T_char_stack_get_closest_terminal_null_stack)
+ASSERT_TRUE(char_stack_get_closest_terminal(NULL) == INTERNAL_ERR)
+ENDTEST
+
+TEST(T_char_stack_push_shift)
+C_STACK_INIT
+ASSERT_TRUE(char_stack_push(&test_char_stack, 'E') == OK)
+ASSERT_TRUE(char_stack_push(&test_char_stack, EXPR_ADD) == OK)
+ASSERT_TRUE(char_stack_push(&test_char_stack, 'E') == OK)
+ASSERT_TRUE(char_stack_push_shift(&test_char_stack) == OK)
+ASSERT_TRUE(char_stack_get_closest_terminal(&test_char_stack) == EXPR_ADD)
+ASSERT_TRUE(char_stack_pop(&test_char_stack) == 'E')
+ASSERT_TRUE(char_stack_get_head(&test_char_stack) == '[')
+C_STACK_FREE
+ENDTEST
+
+TEST(T_char_stack_push_shift_top_terminal)
+C_STACK_INIT
+ASSERT_TRUE(char_stack_push(&test_char_stack, 'E') == OK)
+ASSERT_TRUE(char_stack_push(&test_char_stack, EXPR_ADD) == OK)
+ASSERT_TRUE(char_stack_push_shift(&test_char_stack) == OK)
+ASSERT_TRUE(char_stack_get_closest_terminal(&test_char_stack) == EXPR_ADD)
+ASSERT_TRUE(char_stack_get_head(&test_char_stack) == '[')
+C_STACK_FREE
+ENDTEST
+
+TEST(T_char_stack_push_shift_stack_bottom)
+C_STACK_INIT
+ASSERT_TRUE(char_stack_push(&test_char_stack, 'E') == OK)
+ASSERT_TRUE(char_stack_push_shift(&test_char_stack) == OK)
+ASSERT_TRUE(char_stack_get_closest_terminal(&test_char_stack) == CHAR_STACK_BOTTOM)
+ASSERT_TRUE(char_stack_pop(&test_char_stack) == 'E')
+ASSERT_TRUE(char_stack_get_head(&test_char_stack) == '[')
+C_STACK_FREE
+ENDTEST
+
+TEST(T_char_stack_push_shift_null_stack)
+ASSERT_TRUE(char_stack_push_shift(NULL) == INTERNAL_ERR)
 ENDTEST
 
 int run_stack_tests() {
@@ -240,5 +299,12 @@ int run_stack_tests() {
     errors += T_char_stack_pop_null_stack();
     errors += T_char_stack_pop_empty_stack();
     errors += T_char_stack_complex_test();
+    errors += T_char_stack_get_closest_terminal();
+    errors += T_char_stack_get_closest_terminal_stack_bottom();
+    errors += T_char_stack_get_closest_terminal_null_stack();
+    errors += T_char_stack_push_shift();
+    errors += T_char_stack_push_shift_top_terminal();
+    errors += T_char_stack_push_shift_stack_bottom();
+    errors += T_char_stack_push_shift_null_stack();
     return errors;
 }

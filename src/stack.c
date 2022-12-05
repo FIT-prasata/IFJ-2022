@@ -45,7 +45,7 @@ T_type_t token_stack_pop(Token_stack_t *t_stack) {
         return INTERNAL_ERR;
     }
     if (t_stack->token_head.type == NO_TYPE) {
-        return EMPTY_STACK;
+        return TOKEN_EMPTY_STACK;
     }
     T_type_t result = t_stack->token_head.type;
     Token_stack_t *tmp = t_stack->next_token;
@@ -56,7 +56,7 @@ T_type_t token_stack_pop(Token_stack_t *t_stack) {
 }
 
 void token_stack_clear(Token_stack_t *t_stack) {
-    while (token_stack_pop(t_stack) != EMPTY_STACK);
+    while (token_stack_pop(t_stack) != TOKEN_EMPTY_STACK);
 }
 
 // CHARACTER STACK
@@ -89,12 +89,12 @@ int char_stack_push(Char_stack_t *c_stack, char character) {
     return OK;
 }
 
-int char_stack_pop(Char_stack_t *c_stack) {
+char char_stack_pop(Char_stack_t *c_stack) {
     if (c_stack == NULL) {
-        return INTERNAL_ERR;
+        return CHAR_STACK_POP_ERR;
     }
     if (c_stack->char_head == CHAR_STACK_BOTTOM) {
-        return EMPTY_STACK;
+        return CHAR_STACK_POP_ERR;
     }
     char result = c_stack->char_head;
     Char_stack_t *tmp = c_stack->next_char;
@@ -105,11 +105,14 @@ int char_stack_pop(Char_stack_t *c_stack) {
 }
 
 void char_stack_clear(Char_stack_t *c_stack) {
-    while (char_stack_pop(c_stack) != EMPTY_STACK);
+    while (char_stack_pop(c_stack) != CHAR_STACK_POP_ERR);
 }
 
 ptable_symbol_t char_stack_get_closest_terminal(Char_stack_t *c_stack) {
-    while (c_stack->char_head != '\0') {
+    if (c_stack == NULL) {
+        return INTERNAL_ERR;
+    }
+    while (char_stack_get_head(c_stack) != CHAR_STACK_BOTTOM) {
         for (int i = 0; i < TERMINALS_NUM; i++) {
             if (c_stack->char_head == all_terminals[i]) {
                 return c_stack->char_head;
@@ -117,20 +120,35 @@ ptable_symbol_t char_stack_get_closest_terminal(Char_stack_t *c_stack) {
         }
         c_stack = c_stack->next_char;
     }
-    return '\0';
+    return CHAR_STACK_BOTTOM;
 }
 
 int char_stack_push_shift(Char_stack_t *c_stack) {
-    while (c_stack->char_head != '\0') {
+    if (c_stack == NULL) {
+        return INTERNAL_ERR;
+    }
+    Char_stack_t *prev = c_stack;
+    bool is_first_term = true;
+    while (char_stack_get_head(c_stack) != CHAR_STACK_BOTTOM) {
         for (int i = 0; i < TERMINALS_NUM; i++) {
             if (c_stack->char_head == all_terminals[i]) {
-                Char_stack_t *tmp = c_stack;
-                tmp->char_head = '[';
-                tmp->next_char = c_stack;
+                Char_stack_t *tmp = malloc(sizeof(Char_stack_t));
+                if (tmp == NULL) return INTERNAL_ERR;
+                if (is_first_term != true) {
+                    prev->next_char = tmp;
+                    tmp->char_head = '[';
+                    tmp->next_char = c_stack;
+                }
+                else {
+                    char_stack_push(c_stack, '[');
+                }
                 return OK;
             }
         }
+        is_first_term = false;
+        prev = c_stack;
         c_stack = c_stack->next_char;
     }
-    return CHAR_STACK_NO_MATCH;
+    char_stack_push(c_stack, '[');
+    return OK;
 }

@@ -42,18 +42,18 @@ char ptable[P_TABLE_SIZE][P_TABLE_SIZE] = {
 
 // Right hand sides of rules
 char grammar_rules[RULES_NUM][MAX_RULE_LEN] = {
-  {'E', EXPR_ADD, 'E', '\0'},
-  {'E', EXPR_SUB, 'E', '\0'},
-  {'E', EXPR_MUL, 'E', '\0'},
-  {'E', EXPR_DIV, 'E', '\0'},
-  {'E', EXPR_DOT, 'E', '\0'},
+  {EXPR_NONTERM, EXPR_ADD, EXPR_NONTERM, '\0'},
+  {EXPR_NONTERM, EXPR_SUB, EXPR_NONTERM, '\0'},
+  {EXPR_NONTERM, EXPR_MUL, EXPR_NONTERM, '\0'},
+  {EXPR_NONTERM, EXPR_DIV, EXPR_NONTERM, '\0'},
+  {EXPR_NONTERM, EXPR_DOT, EXPR_NONTERM, '\0'},
   {EXPR_ID, '\0'},
-  {'E', EXPR_EQ, 'E', '\0'},
-  {'E', EXPR_NEQ, 'E', '\0'},
-  {'E', EXPR_LT, 'E', '\0'},
-  {'E', EXPR_GT, 'E', '\0'},
-  {'E', EXPR_LE, 'E', '\0'},
-  {'E', EXPR_GE, 'E', '\0'}
+  {EXPR_NONTERM, EXPR_EQ, EXPR_NONTERM, '\0'},
+  {EXPR_NONTERM, EXPR_NEQ, EXPR_NONTERM, '\0'},
+  {EXPR_NONTERM, EXPR_LT, EXPR_NONTERM, '\0'},
+  {EXPR_NONTERM, EXPR_GT, EXPR_NONTERM, '\0'},
+  {EXPR_NONTERM, EXPR_LE, EXPR_NONTERM, '\0'},
+  {EXPR_NONTERM, EXPR_GE, EXPR_NONTERM, '\0'}
 };
 
 ptable_move_t ptable_get_next_move(ptable_symbol_t stack, ptable_symbol_t input) {
@@ -78,9 +78,7 @@ ptable_move_t ptable_get_next_move(ptable_symbol_t stack, ptable_symbol_t input)
 }
 
 int expr_shift(Char_stack_t *c_stack, char character) {
-  if (char_stack_push_shift(c_stack) == CHAR_STACK_NO_MATCH) {
-    return INTERNAL_ERR;
-  }
+  char_stack_push_shift(c_stack);
   if (char_stack_push(c_stack, character) == INTERNAL_ERR) {
     return INTERNAL_ERR;
   }

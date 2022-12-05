@@ -53,9 +53,6 @@ code_generator.o: src/code_generator.c
 expr.o: src/expr.c
 	$(CC) $(CFLAGS) $< -c -o $@
 
-# expr.o: src/expr.c
-# 	$(CC) $(CFLAGS) $< -c -o $@
-
 # Formatting
 lint:
 	clang-format -i src/*.c & clang-format -i src/*.h

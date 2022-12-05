@@ -22,10 +22,11 @@
 #include "dynamic_string.h"
 
 
-#define P_TABLE_SIZE 15 // Size of precedence table
-#define EOEXPR 999      // End of expression
-#define RULES_NUM 13    // Number of rules
-#define MAX_RULE_LEN 4  // Maximum length of rule (in chars)
+#define P_TABLE_SIZE 15  // Size of precedence table
+#define EOEXPR 999       // End of expression
+#define RULES_NUM 13     // Number of rules
+#define MAX_RULE_LEN 4   // Maximum length of rule (in chars)
+#define EXPR_NONTERM 'E' // Nonterminal symbol
 
 // Deciding what precedence table operation is next
 typedef enum {
