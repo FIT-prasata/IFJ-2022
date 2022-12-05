@@ -11,9 +11,9 @@
 
 // LOCAL INCLUDES
 #include "expr.h"
-#include "stack.h"
-#include "scanner.h"
-#include "symtable.h"
-#include "parser.h"
-#include "dynamic_string.h"
 
+#include "dynamic_string.h"
+#include "parser.h"
+#include "scanner.h"
+#include "stack.h"
+#include "symtable.h"

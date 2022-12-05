@@ -15,24 +15,23 @@
 // Author: <xsvetl07> - Adam Světlík
 
 // EXTERNAL INCLUDES
-#include <stdlib.h>
 #include <stdio.h>
-
+#include <stdlib.h>
 
 // line counting
 extern int line_num;
 
 // Specification defined erros
 #define OK 0
-#define LEX_ERR 1         // Lexical analysis error
-#define SYNTAX_ERR 2      // Syntax analysis error
+#define LEX_ERR 1  // Lexical analysis error
+#define SYNTAX_ERR 2  // Syntax analysis error
 #define UNDEF_FUNC_ERR 3  // Undefined function / redefinition
-#define FUNC_TYPE_ERR 4   // Incorrect function parameter(s) / return type
-#define UNDEF_VAR_ERR 5   // Undefined variable
-#define RET_ERR 6         // Function return syntax error
-#define EXPR_TYPE_ERR 7   // Expression type incompatibility
-#define OTHER_ERR 8       // Other semantics errors
-#define INTERNAL_ERR 99   // Internal compiler error (memory allocation)
+#define FUNC_TYPE_ERR 4  // Incorrect function parameter(s) / return type
+#define UNDEF_VAR_ERR 5  // Undefined variable
+#define RET_ERR 6  // Function return syntax error
+#define EXPR_TYPE_ERR 7  // Expression type incompatibility
+#define OTHER_ERR 8  // Other semantics errors
+#define INTERNAL_ERR 99  // Internal compiler error (memory allocation)
 
 // Custom errors
 #define NOT_IMPLEMENTED 100
@@ -63,4 +62,4 @@ void try(int code);
 // param: type - error type (int)
 void raise(int code);
 
-#endif // _ERROR_H_
+#endif  // _ERROR_H_

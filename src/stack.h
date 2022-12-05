@@ -19,8 +19,8 @@
 #include <stdlib.h>
 
 // LOCAL INCLUDES
-#include "scanner.h"  // for accessing token struct later on
 #include "error.h"    // for status codes
+#include "scanner.h"  // for accessing token struct later on
 
 // line counting
 extern int line_num;
@@ -42,4 +42,4 @@ void token_stack_push(Token_stack_t *t_stack, Token_t token);
 int token_stack_pop(Token_stack_t *t_stack);
 void token_stack_clear(Token_stack_t *t_stack);
 
-#endif // _STACK_H_
+#endif  // _STACK_H_

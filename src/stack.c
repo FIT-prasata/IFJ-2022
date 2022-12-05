@@ -12,7 +12,6 @@
 // LOCAL INCLUDES
 #include "stack.h"
 
-
 // Initializes stack
 int token_stack_init(Token_stack_t *t_stack) {
     if (t_stack == NULL) {
@@ -49,5 +48,6 @@ int token_stack_pop(Token_stack_t *t_stack) {
 
 // Clears whole stack
 void token_stack_clear(Token_stack_t *t_stack) {
-    while (token_stack_pop(t_stack) != EMPTY_STACK);
+    while (token_stack_pop(t_stack) != EMPTY_STACK)
+        ;
 }

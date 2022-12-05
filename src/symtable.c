@@ -14,7 +14,6 @@
 // LOCAL INCLUDES
 #include "symtable.h"
 
-
 // Hashtable constructor - initializes hashtable
 Htab_t *htab_init(size_t size) {
     if (size < 1) {

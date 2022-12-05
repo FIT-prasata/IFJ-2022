@@ -12,7 +12,6 @@
 // LOCAL INCLUDES
 #include "error.h"
 
-
 void error_display(int type, int line_num) {
     switch (type) {
         // Custom errors will be added with more detailed description and return
