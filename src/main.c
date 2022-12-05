@@ -15,14 +15,20 @@
 int line_num = 1;
 
 // LOCAL INCLUDES - tohletoto legacy code nechat v tomto poradi plsky
-#include "error.h"
 #include "code_generator.h"
 #include "dynamic_string.h"
-#include "stack.h"
+#include "error.h"
+#include "parser.h"
 #include "scanner.h"
+#include "stack.h"
 #include "symtable.h"
 
-
 int main(void) {
+    int status = OK;
+
+    if ((status = parse()) != OK) {
+        error_display(status, 0);
+    }
+
     return 0;
 }

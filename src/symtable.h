@@ -17,10 +17,10 @@
 #define _SYMTABLE_H_
 
 // LOCAL INCLUDES
-#include "scanner.h"
-#include "stack.h"
 #include <stdint.h>
 
+#include "scanner.h"
+#include "stack.h"
 
 // line counting
 extern int line_num;
@@ -207,4 +207,4 @@ int htab_clear(Htab_t *table);
  */
 int htab_free(Htab_t *table);
 
-#endif // _SYMTABLE_H_
+#endif  // _SYMTABLE_H_

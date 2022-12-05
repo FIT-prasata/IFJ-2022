@@ -118,7 +118,6 @@ int param_rule(Token_t *current_token, Htab_t *global_table);
  */
 int param_list_rule(Token_t *current_token, Htab_t *global_table);
 
-
 /**
  * @brief   RULES
  *          <TYPE> -> K_STRING | K_INT | K_FLOAT | K_NULL
