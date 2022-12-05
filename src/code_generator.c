@@ -265,13 +265,13 @@ void generate_dprint(char *var, FILE *file) {
 }
 
 void generate_def_func(Symbol_t *func, FILE *file) {
-    fprintf(file, "JUMP .end_%s\n", func->attribute.string);
-    fprintf(file, "LABEL .%s\n", func->attribute.string);
+    fprintf(file, "JUMP .end_%s\n", func->attribute);
+    fprintf(file, "LABEL .%s\n", func->attribute);
     fprintf(file, "CREATEFRAME\n");
     fprintf(file, "PUSHFRAME\n");
     for (int i = 0; i < func->func->argc; i++) {
-        fprintf(file, "DEFVAR LF@%s\n", func->func->argv[i].attribute.string);
-        fprintf(file, "POPS LF@%s\n", func->func->argv[i].attribute.string);
+        fprintf(file, "DEFVAR LF@%s\n", func->func->argv[i].attribute);
+        fprintf(file, "POPS LF@%s\n", func->func->argv[i].attribute);
     }
 }
 
@@ -288,23 +288,23 @@ void generate_return(Symbol_t *func, Symbol_type_t type, char *attribute,
     }
     fprintf(file, "POPFRAME\n");
     fprintf(file, "RETURN\n");
-    fprintf(file, "LABEL .end_%s\n", func->attribute.string);
+    fprintf(file, "LABEL .end_%s\n", func->attribute);
 }
 
 void generate_func_call(Symbol_t *func, FILE *file) {
     for (int i = func->func->argc; i > 0; i--) {
         fprintf(file, "PUSHS LF@%s\n",
-                func->func->argv[i - 1].attribute.string);
+                func->func->argv[i - 1].attribute);
     }
-    fprintf(file, "CALL .%s\n", func->attribute.string);
+    fprintf(file, "CALL .%s\n", func->attribute);
 }
 
 void generate_func_call_assign(char *destination, Symbol_t *func, FILE *file) {
     for (int i = func->func->argc; i > 0; i--) {
         fprintf(file, "PUSHS LF@%s\n",
-                func->func->argv[i - 1].attribute.string);
+                func->func->argv[i - 1].attribute);
     }
-    fprintf(file, "CALL .%s\n", func->attribute.string);
+    fprintf(file, "CALL .%s\n", func->attribute);
     fprintf(file, "POPS %s\n", destination);
 }
 
@@ -462,7 +462,7 @@ int variable_convert(Symbol_t *variable, DString_t *converted_var) {
         default:
             break;
     }
-    CHECK_OK(d_string_add_str(&string, variable->attribute.string));
+    CHECK_OK(d_string_add_str(&string, variable->attribute));
     CHECK_OK(d_string_copy(&string, converted_var));
     return OK;
 }
@@ -473,11 +473,10 @@ int const_convert(Symbol_t *constant, DString_t *converted_const) {
     CHECK_OK(d_string_init(&string));
     if (constant->const_type == INT) {
         CHECK_OK(d_string_add_str(&string, "int@"));
-        CHECK_OK(d_string_add_str(&string, constant->attribute.string));
+        CHECK_OK(d_string_add_str(&string, constant->attribute));
     } else if (constant->const_type == FLOAT) {
         CHECK_OK(d_string_add_str(&string, "float@"));
-        // TODO: buffer, sprintf %a, d_string_add_str
-        CHECK_OK(d_string_add_str(&string, constant->attribute.string));
+        CHECK_OK(d_string_add_str(&string, constant->attribute));
     } else if (constant->const_type == STRING) {
         CHECK_OK(string_convert(constant, converted_const));
         return OK;
@@ -493,17 +492,17 @@ int const_convert(Symbol_t *constant, DString_t *converted_const) {
 int string_convert(Symbol_t *string, DString_t *converted_str) {
     char code[5];
     CHECK_OK(d_string_add_str(converted_str, "string@"));
-    int len = (int)strlen(string->attribute.string);
+    int len = (int)strlen(string->attribute);
     for (int i = 0; i < len; i++) {
-        if ((string->attribute.string[i] >= 0 &&
-             string->attribute.string[i] <= 32) ||
-            string->attribute.string[i] == 35 ||
-            string->attribute.string[i] == 92) {
-            sprintf(code, "\\%03d", string->attribute.string[i]);
+        if ((string->attribute[i] >= 0 &&
+             string->attribute[i] <= 32) ||
+            string->attribute[i] == 35 ||
+            string->attribute[i] == 92) {
+            sprintf(code, "\\%03d", string->attribute[i]);
             CHECK_OK(d_string_add_str(converted_str, code));
         } else {
             CHECK_OK(
-                d_string_add_char(converted_str, string->attribute.string[i]));
+                d_string_add_char(converted_str, string->attribute[i]));
         }
     }
     return OK;

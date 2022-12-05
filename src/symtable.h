@@ -97,7 +97,7 @@ typedef enum Symbol_type {
  * @note Used in Htab_item_t
  */
 typedef struct Symbol {
-    T_attr_t attribute;
+    char *attribute;
     Symbol_type_t symbol_type;
     Var_t *var;
     Func_t *func;
