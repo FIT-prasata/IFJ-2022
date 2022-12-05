@@ -40,12 +40,6 @@ typedef enum {
 // 2. Return corresponding move from move enum
 ptable_move_t ptable_get_next_move(ptable_symbol_t stack, ptable_symbol_t input);
 
-// Returns precedence table symbol based on top terminal on stack
-ptable_symbol_t ptable_get_symbol_from_char(char c);
-
-// Returns terminal based on precedence table symbol
-char ptable_get_char_from_symbol(ptable_symbol_t symbol);
-
 // Shift operation
 // 1. Push '[' char on top of the closest terminal on stack - TODO Luke -> stack for expressions
 // 2. Push input char on top of the stack
@@ -61,7 +55,7 @@ int expr_shift(Char_stack_t *c_stack, char character);
 // 6. Check if the string matches any of the rules
 // 7. Push the left hand side of the rule on top of the stack ('E')
 // 8. Return status code
-int expr_reduce(Char_stack_t *c_stack, Token_stack_t *t_stack, Token_t *token);
+int expr_reduce(Char_stack_t *c_stack /*, Token_stack_t *t_stack, Token_t *token */);
 
 // Special shift operation
 // 1. Push terminal on stack

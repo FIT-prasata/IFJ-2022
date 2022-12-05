@@ -66,13 +66,13 @@ typedef enum {
 int token_stack_init(Token_stack_t *t_stack);
 
 // Returns token that is currently on top of the token stack 
-Token_t token_stack_get_head(Token_stack_t *t_stack);
+T_type_t token_stack_get_head(Token_stack_t *t_stack);
 
 // Pushes token into the stack
 int token_stack_push(Token_stack_t *t_stack, Token_t *token);
 
 // Pops token from the stack
-int token_stack_pop(Token_stack_t *t_stack);
+T_type_t token_stack_pop(Token_stack_t *t_stack);
 
 // Might be useful for debugging
 void token_stack_clear(Token_stack_t *t_stack);

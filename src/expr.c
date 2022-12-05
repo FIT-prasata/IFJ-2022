@@ -87,28 +87,28 @@ int expr_shift(Char_stack_t *c_stack, char character) {
   return OK;
 }
 
-int expr_reduce(Char_stack_t *c_stack, Token_stack_t *t_stack, Token_t *token) {
-  DString_t *d_string;
-  if (d_string_init(d_string) == INTERNAL_ERR) {
+int expr_reduce(Char_stack_t *c_stack/*, Token_stack_t *t_stack, Token_t *token*/) {
+  DString_t d_string;
+  if (d_string_init(&d_string) == INTERNAL_ERR) {
     return INTERNAL_ERR;
   };
-  char head_term = char_stack_get_closest_terminal(c_stack);
+  //char head_term = char_stack_get_closest_terminal(c_stack);
 
   // GENERATE INSTRUCTION HERE
 
   // Reduction of expression
   char head_char = char_stack_pop(c_stack);
   while (head_char != CHAR_STACK_BOTTOM && head_char != '[') {
-    if (d_string_add_char(d_string, head_char) == INTERNAL_ERR) {
-      d_string_free_and_clear(d_string);
+    if (d_string_add_char(&d_string, head_char) == INTERNAL_ERR) {
+      d_string_free_and_clear(&d_string);
       return INTERNAL_ERR;
     }
     head_char = char_stack_pop(c_stack);
-    if (is_valid_rule(d_string) == INTERNAL_ERR) {
-      d_string_free_and_clear(d_string);
+    if (is_valid_rule(&d_string) == INTERNAL_ERR) {
+      d_string_free_and_clear(&d_string);
       return INTERNAL_ERR;
     }
-    d_string_free_and_clear(d_string);
+    d_string_free_and_clear(&d_string);
 
     // Pushing left hand side of rule
     if (char_stack_push(c_stack, 'E') == INTERNAL_ERR) {
@@ -139,7 +139,6 @@ int is_valid_rule(DString_t *d_string) {
 }
 
 int expr_parse(Char_stack_t *c_stack, Token_stack_t *t_stack, Token_t *token) {
-  bool expr_loaded = false;
   ptable_symbol_t input;
   // Handle edge cases inside assignment statement
   switch (token->type) {
@@ -216,7 +215,7 @@ int expr_parse(Char_stack_t *c_stack, Token_stack_t *t_stack, Token_t *token) {
       break;
   }
 
-  ptable_symbol_t stack = char_stack_get_closest_terminal(c_stack); // TOTO JE KURVA ZLE
+  ptable_symbol_t stack = char_stack_get_closest_terminal(c_stack);
   ptable_move_t next_move = ptable_get_next_move(stack, input);
 
   switch (next_move) {
@@ -226,7 +225,7 @@ int expr_parse(Char_stack_t *c_stack, Token_stack_t *t_stack, Token_t *token) {
       }
       return OK;
     case EXPR_REDUCE:
-      if (expr_reduce(c_stack, t_stack, token) == INTERNAL_ERR) {
+      if (expr_reduce(c_stack/*, t_stack, token*/) == INTERNAL_ERR) {
         return INTERNAL_ERR; // Not sure which error type to choose
       }
       return OK;
@@ -243,15 +242,15 @@ int expr_parse(Char_stack_t *c_stack, Token_stack_t *t_stack, Token_t *token) {
 }
 
 int expr_main(Htab_t *table, Token_t *token) {
-  Char_stack_t *c_stack;
-  Token_stack_t *t_stack;
-  if (char_stack_init(c_stack) == INTERNAL_ERR) {
+  Char_stack_t c_stack;
+  Token_stack_t t_stack;
+  if (char_stack_init(&c_stack) == INTERNAL_ERR) {
     return INTERNAL_ERR;
   }
-  if (token_stack_init(t_stack) == INTERNAL_ERR) {
+  if (token_stack_init(&t_stack) == INTERNAL_ERR) {
     return INTERNAL_ERR;
   }
-  if (char_stack_push(c_stack, CHAR_STACK_BOTTOM) == INTERNAL_ERR) {
+  if (char_stack_push(&c_stack, CHAR_STACK_BOTTOM) == INTERNAL_ERR) {
     return INTERNAL_ERR;
   }
   if (token == NULL) {
@@ -262,16 +261,15 @@ int expr_main(Htab_t *table, Token_t *token) {
   }
   if (token->type == T_ID) {
     Htab_item_t *item;
-    if ((item = htab_lookup_add(table, token)) == NULL) {
-      // Check if the id exists, if not then throw an error, might need a lookup only function ?
+    if ((item = htab_find(table, token->attribute.string)) == NULL) {
       return INTERNAL_ERR; // Not sure which error type to choose
     }
-    if (token_stack_push(t_stack, token) == INTERNAL_ERR) {
+    if (token_stack_push(&t_stack, token) == INTERNAL_ERR) {
       return INTERNAL_ERR; // Not sure which error type to choose
     }
   }
 
-  int status = expr_parse(c_stack, t_stack, token); // Might need location as well for context
+  int status = expr_parse(&c_stack, &t_stack, token); // Might need location as well for context
   if (status == EOEXPR) {
     // TODO: handle
   }

@@ -27,6 +27,11 @@ extern int line_num;
 #include "scanner.h"
 #include "symtable.h"
 
+// Location of expression
+#define EXPR_RET 100
+#define EXPR_COND 101
+#define EXPR_ASSIGN 102
+
 // scope check
 typedef struct {
     bool in_func;
@@ -186,6 +191,6 @@ int func_call_rule(Token_t *current_token, Htab_t *global_table);
  * @param global_table
  * @return
  */
-int expr_rule(Token_t *current_token, Htab_t *global_table);
+int expr_rule(Token_t *current_token, Htab_t *global_table, int location);
 
 #endif  // _PARSER_H_

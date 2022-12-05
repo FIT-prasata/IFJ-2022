@@ -313,7 +313,7 @@ int stat_rule(Token_t *current_token, scope_t *scope_state,
         if ((status = scan(current_token)) != OK) return status;
 
         // handle ... -> ... <EXPR>
-        if ((status = expr_rule(current_token, global_table)) != OK)
+        if ((status = expr_rule(current_token, global_table, EXPR_COND)) != OK)
             return status;
 
         // get new token
@@ -370,7 +370,7 @@ int stat_rule(Token_t *current_token, scope_t *scope_state,
         if ((status = scan(current_token)) != OK) return status;
 
         // handle ... -> ... <EXPR>
-        if ((status = expr_rule(current_token, global_table)) != OK)
+        if ((status = expr_rule(current_token, global_table, EXPR_COND)) != OK)
             return status;
 
         // get new token
@@ -398,7 +398,7 @@ int stat_rule(Token_t *current_token, scope_t *scope_state,
         if ((status = scan(current_token)) != OK) return status;
 
         // handle ... -> ... <EXPR>
-        if ((status = expr_rule(current_token, global_table)) != OK)
+        if ((status = expr_rule(current_token, global_table, EXPR_RET)) != OK)
             return status;
 
         // get new token
@@ -487,7 +487,7 @@ int assign_type_rule(Token_t *current_token, Htab_t *global_table) {
     }
 
     // handle ... -> <EXPR>
-    if ((status = expr_rule(current_token, global_table)) != OK) return status;
+    if ((status = expr_rule(current_token, global_table, EXPR_ASSIGN)) != OK) return status;
 
     return status;
 }
@@ -519,7 +519,7 @@ int func_call_rule(Token_t *current_token, Htab_t *global_table) {
     return status;
 }
 
-int expr_rule(Token_t *current_token, Htab_t *global_table) {
+int expr_rule(Token_t *current_token, Htab_t *global_table, int location) {
     int status = OK;
     // TODO
     return status;

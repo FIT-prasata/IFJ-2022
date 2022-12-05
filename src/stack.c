@@ -23,22 +23,31 @@ int token_stack_init(Token_stack_t *t_stack) {
     return OK;
 }
 
-Token_t token_stack_get_head(Token_stack_t *t_stack) { return t_stack->token_head; }
+T_type_t token_stack_get_head(Token_stack_t *t_stack) { 
+    if (t_stack == NULL) {
+        return INTERNAL_ERR;
+    }
+    return t_stack->token_head.type;
+}
 
 int token_stack_push(Token_stack_t *t_stack, Token_t *token) {
     Token_stack_t *tmp = (Token_stack_t *)malloc(sizeof(Token_stack_t));
-    if (tmp == NULL) return INTERNAL_ERR;
+    if (tmp == NULL || token == NULL || token->type == NO_TYPE || t_stack == NULL) return INTERNAL_ERR;
     tmp->token_head = t_stack->token_head;
     tmp->next_token = t_stack->next_token;
     t_stack->token_head = *token;
     t_stack->next_token = tmp;
-    free(tmp);
     return OK;
 }
 
-int token_stack_pop(Token_stack_t *t_stack) {
-    if (t_stack == NULL || t_stack->token_head.type == NO_TYPE) return EMPTY_STACK;
-    int result = t_stack->token_head.type;
+T_type_t token_stack_pop(Token_stack_t *t_stack) {
+    if (t_stack == NULL) {
+        return INTERNAL_ERR;
+    }
+    if (t_stack->token_head.type == NO_TYPE) {
+        return EMPTY_STACK;
+    }
+    T_type_t result = t_stack->token_head.type;
     Token_stack_t *tmp = t_stack->next_token;
     t_stack->token_head = t_stack->next_token->token_head;
     t_stack->next_token = t_stack->next_token->next_token;
