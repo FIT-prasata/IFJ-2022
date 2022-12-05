@@ -73,7 +73,7 @@ int htab_insert_item(Htab_t *table, Token_t *token) {
     } else if (token->type == T_FUNC_ID) {
         item->data.symbol_type = FUNCTION;
         item->data.func->argc = 0;
-        item->data.func->argv_types = NULL;
+        item->data.func->argv = NULL;
         item->data.func->return_type = NIL;
         item->data.func->defined = false;
         item->data.func->used = false;

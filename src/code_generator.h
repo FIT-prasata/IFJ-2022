@@ -514,3 +514,5 @@ int string_convert(Symbol_t *string, DString_t *converted_str);
  */
 int generate_instruction(Operation_t operation, Symbol_t *dest_in, Symbol_t *var_in_1,
              Symbol_t *var_in_2, int label, FILE *file);
+
+int tmp_var_count = 1;

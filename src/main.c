@@ -94,7 +94,7 @@ int main(void) {
     free(token2);
     fclose(file);*/
 
-    FILE *file = fopen("./src/adam-test-if2.out", "w");
+    FILE *file = fopen("./src/test.code", "w");
     CHECK_NULL(file);
 
     Symbol_t *symbol1 = malloc(sizeof(Symbol_t));
@@ -118,12 +118,68 @@ int main(void) {
     symbol2->var = NULL;
     symbol2->func = NULL;
 
+    Symbol_t *symbol3 = malloc(sizeof(Symbol_t));
+    CHECK_NULL(symbol3);
+    symbol3->attribute = calloc(7, sizeof(char));
+    CHECK_NULL(symbol3->attribute);
+    strcpy(symbol3->attribute, "true\n");
+    symbol3->symbol_type = CONSTANT;
+    symbol3->const_type = STRING;
+    symbol3->var = NULL;
+    symbol3->func = NULL;
+
+    Symbol_t *symbol4 = malloc(sizeof(Symbol_t));
+    CHECK_NULL(symbol4);
+    symbol4->attribute = calloc(8, sizeof(char));
+    CHECK_NULL(symbol4->attribute);
+    strcpy(symbol4->attribute, "false\n");
+    symbol4->symbol_type = CONSTANT;
+    symbol4->const_type = STRING;
+    symbol4->var = NULL;
+    symbol4->func = NULL;
+
+    CHECK_OK(generate_instruction(PROLOG, NULL, NULL, NULL, 0, file));
+    CHECK_OK(generate_instruction(DEFVAR, NULL, symbol1, NULL, 0, file));
+    CHECK_OK(generate_instruction(ASSIGN, symbol1, symbol2, NULL, 0, file));
+    strcpy(symbol2->attribute, "10");
+
+
+
     CHECK_OK(generate_instruction(IF_LT, NULL, symbol1, symbol2, 1, file));
+        CHECK_OK(generate_instruction(WRITE, NULL, symbol3, NULL, 1, file));
+    CHECK_OK(generate_instruction(IF_ELSE, NULL, NULL, NULL, 1, file));
+        CHECK_OK(generate_instruction(WRITE, NULL, symbol4, NULL, 1, file));
+    CHECK_OK(generate_instruction(IF_END, NULL, NULL, NULL, 1, file));
+
     CHECK_OK(generate_instruction(IF_GT, NULL, symbol1, symbol2, 2, file));
+        CHECK_OK(generate_instruction(WRITE, NULL, symbol3, NULL, 1, file));
+    CHECK_OK(generate_instruction(IF_ELSE, NULL, NULL, NULL, 2, file));
+        CHECK_OK(generate_instruction(WRITE, NULL, symbol4, NULL, 1, file));
+    CHECK_OK(generate_instruction(IF_END, NULL, NULL, NULL, 2, file));
+
     CHECK_OK(generate_instruction(IF_LEQ, NULL, symbol1, symbol2, 3, file));
+        CHECK_OK(generate_instruction(WRITE, NULL, symbol3, NULL, 1, file));
+    CHECK_OK(generate_instruction(IF_ELSE, NULL, NULL, NULL, 3, file));
+        CHECK_OK(generate_instruction(WRITE, NULL, symbol4, NULL, 1, file));
+    CHECK_OK(generate_instruction(IF_END, NULL, NULL, NULL, 3, file));
+
     CHECK_OK(generate_instruction(IF_GEQ, NULL, symbol1, symbol2, 4, file));
+        CHECK_OK(generate_instruction(WRITE, NULL, symbol3, NULL, 1, file));
+    CHECK_OK(generate_instruction(IF_ELSE, NULL, NULL, NULL, 4, file));
+        CHECK_OK(generate_instruction(WRITE, NULL, symbol4, NULL, 1, file));
+    CHECK_OK(generate_instruction(IF_END, NULL, NULL, NULL, 4, file));
+
     CHECK_OK(generate_instruction(IF_EQ, NULL, symbol1, symbol2, 5, file));
+        CHECK_OK(generate_instruction(WRITE, NULL, symbol3, NULL, 1, file));
+    CHECK_OK(generate_instruction(IF_ELSE, NULL, NULL, NULL, 5, file));
+        CHECK_OK(generate_instruction(WRITE, NULL, symbol4, NULL, 1, file));
+    CHECK_OK(generate_instruction(IF_END, NULL, NULL, NULL, 5, file));
+
     CHECK_OK(generate_instruction(IF_NEQ, NULL, symbol1, symbol2, 6, file));
+        CHECK_OK(generate_instruction(WRITE, NULL, symbol3, NULL, 1, file));
+    CHECK_OK(generate_instruction(IF_ELSE, NULL, NULL, NULL, 6, file));
+        CHECK_OK(generate_instruction(WRITE, NULL, symbol4, NULL, 1, file));
+    CHECK_OK(generate_instruction(IF_END, NULL, NULL, NULL, 6, file));
 
 
     free(symbol1);
