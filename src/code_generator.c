@@ -386,6 +386,12 @@ int generate_instruction(Operation_t operation, Symbol_t *dest_in, Symbol_t *var
         case CALL_FUNC_ASSIGN:
             generate_func_call_assign(dest.str, var_in_1, file);
             break;
+        case IN_STRLEN: // built-in strlen function
+            generate_strlen(var1.str, dest.str, file); // snad OK
+            break;
+        case DEF_FUNC:
+
+            break;
         default:
             return INTERNAL_ERR;
     }
