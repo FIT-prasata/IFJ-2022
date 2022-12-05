@@ -61,7 +61,17 @@ int htab_insert_item(Htab_t *table, Token_t *token) {
         return INTERNAL_ERR;
     }
     item->data.next = NULL;
-    item->data.attribute = key; // TODO: rework to strcpy
+    item->data.attribute = malloc(sizeof(char) * (strlen(key) + 1));
+    if (item->data.attribute == NULL) {
+            free(item);
+            return INTERNAL_ERR;
+    }
+    if (strcpy(item->data.attribute, key) != 0) {
+        free(item->data.attribute);
+        free(item);
+        return INTERNAL_ERR;
+    }
+    free(token->attribute.string); //TODO: research if free here is ok
     if (token->type == T_ID) {
         item->data.symbol_type = VARIABLE;
         item->data.var->var_type = NIL;
@@ -80,6 +90,7 @@ int htab_insert_item(Htab_t *table, Token_t *token) {
         item->data.var = NULL;
         item->data.const_type = NIL;
     } else {
+        free(item->data.attribute);
         free(item);
         return INTERNAL_ERR;
     }
@@ -144,6 +155,7 @@ int htab_erase(Htab_t *table, Htab_key_t key) {
     } else {
         pervious->next = item->next;
     }
+    free(item->data.attribute);
     free(item);
     table->size--;
     return OK;
