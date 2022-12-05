@@ -13,7 +13,6 @@
 
 #include "code_generator.h"
 
-
 void generate_while_start(Operation_t type, char *var1, char *var2, int label,
                           FILE *file) {
     switch (type) {
@@ -23,18 +22,22 @@ void generate_while_start(Operation_t type, char *var1, char *var2, int label,
             break;
         case WHILE_NEQ:
             fprintf(file, "LABEL .while_start_%d\n", label);
-            fprintf(file, "JUMPIFNEQ .while_body_%d %s %s\n", label, var1, var2);
+            fprintf(file, "JUMPIFNEQ .while_body_%d %s %s\n", label, var1,
+                    var2);
             break;
         case WHILE_LT:
         case WHILE_GT:
             fprintf(file, "DEFVAR GF@%%tmp%d\n", tmp_var_count++);
             fprintf(file, "LABEL .while_start_%d\n", label);
             if (type == WHILE_GT) {
-                fprintf(file, "GT GF@%%tmp%d %s %s\n", tmp_var_count - 1, var1, var2);
-            } else { // type == WHILE_LT
-                fprintf(file, "LT GF@%%tmp%d %s %s\n", tmp_var_count - 1, var1, var2);
+                fprintf(file, "GT GF@%%tmp%d %s %s\n", tmp_var_count - 1, var1,
+                        var2);
+            } else {  // type == WHILE_LT
+                fprintf(file, "LT GF@%%tmp%d %s %s\n", tmp_var_count - 1, var1,
+                        var2);
             }
-            fprintf(file, "JUMPIFEQ .while_body_%d GF@%%tmp%d bool@true\n", label, tmp_var_count - 1);
+            fprintf(file, "JUMPIFEQ .while_body_%d GF@%%tmp%d bool@true\n",
+                    label, tmp_var_count - 1);
             break;
         case WHILE_LEQ:
         case WHILE_GEQ:
@@ -43,13 +46,18 @@ void generate_while_start(Operation_t type, char *var1, char *var2, int label,
             fprintf(file, "DEFVAR GF@%%tmp%d\n", tmp_var_count++);
             fprintf(file, "LABEL .while_start_%d\n", label);
             if (type == WHILE_GEQ) {
-                fprintf(file, "GT GF@%%tmp%d %s %s\n", tmp_var_count - 3, var1, var2);
-            } else { // type == WHILE_LEQ
-                fprintf(file, "LT GF@%%tmp%d %s %s\n", tmp_var_count - 3, var1, var2);
+                fprintf(file, "GT GF@%%tmp%d %s %s\n", tmp_var_count - 3, var1,
+                        var2);
+            } else {  // type == WHILE_LEQ
+                fprintf(file, "LT GF@%%tmp%d %s %s\n", tmp_var_count - 3, var1,
+                        var2);
             }
-            fprintf(file, "EQ GF@%%tmp%d %s %s\n", tmp_var_count - 2, var1, var2);
-            fprintf(file, "OR GF@%%tmp%d GF@%%tmp%d GF@%%tmp%d\n", tmp_var_count - 1, tmp_var_count - 3, tmp_var_count - 2);
-            fprintf(file, "JUMPIFEQ .while_body_%d GF@%%tmp%d bool@true\n", label, tmp_var_count - 1);
+            fprintf(file, "EQ GF@%%tmp%d %s %s\n", tmp_var_count - 2, var1,
+                    var2);
+            fprintf(file, "OR GF@%%tmp%d GF@%%tmp%d GF@%%tmp%d\n",
+                    tmp_var_count - 1, tmp_var_count - 3, tmp_var_count - 2);
+            fprintf(file, "JUMPIFEQ .while_body_%d GF@%%tmp%d bool@true\n",
+                    label, tmp_var_count - 1);
             break;
         default:
             break;
@@ -76,11 +84,14 @@ void generate_if_start(Operation_t type, char *var1, char *var2, int label,
         case IF_GT:
             fprintf(file, "DEFVAR GF@%%tmp%d\n", tmp_var_count++);
             if (type == IF_GT) {
-                fprintf(file, "GT GF@%%tmp%d %s %s\n", tmp_var_count - 1, var1, var2);
-            } else { // type == IF_LT
-                fprintf(file, "LT GF@%%tmp%d %s %s\n", tmp_var_count - 1, var1, var2);
+                fprintf(file, "GT GF@%%tmp%d %s %s\n", tmp_var_count - 1, var1,
+                        var2);
+            } else {  // type == IF_LT
+                fprintf(file, "LT GF@%%tmp%d %s %s\n", tmp_var_count - 1, var1,
+                        var2);
             }
-            fprintf(file, "JUMPIFEQ .if_start_%d GF@%%tmp%d bool@true\n", label, tmp_var_count - 1);
+            fprintf(file, "JUMPIFEQ .if_start_%d GF@%%tmp%d bool@true\n", label,
+                    tmp_var_count - 1);
             break;
         case IF_LEQ:
         case IF_GEQ:
@@ -88,13 +99,18 @@ void generate_if_start(Operation_t type, char *var1, char *var2, int label,
             fprintf(file, "DEFVAR GF@%%tmp%d\n", tmp_var_count++);
             fprintf(file, "DEFVAR GF@%%tmp%d\n", tmp_var_count++);
             if (type == IF_GEQ) {
-                fprintf(file, "GT GF@%%tmp%d %s %s\n", tmp_var_count - 3, var1, var2);
-            } else { // type == IF_LEQ
-                fprintf(file, "LT GF@%%tmp%d %s %s\n", tmp_var_count - 3, var1, var2);
+                fprintf(file, "GT GF@%%tmp%d %s %s\n", tmp_var_count - 3, var1,
+                        var2);
+            } else {  // type == IF_LEQ
+                fprintf(file, "LT GF@%%tmp%d %s %s\n", tmp_var_count - 3, var1,
+                        var2);
             }
-            fprintf(file, "EQ GF@%%tmp%d %s %s\n", tmp_var_count - 2, var1, var2);
-            fprintf(file, "OR GF@%%tmp%d GF@%%tmp%d GF@%%tmp%d\n", tmp_var_count - 1, tmp_var_count - 3, tmp_var_count - 2);
-            fprintf(file, "JUMPIFEQ .if_start_%d GF@%%tmp%d bool@true\n", label, tmp_var_count - 1);
+            fprintf(file, "EQ GF@%%tmp%d %s %s\n", tmp_var_count - 2, var1,
+                    var2);
+            fprintf(file, "OR GF@%%tmp%d GF@%%tmp%d GF@%%tmp%d\n",
+                    tmp_var_count - 1, tmp_var_count - 3, tmp_var_count - 2);
+            fprintf(file, "JUMPIFEQ .if_start_%d GF@%%tmp%d bool@true\n", label,
+                    tmp_var_count - 1);
             break;
         default:
             break;
@@ -249,22 +265,22 @@ void generate_dprint(char *var, FILE *file) {
 }
 
 void generate_def_func(Symbol_t *func, FILE *file) {
-    fprintf(file, "JUMP .end_%s\n", func->attribute);
-    fprintf(file, "LABEL .%s\n", func->attribute);
+    fprintf(file, "JUMP .end_%s\n", func->attribute.string);
+    fprintf(file, "LABEL .%s\n", func->attribute.string);
     fprintf(file, "CREATEFRAME\n");
     fprintf(file, "PUSHFRAME\n");
     for (int i = 0; i < func->func->argc; i++) {
-        fprintf(file, "DEFVAR LF@%s\n", func->func->argv[i].attribute);
-        fprintf(file, "POPS LF@%s\n", func->func->argv[i].attribute);
+        fprintf(file, "DEFVAR LF@%s\n", func->func->argv[i].attribute.string);
+        fprintf(file, "POPS LF@%s\n", func->func->argv[i].attribute.string);
     }
 }
 
-void generate_return(Symbol_t *func, Symbol_type_t type, char *attribute, FILE *file) {
-    // TODO: need to pass func->attribute from PARSER to write end label of function
+void generate_return(Symbol_t *func, Symbol_type_t type, char *attribute,
+                     FILE *file) {
+    // TODO: need to pass func->attribute from PARSER to write end label of
+    // function
     if (attribute != NULL) {
-        if (type == VARIABLE) {
-            fprintf(file, "PUSHS %s\n", attribute);
-        } else if (type == CONSTANT) {
+        if (type == VARIABLE || type == CONSTANT) {
             fprintf(file, "PUSHS %s\n", attribute);
         } else if (type == INTERN_VAR) {
             fprintf(file, "PUSHS %%tmp%d\n", tmp_var_count - 1);
@@ -272,32 +288,36 @@ void generate_return(Symbol_t *func, Symbol_type_t type, char *attribute, FILE *
     }
     fprintf(file, "POPFRAME\n");
     fprintf(file, "RETURN\n");
-    fprintf(file, "LABEL .end_%s\n", func->attribute);
+    fprintf(file, "LABEL .end_%s\n", func->attribute.string);
 }
 
 void generate_func_call(Symbol_t *func, FILE *file) {
     for (int i = func->func->argc; i > 0; i--) {
-        fprintf(file, "PUSHS LF@%s\n", func->func->argv[i - 1].attribute);
+        fprintf(file, "PUSHS LF@%s\n",
+                func->func->argv[i - 1].attribute.string);
     }
-    fprintf(file, "CALL .%s\n", func->attribute);
+    fprintf(file, "CALL .%s\n", func->attribute.string);
 }
 
 void generate_func_call_assign(char *destination, Symbol_t *func, FILE *file) {
-        for (int i = func->func->argc; i > 0; i--) {
-        fprintf(file, "PUSHS LF@%s\n", func->func->argv[i - 1].attribute);
+    for (int i = func->func->argc; i > 0; i--) {
+        fprintf(file, "PUSHS LF@%s\n",
+                func->func->argv[i - 1].attribute.string);
     }
-    fprintf(file, "CALL .%s\n", func->attribute);
+    fprintf(file, "CALL .%s\n", func->attribute.string);
     fprintf(file, "POPS %s\n", destination);
 }
 
-int generate_instruction(Operation_t operation, Symbol_t *dest_in, Symbol_t *var_in_1,
-             Symbol_t *var_in_2, int label, FILE *file) {
+int generate_instruction(Operation_t operation, Symbol_t *dest_in,
+                         Symbol_t *var_in_1, Symbol_t *var_in_2, int label,
+                         FILE *file) {
     DString_t var1, var2, dest;
     d_string_init(&var1);
     d_string_init(&var2);
     d_string_init(&dest);
     if (dest_in != NULL) {
-        if (dest_in->symbol_type == VARIABLE || dest_in->symbol_type == INTERN_VAR) {
+        if (dest_in->symbol_type == VARIABLE ||
+            dest_in->symbol_type == INTERN_VAR) {
             CHECK_OK(variable_convert(dest_in, &dest));
         } else if (dest_in->symbol_type == CONSTANT) {
             CHECK_OK(const_convert(dest_in, &dest));
@@ -379,11 +399,11 @@ int generate_instruction(Operation_t operation, Symbol_t *dest_in, Symbol_t *var
         case READ:  // when reading, variable type is always in
                     // var_in_1->const_type
             // TODO: make this note in function description
-            if (var_in_1->const_type == INT) { // readi() function
+            if (var_in_1->const_type == INT) {  // readi() function
                 generate_read(dest.str, "int", file);
-            } else if (var_in_1->const_type == FLOAT) { // readf() function
+            } else if (var_in_1->const_type == FLOAT) {  // readf() function
                 generate_read(dest.str, "float", file);
-            } else if (var_in_1->const_type == STRING) { // reads() function
+            } else if (var_in_1->const_type == STRING) {  // reads() function
                 generate_read(dest.str, "string", file);
             }
             break;
@@ -398,10 +418,13 @@ int generate_instruction(Operation_t operation, Symbol_t *dest_in, Symbol_t *var
             break;
         case RETURN:
             if (var_in_1 != NULL) {
-                // TODO: need to pass func->attribute from PARSER to write end label of function
-                generate_return(var_in_2, var_in_1->symbol_type, var1.str, file);
+                // TODO: need to pass func->attribute from PARSER to write end
+                // label of function
+                generate_return(var_in_2, var_in_1->symbol_type, var1.str,
+                                file);
             } else {
-                // TODO: need to pass func->attribute from PARSER to write end label of function
+                // TODO: need to pass func->attribute from PARSER to write end
+                // label of function
                 generate_return(var_in_2, 0, NULL, file);
             }
             break;
@@ -436,7 +459,7 @@ int variable_convert(Symbol_t *variable, DString_t *converted_var) {
         default:
             break;
     }
-    CHECK_OK(d_string_add_str(&string, variable->attribute));
+    CHECK_OK(d_string_add_str(&string, variable->attribute.string));
     CHECK_OK(d_string_copy(&string, converted_var));
     return OK;
 }
@@ -447,10 +470,10 @@ int const_convert(Symbol_t *constant, DString_t *converted_const) {
     CHECK_OK(d_string_init(&string));
     if (constant->const_type == INT) {
         CHECK_OK(d_string_add_str(&string, "int@"));
-        CHECK_OK(d_string_add_str(&string, constant->attribute));
+        CHECK_OK(d_string_add_str(&string, constant->attribute.string));
     } else if (constant->const_type == FLOAT) {
         CHECK_OK(d_string_add_str(&string, "float@"));
-        CHECK_OK(d_string_add_str(&string, constant->attribute));
+        CHECK_OK(d_string_add_str(&string, constant->attribute.string));
     } else if (constant->const_type == STRING) {
         CHECK_OK(string_convert(constant, converted_const));
         return OK;
@@ -466,14 +489,17 @@ int const_convert(Symbol_t *constant, DString_t *converted_const) {
 int string_convert(Symbol_t *string, DString_t *converted_str) {
     char code[5];
     CHECK_OK(d_string_add_str(converted_str, "string@"));
-    int len = (int)strlen(string->attribute);
+    int len = (int)strlen(string->attribute.string);
     for (int i = 0; i < len; i++) {
-        if ((string->attribute[i] >= 0 && string->attribute[i] <= 32) ||
-            string->attribute[i] == 35 || string->attribute[i] == 92) {
-            sprintf(code, "\\%03d", string->attribute[i]);
+        if ((string->attribute.string[i] >= 0 &&
+             string->attribute.string[i] <= 32) ||
+            string->attribute.string[i] == 35 ||
+            string->attribute.string[i] == 92) {
+            sprintf(code, "\\%03d", string->attribute.string[i]);
             CHECK_OK(d_string_add_str(converted_str, code));
         } else {
-            CHECK_OK(d_string_add_char(converted_str, string->attribute[i]));
+            CHECK_OK(
+                d_string_add_char(converted_str, string->attribute.string[i]));
         }
     }
     return OK;

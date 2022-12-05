@@ -18,8 +18,8 @@ int tmp_var_count = 1;
 #include "code_generator.h"
 #include "dynamic_string.h"
 #include "error.h"
-#include "scanner.h"
-#include "stack.h"
+//#include "scanner.h"
+//#include "stack.h"
 #include "symtable.h"
 
 int main(void) {
@@ -99,9 +99,9 @@ int main(void) {
 
     Symbol_t *symbol1 = malloc(sizeof(Symbol_t));
     CHECK_NULL(symbol1);
-    symbol1->attribute = calloc(3, sizeof(char));
-    CHECK_NULL(symbol1->attribute);
-    strcpy(symbol1->attribute, "$a");
+    symbol1->attribute.string = calloc(3, sizeof(char));
+    CHECK_NULL(symbol1->attribute.string);
+    strcpy(symbol1->attribute.string, "$a");
     symbol1->symbol_type = VARIABLE;
     symbol1->var = malloc(sizeof(Var_t));
     CHECK_NULL(symbol1->var);
@@ -110,52 +110,47 @@ int main(void) {
 
     Symbol_t *symbol2 = malloc(sizeof(Symbol_t));
     CHECK_NULL(symbol2);
-    symbol2->attribute = calloc(3, sizeof(char));
-    CHECK_NULL(symbol2->attribute);
-    strcpy(symbol2->attribute, "f");
+    symbol2->attribute.string = calloc(3, sizeof(char));
+    CHECK_NULL(symbol2->attribute.string);
+    strcpy(symbol2->attribute.string, "f");
     symbol2->symbol_type = FUNCTION;
     symbol2->var = NULL;
     symbol2->func->argc = 3;
     symbol2->func->argv = malloc(3 * sizeof(Symbol_t));
     CHECK_NULL(symbol2->func->argv);
 
-    symbol2->func->argv[0].attribute = calloc(3, sizeof(char));
-    CHECK_NULL(symbol1->attribute);
-    strcpy(symbol1->attribute, "$a");
+    symbol2->func->argv[0].attribute.string = calloc(3, sizeof(char));
+    CHECK_NULL(symbol1->attribute.string);
+    strcpy(symbol1->attribute.string, "$a");
     symbol1->symbol_type = VARIABLE;
     symbol1->var = malloc(sizeof(Var_t));
     CHECK_NULL(symbol1->var);
     symbol1->var->frame = GF;
     symbol1->func = NULL;
 
-    symbol2->func->argv[1].attribute = calloc(3, sizeof(char));
-    CHECK_NULL(symbol1->attribute);
-    strcpy(symbol1->attribute, "$b");
+    symbol2->func->argv[1].attribute.string = calloc(3, sizeof(char));
+    CHECK_NULL(symbol1->attribute.string);
+    strcpy(symbol1->attribute.string, "$b");
     symbol1->symbol_type = VARIABLE;
     symbol1->var = malloc(sizeof(Var_t));
     CHECK_NULL(symbol1->var);
     symbol1->var->frame = GF;
     symbol1->func = NULL;
 
-    symbol2->func->argv[2].attribute = calloc(3, sizeof(char));
-    CHECK_NULL(symbol1->attribute);
-    strcpy(symbol1->attribute, "$c");
+    symbol2->func->argv[2].attribute.string = calloc(3, sizeof(char));
+    CHECK_NULL(symbol1->attribute.string);
+    strcpy(symbol1->attribute.string, "$c");
     symbol1->symbol_type = VARIABLE;
     symbol1->var = malloc(sizeof(Var_t));
     CHECK_NULL(symbol1->var);
     symbol1->var->frame = GF;
     symbol1->func = NULL;
-
-
-
-
-
 
     Symbol_t *symbol3 = malloc(sizeof(Symbol_t));
     CHECK_NULL(symbol3);
-    symbol3->attribute = calloc(7, sizeof(char));
-    CHECK_NULL(symbol3->attribute);
-    strcpy(symbol3->attribute, "true\n");
+    symbol3->attribute.string = calloc(7, sizeof(char));
+    CHECK_NULL(symbol3->attribute.string);
+    strcpy(symbol3->attribute.string, "true\n");
     symbol3->symbol_type = CONSTANT;
     symbol3->const_type = STRING;
     symbol3->var = NULL;
@@ -163,16 +158,15 @@ int main(void) {
 
     Symbol_t *symbol4 = malloc(sizeof(Symbol_t));
     CHECK_NULL(symbol4);
-    symbol4->attribute = calloc(8, sizeof(char));
-    CHECK_NULL(symbol4->attribute);
-    strcpy(symbol4->attribute, "false\n");
+    symbol4->attribute.string = calloc(8, sizeof(char));
+    CHECK_NULL(symbol4->attribute.string);
+    strcpy(symbol4->attribute.string, "false\n");
     symbol4->symbol_type = CONSTANT;
     symbol4->const_type = STRING;
     symbol4->var = NULL;
     symbol4->func = NULL;
 
     CHECK_OK(generate_instruction(CALL_FUNC, NULL, symbol2, NULL, 0, file));
-
 
     free(symbol1);
     free(symbol2);

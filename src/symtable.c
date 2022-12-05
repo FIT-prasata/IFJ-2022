@@ -61,19 +61,21 @@ int htab_insert_item(Htab_t *table, Token_t *token) {
         return INTERNAL_ERR;
     }
     item->data.next = NULL;
-    item->data.attribute = malloc(sizeof(char) * (strlen(key) + 1));
-    if (item->data.attribute == NULL) {
-            free(item);
-            return INTERNAL_ERR;
-    }
-    if (strcpy(item->data.attribute, key) != 0) {
-        free(item->data.attribute);
+    item->data.attribute.string = malloc(sizeof(char) * (strlen(key) + 1));
+    if (item->data.attribute.string == NULL) {
         free(item);
         return INTERNAL_ERR;
     }
-    free(token->attribute.string); //TODO: research if free here is ok
+    strcpy(item->data.attribute.string, key);
+    // free(token->attribute.string);  // TODO: research if free here is ok
     if (token->type == T_ID) {
         item->data.symbol_type = VARIABLE;
+        item->data.var = malloc(sizeof(Var_t));
+        if (item->data.var == NULL) {
+            free(item->data.attribute.string);
+            free(item);
+            return INTERNAL_ERR;
+        }
         item->data.var->var_type = NIL;
         item->data.var->asigned = false;
         item->data.var->frame = UNDEF;
@@ -82,6 +84,12 @@ int htab_insert_item(Htab_t *table, Token_t *token) {
         item->data.const_type = NIL;
     } else if (token->type == T_FUNC_ID) {
         item->data.symbol_type = FUNCTION;
+        item->data.func = malloc(sizeof(Func_t));
+        if (item->data.func == NULL) {
+            free(item->data.attribute.string);
+            free(item);
+            return INTERNAL_ERR;
+        }
         item->data.func->argc = 0;
         item->data.func->argv = NULL;
         item->data.func->return_type = NIL;
@@ -90,7 +98,7 @@ int htab_insert_item(Htab_t *table, Token_t *token) {
         item->data.var = NULL;
         item->data.const_type = NIL;
     } else {
-        free(item->data.attribute);
+        free(item->data.attribute.string);
         free(item);
         return INTERNAL_ERR;
     }
@@ -109,7 +117,7 @@ Htab_item_t *htab_find(Htab_t *table, Htab_key_t key) {
     }
     int hash = htab_hash_function(key) % table->arr_size;
     Htab_item_t *item = table->arr_ptr[hash];
-    while (item != NULL && strcmp(item->data.attribute, key) != 0) {
+    while (item != NULL && strcmp(item->data.attribute.string, key) != 0) {
         item = item->next;
     }
     if (item == NULL) {
@@ -143,7 +151,7 @@ int htab_erase(Htab_t *table, Htab_key_t key) {
     int hash = htab_hash_function(key) % table->arr_size;
     Htab_item_t *item = table->arr_ptr[hash];
     Htab_item_t *pervious = NULL;
-    while (item != NULL && strcmp(item->data.attribute, key)) {
+    while (item != NULL && strcmp(item->data.attribute.string, key)) {
         pervious = item;
         item = item->next;
     }
@@ -155,7 +163,7 @@ int htab_erase(Htab_t *table, Htab_key_t key) {
     } else {
         pervious->next = item->next;
     }
-    free(item->data.attribute);
+    free(item->data.attribute.string);
     free(item);
     table->size--;
     return OK;
@@ -171,7 +179,8 @@ int htab_clear(Htab_t *table) {
         Htab_item_t *item = table->arr_ptr[i];
 
         while (item != NULL) {
-            if (htab_erase(table, item->data.attribute) == INTERNAL_ERR) {
+            if (htab_erase(table, item->data.attribute.string) ==
+                INTERNAL_ERR) {
                 return INTERNAL_ERR;
             }
             item = item->next;

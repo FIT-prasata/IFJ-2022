@@ -16,7 +16,6 @@
 extern int tmp_var_count;
 #define INTERN_VAR_LEN 100
 
-
 // Local includes
 #include "dynamic_string.h"
 #include "error.h"
@@ -287,7 +286,8 @@ void generate_call(char *label, FILE *file);
  *
  * @param file File to write the code to
  */
-void generate_return(Symbol_t *func, Symbol_type_t type, char *attribute, FILE *file);
+void generate_return(Symbol_t *func, Symbol_type_t type, char *attribute,
+                     FILE *file);
 
 /**
  * @brief Generates code for pushs
@@ -517,5 +517,6 @@ int string_convert(Symbol_t *string, DString_t *converted_str);
  *
  * @todo not implemented yet
  */
-int generate_instruction(Operation_t operation, Symbol_t *dest_in, Symbol_t *var_in_1,
-             Symbol_t *var_in_2, int label, FILE *file);
+int generate_instruction(Operation_t operation, Symbol_t *dest_in,
+                         Symbol_t *var_in_1, Symbol_t *var_in_2, int label,
+                         FILE *file);
