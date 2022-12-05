@@ -469,9 +469,70 @@ input = EXPR_RBR;
 ASSERT_TRUE(ptable_get_next_move(stack, input) == EXPR_REDUCE);
 ENDTEST
 
+TEST(T_expr_shift)
+Char_stack_t test_char_stack;      
+char_stack_init(&test_char_stack);
+char_stack_push(&test_char_stack, 'E');
+char_stack_push(&test_char_stack, EXPR_ADD);
+char_stack_push(&test_char_stack, 'E');
+ASSERT_TRUE(expr_shift(&test_char_stack, EXPR_ID) == OK)
+ASSERT_TRUE(char_stack_pop(&test_char_stack) == EXPR_ID)
+ASSERT_TRUE(char_stack_pop(&test_char_stack) == 'E')
+ASSERT_TRUE(char_stack_pop(&test_char_stack) == '[')
+ASSERT_TRUE(char_stack_pop(&test_char_stack) == EXPR_ADD)
+ASSERT_TRUE(char_stack_pop(&test_char_stack) == 'E')
+ASSERT_TRUE(char_stack_pop(&test_char_stack) == CHAR_STACK_POP_ERR)
+ENDTEST
+
+TEST(T_expr_shift_stack_bottom)
+Char_stack_t test_char_stack;
+char_stack_init(&test_char_stack);
+ASSERT_TRUE(expr_shift(&test_char_stack, EXPR_ID) == OK)
+ASSERT_TRUE(char_stack_pop(&test_char_stack) == EXPR_ID)
+ASSERT_TRUE(char_stack_pop(&test_char_stack) == '[')
+ASSERT_TRUE(char_stack_pop(&test_char_stack) == CHAR_STACK_POP_ERR)
+ENDTEST
+
+TEST(T_expr_shift_null_stack)
+ASSERT_TRUE(expr_shift(NULL, EXPR_ID) == INTERNAL_ERR)
+ENDTEST
+
+TEST(T_expr_special_shift)
+Char_stack_t test_char_stack;
+char_stack_init(&test_char_stack);
+char_stack_push(&test_char_stack, 'E');
+char_stack_push(&test_char_stack, EXPR_ADD);
+char_stack_push(&test_char_stack, 'E');
+ASSERT_TRUE(expr_special_shift(&test_char_stack, EXPR_RBR) == OK)
+ASSERT_TRUE(char_stack_pop(&test_char_stack) == EXPR_RBR)
+ASSERT_TRUE(char_stack_pop(&test_char_stack) == 'E')
+ASSERT_TRUE(char_stack_pop(&test_char_stack) == EXPR_ADD)
+ASSERT_TRUE(char_stack_pop(&test_char_stack) == 'E')
+ASSERT_TRUE(char_stack_pop(&test_char_stack) == CHAR_STACK_POP_ERR)
+ENDTEST
+
+TEST(T_expr_special_shift_stack_bottom)
+Char_stack_t test_char_stack;
+char_stack_init(&test_char_stack);
+ASSERT_TRUE(expr_special_shift(&test_char_stack, EXPR_RBR) == OK)
+ASSERT_TRUE(char_stack_pop(&test_char_stack) == EXPR_RBR)
+ASSERT_TRUE(char_stack_pop(&test_char_stack) == CHAR_STACK_POP_ERR)
+ENDTEST
+
+TEST(T_expr_special_shift_null_stack)
+ASSERT_TRUE(expr_special_shift(NULL, EXPR_RBR) == INTERNAL_ERR)
+ENDTEST
+
 int run_expr_tests() {
     int errors = 0;
     printf("Running expression parser tests...\n");
     errors += T_expr_get_next_move_complex();
+    errors += T_expr_shift();
+    errors += T_expr_shift_stack_bottom();
+    errors += T_expr_shift_null_stack();
+    // TODO expr reduce tests
+    errors += T_expr_special_shift();
+    errors += T_expr_special_shift_stack_bottom();
+    errors += T_expr_special_shift_null_stack();
     return errors;
 }
