@@ -67,6 +67,7 @@ typedef enum Operation {
     // BUILD-IN FUNCTIONS
     WRITE,
     READ,
+    IN_STRLEN,
 
     DEFVAR,
     ASSIGN,

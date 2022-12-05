@@ -413,6 +413,9 @@ int generate_instruction(Operation_t operation, Symbol_t *dest_in,
         case CALL_FUNC_ASSIGN:
             generate_func_call_assign(dest.str, var_in_1, file);
             break;
+        case IN_STRLEN: // built-in strlen function
+            generate_strlen(var1.str, dest.str, file); // snad OK
+            break;
         case DEF_FUNC:
             generate_def_func(var_in_1, file);
             break;
@@ -473,6 +476,7 @@ int const_convert(Symbol_t *constant, DString_t *converted_const) {
         CHECK_OK(d_string_add_str(&string, constant->attribute.string));
     } else if (constant->const_type == FLOAT) {
         CHECK_OK(d_string_add_str(&string, "float@"));
+        // TODO: buffer, sprintf %a, d_string_add_str
         CHECK_OK(d_string_add_str(&string, constant->attribute.string));
     } else if (constant->const_type == STRING) {
         CHECK_OK(string_convert(constant, converted_const));
