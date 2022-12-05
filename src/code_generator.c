@@ -293,16 +293,38 @@ void generate_return(Symbol_t *func, Symbol_type_t type, char *attribute,
 
 void generate_func_call(Symbol_t *func, FILE *file) {
     for (int i = func->func->argc; i > 0; i--) {
-        fprintf(file, "PUSHS LF@%s\n",
-                func->func->argv[i - 1].attribute);
+        switch (func->func->argv[i - 1].var->frame) {
+            case GF:
+                fprintf(file, "PUSHS GF@%s\n", func->func->argv[i - 1].attribute);
+                break;
+            case LF:
+                fprintf(file, "PUSHS LF@%s\n", func->func->argv[i - 1].attribute);
+                break;
+            case TF:
+                fprintf(file, "PUSHS TF@%s\n", func->func->argv[i - 1].attribute);
+                break;
+            default:
+                break;
+        }
     }
     fprintf(file, "CALL .%s\n", func->attribute);
 }
 
 void generate_func_call_assign(char *destination, Symbol_t *func, FILE *file) {
     for (int i = func->func->argc; i > 0; i--) {
-        fprintf(file, "PUSHS LF@%s\n",
-                func->func->argv[i - 1].attribute);
+        switch (func->func->argv[i - 1].var->frame) {
+            case GF:
+                fprintf(file, "PUSHS GF@%s\n", func->func->argv[i - 1].attribute);
+                break;
+            case LF:
+                fprintf(file, "PUSHS LF@%s\n", func->func->argv[i - 1].attribute);
+                break;
+            case TF:
+                fprintf(file, "PUSHS TF@%s\n", func->func->argv[i - 1].attribute);
+                break;
+            default:
+                break;
+        }
     }
     fprintf(file, "CALL .%s\n", func->attribute);
     fprintf(file, "POPS %s\n", destination);
@@ -413,8 +435,8 @@ int generate_instruction(Operation_t operation, Symbol_t *dest_in,
         case CALL_FUNC_ASSIGN:
             generate_func_call_assign(dest.str, var_in_1, file);
             break;
-        case IN_STRLEN: // built-in strlen function
-            generate_strlen(var1.str, dest.str, file); // snad OK
+        case IN_STRLEN:  // built-in strlen function
+            generate_strlen(var1.str, dest.str, file);  // snad OK
             break;
         case DEF_FUNC:
             generate_def_func(var_in_1, file);
@@ -494,15 +516,12 @@ int string_convert(Symbol_t *string, DString_t *converted_str) {
     CHECK_OK(d_string_add_str(converted_str, "string@"));
     int len = (int)strlen(string->attribute);
     for (int i = 0; i < len; i++) {
-        if ((string->attribute[i] >= 0 &&
-             string->attribute[i] <= 32) ||
-            string->attribute[i] == 35 ||
-            string->attribute[i] == 92) {
+        if ((string->attribute[i] >= 0 && string->attribute[i] <= 32) ||
+            string->attribute[i] == 35 || string->attribute[i] == 92) {
             sprintf(code, "\\%03d", string->attribute[i]);
             CHECK_OK(d_string_add_str(converted_str, code));
         } else {
-            CHECK_OK(
-                d_string_add_char(converted_str, string->attribute[i]));
+            CHECK_OK(d_string_add_char(converted_str, string->attribute[i]));
         }
     }
     return OK;
@@ -510,7 +529,7 @@ int string_convert(Symbol_t *string, DString_t *converted_str) {
 
 // Build-in functions
 
-void built_in_floatval(FILE *file){
+void built_in_floatval(FILE *file) {
     fprintf(file, "JUMP $end_floatval\n");
     fprintf(file, "LABEL .floatval\n");
     fprintf(file, "CREATEFRAME\n");
@@ -546,7 +565,7 @@ void built_in_floatval(FILE *file){
     fprintf(file, "LABEL $end_floatval\n");
 }
 
-void built_in_intval(FILE *file){
+void built_in_intval(FILE *file) {
     fprintf(file, "JUMP $end_intval\n");
     fprintf(file, "LABEL .intval\n");
     fprintf(file, "CREATEFRAME\n");
@@ -582,8 +601,7 @@ void built_in_intval(FILE *file){
     fprintf(file, "LABEL $end_intval\n");
 }
 
-
-void built_in_strval(FILE *file){
+void built_in_strval(FILE *file) {
     fprintf(file, "JUMP $end_strval\n");
     fprintf(file, "LABEL .strval\n");
     fprintf(file, "CREATEFRAME\n");
@@ -613,4 +631,3 @@ void built_in_strval(FILE *file){
     fprintf(file, "RETURN\n");
     fprintf(file, "LABEL $end_strval\n");
 }
-

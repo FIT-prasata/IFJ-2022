@@ -179,8 +179,7 @@ int htab_clear(Htab_t *table) {
         Htab_item_t *item = table->arr_ptr[i];
 
         while (item != NULL) {
-            if (htab_erase(table, item->data.attribute) ==
-                INTERNAL_ERR) {
+            if (htab_erase(table, item->data.attribute) == INTERNAL_ERR) {
                 return INTERNAL_ERR;
             }
             item = item->next;

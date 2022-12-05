@@ -101,7 +101,7 @@ int main(void) {
     CHECK_NULL(symbol1);
     symbol1->attribute = calloc(3, sizeof(char));
     CHECK_NULL(symbol1->attribute);
-    strcpy(symbol1->attribute, "$a");
+    strcpy(symbol1->attribute, "$x");
     symbol1->symbol_type = VARIABLE;
     symbol1->var = malloc(sizeof(Var_t));
     CHECK_NULL(symbol1->var);
@@ -115,36 +115,38 @@ int main(void) {
     strcpy(symbol2->attribute, "f");
     symbol2->symbol_type = FUNCTION;
     symbol2->var = NULL;
+    symbol2->func = malloc(sizeof(Func_t));
+    CHECK_NULL(symbol2->func);
     symbol2->func->argc = 3;
     symbol2->func->argv = malloc(3 * sizeof(Symbol_t));
     CHECK_NULL(symbol2->func->argv);
 
     symbol2->func->argv[0].attribute = calloc(3, sizeof(char));
-    CHECK_NULL(symbol1->attribute);
-    strcpy(symbol1->attribute, "$a");
-    symbol1->symbol_type = VARIABLE;
-    symbol1->var = malloc(sizeof(Var_t));
-    CHECK_NULL(symbol1->var);
-    symbol1->var->frame = GF;
-    symbol1->func = NULL;
+    CHECK_NULL(symbol2->func->argv[0].attribute);
+    strcpy(symbol2->func->argv[0].attribute, "$a");
+    symbol2->func->argv[0].symbol_type = VARIABLE;
+    symbol2->func->argv[0].var = malloc(sizeof(Var_t));
+    CHECK_NULL(symbol2->func->argv[0].var);
+    symbol2->func->argv[0].var->frame = GF;
+    symbol2->func->argv[0].func = NULL;
 
     symbol2->func->argv[1].attribute = calloc(3, sizeof(char));
-    CHECK_NULL(symbol1->attribute);
-    strcpy(symbol1->attribute, "$b");
-    symbol1->symbol_type = VARIABLE;
-    symbol1->var = malloc(sizeof(Var_t));
-    CHECK_NULL(symbol1->var);
-    symbol1->var->frame = GF;
-    symbol1->func = NULL;
+    CHECK_NULL(symbol2->func->argv[1].attribute);
+    strcpy(symbol2->func->argv[1].attribute, "$b");
+    symbol2->func->argv[1].symbol_type = VARIABLE;
+    symbol2->func->argv[1].var = malloc(sizeof(Var_t));
+    CHECK_NULL(symbol2->func->argv[1].var);
+    symbol2->func->argv[1].var->frame = GF;
+    symbol2->func->argv[1].func = NULL;
 
     symbol2->func->argv[2].attribute = calloc(3, sizeof(char));
-    CHECK_NULL(symbol1->attribute);
-    strcpy(symbol1->attribute, "$c");
-    symbol1->symbol_type = VARIABLE;
-    symbol1->var = malloc(sizeof(Var_t));
-    CHECK_NULL(symbol1->var);
-    symbol1->var->frame = GF;
-    symbol1->func = NULL;
+    CHECK_NULL(symbol2->func->argv[2].attribute);
+    strcpy(symbol2->func->argv[2].attribute, "$c");
+    symbol2->func->argv[2].symbol_type = VARIABLE;
+    symbol2->func->argv[2].var = malloc(sizeof(Var_t));
+    CHECK_NULL(symbol2->func->argv[2].var);
+    symbol2->func->argv[2].var->frame = GF;
+    symbol2->func->argv[2].func = NULL;
 
     Symbol_t *symbol3 = malloc(sizeof(Symbol_t));
     CHECK_NULL(symbol3);
@@ -166,10 +168,8 @@ int main(void) {
     symbol4->var = NULL;
     symbol4->func = NULL;
 
-    CHECK_OK(generate_instruction(CALL_FUNC, NULL, symbol2, NULL, 0, file));
+    CHECK_OK(generate_instruction(CALL_FUNC_ASSIGN, symbol1, symbol2, NULL, 0, file));
 
-    free(symbol1);
-    free(symbol2);
     fclose(file);
     return OK;
 }
