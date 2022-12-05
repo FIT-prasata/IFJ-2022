@@ -13,7 +13,7 @@
 
 // GLOBAL line number
 int line_num = 1;
-
+int tmp_var_count = 1;
 // LOCAL INCLUDES - tohletoto legacy code nechat v tomto poradi plsky
 #include "code_generator.h"
 #include "dynamic_string.h"
@@ -143,43 +143,11 @@ int main(void) {
     CHECK_OK(generate_instruction(ASSIGN, symbol1, symbol2, NULL, 0, file));
     strcpy(symbol2->attribute, "10");
 
-
-
-    CHECK_OK(generate_instruction(IF_LT, NULL, symbol1, symbol2, 1, file));
-        CHECK_OK(generate_instruction(WRITE, NULL, symbol3, NULL, 1, file));
-    CHECK_OK(generate_instruction(IF_ELSE, NULL, NULL, NULL, 1, file));
-        CHECK_OK(generate_instruction(WRITE, NULL, symbol4, NULL, 1, file));
-    CHECK_OK(generate_instruction(IF_END, NULL, NULL, NULL, 1, file));
-
-    CHECK_OK(generate_instruction(IF_GT, NULL, symbol1, symbol2, 2, file));
-        CHECK_OK(generate_instruction(WRITE, NULL, symbol3, NULL, 1, file));
-    CHECK_OK(generate_instruction(IF_ELSE, NULL, NULL, NULL, 2, file));
-        CHECK_OK(generate_instruction(WRITE, NULL, symbol4, NULL, 1, file));
-    CHECK_OK(generate_instruction(IF_END, NULL, NULL, NULL, 2, file));
-
-    CHECK_OK(generate_instruction(IF_LEQ, NULL, symbol1, symbol2, 3, file));
-        CHECK_OK(generate_instruction(WRITE, NULL, symbol3, NULL, 1, file));
-    CHECK_OK(generate_instruction(IF_ELSE, NULL, NULL, NULL, 3, file));
-        CHECK_OK(generate_instruction(WRITE, NULL, symbol4, NULL, 1, file));
-    CHECK_OK(generate_instruction(IF_END, NULL, NULL, NULL, 3, file));
-
-    CHECK_OK(generate_instruction(IF_GEQ, NULL, symbol1, symbol2, 4, file));
-        CHECK_OK(generate_instruction(WRITE, NULL, symbol3, NULL, 1, file));
-    CHECK_OK(generate_instruction(IF_ELSE, NULL, NULL, NULL, 4, file));
-        CHECK_OK(generate_instruction(WRITE, NULL, symbol4, NULL, 1, file));
-    CHECK_OK(generate_instruction(IF_END, NULL, NULL, NULL, 4, file));
-
-    CHECK_OK(generate_instruction(IF_EQ, NULL, symbol1, symbol2, 5, file));
-        CHECK_OK(generate_instruction(WRITE, NULL, symbol3, NULL, 1, file));
-    CHECK_OK(generate_instruction(IF_ELSE, NULL, NULL, NULL, 5, file));
-        CHECK_OK(generate_instruction(WRITE, NULL, symbol4, NULL, 1, file));
-    CHECK_OK(generate_instruction(IF_END, NULL, NULL, NULL, 5, file));
-
-    CHECK_OK(generate_instruction(IF_NEQ, NULL, symbol1, symbol2, 6, file));
-        CHECK_OK(generate_instruction(WRITE, NULL, symbol3, NULL, 1, file));
-    CHECK_OK(generate_instruction(IF_ELSE, NULL, NULL, NULL, 6, file));
-        CHECK_OK(generate_instruction(WRITE, NULL, symbol4, NULL, 1, file));
-    CHECK_OK(generate_instruction(IF_END, NULL, NULL, NULL, 6, file));
+    CHECK_OK(generate_instruction(WHILE_LEQ, NULL, symbol1, symbol2, 1, file));
+        CHECK_OK(generate_instruction(WRITE, NULL, symbol1, NULL, 0, file));
+        strcpy(symbol2->attribute, "1");
+        CHECK_OK(generate_instruction(ADD, symbol1, symbol1, symbol2, 0, file));
+    CHECK_OK(generate_instruction(WHILE_END, NULL, NULL, NULL, 1, file));
 
 
     free(symbol1);

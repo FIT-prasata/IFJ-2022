@@ -13,19 +13,22 @@
 
 #include "code_generator.h"
 
+
 void generate_while_start(Operation_t type, char *var1, char *var2, int label,
                           FILE *file) {
-    fprintf(file, "LABEL .while_start_%d\n", label);
     switch (type) {
         case WHILE_EQ:
+            fprintf(file, "LABEL .while_start_%d\n", label);
             fprintf(file, "JUMPIFEQ .while_body_%d %s %s\n", label, var1, var2);
             break;
         case WHILE_NEQ:
+            fprintf(file, "LABEL .while_start_%d\n", label);
             fprintf(file, "JUMPIFNEQ .while_body_%d %s %s\n", label, var1, var2);
             break;
         case WHILE_LT:
         case WHILE_GT:
             fprintf(file, "DEFVAR GF@%%tmp%d\n", tmp_var_count++);
+            fprintf(file, "LABEL .while_start_%d\n", label);
             if (type == WHILE_GT) {
                 fprintf(file, "GT GF@%%tmp%d %s %s\n", tmp_var_count - 1, var1, var2);
             } else { // type == WHILE_LT
@@ -38,6 +41,7 @@ void generate_while_start(Operation_t type, char *var1, char *var2, int label,
             fprintf(file, "DEFVAR GF@%%tmp%d\n", tmp_var_count++);
             fprintf(file, "DEFVAR GF@%%tmp%d\n", tmp_var_count++);
             fprintf(file, "DEFVAR GF@%%tmp%d\n", tmp_var_count++);
+            fprintf(file, "LABEL .while_start_%d\n", label);
             if (type == WHILE_GEQ) {
                 fprintf(file, "GT GF@%%tmp%d %s %s\n", tmp_var_count - 3, var1, var2);
             } else { // type == WHILE_LEQ
@@ -58,8 +62,6 @@ void generate_while_end(int label, FILE *file) {
     fprintf(file, "JUMP .while_start_%d\n", label);
     fprintf(file, "LABEL .while_end_%d\n", label);
 }
-
-
 
 void generate_if_start(Operation_t type, char *var1, char *var2, int label,
                        FILE *file) {
@@ -113,23 +115,23 @@ void generate_if_end(int label, FILE *file) {
 void generate_prolog(FILE *file) { fprintf(file, ".IFJcode22\n"); }
 
 void generate_add(char *var1, char *var2, char *destination, FILE *file) {
-    fprintf(file, "ADD %s, %s, %s\n", destination, var1, var2);
+    fprintf(file, "ADD %s %s %s\n", destination, var1, var2);
 }
 
 void generate_sub(char *var1, char *var2, char *destination, FILE *file) {
-    fprintf(file, "SUB %s, %s, %s\n", destination, var1, var2);
+    fprintf(file, "SUB %s %s %s\n", destination, var1, var2);
 }
 
 void generate_mul(char *var1, char *var2, char *destination, FILE *file) {
-    fprintf(file, "MUL %s, %s, %s\n", destination, var1, var2);
+    fprintf(file, "MUL %s %s %s\n", destination, var1, var2);
 }
 
 void generate_div(char *var1, char *var2, char *destination, FILE *file) {
-    fprintf(file, "DIV %s, %s, %s\n", destination, var1, var2);
+    fprintf(file, "DIV %s %s %s\n", destination, var1, var2);
 }
 
 void generate_idiv(char *var1, char *var2, char *destination, FILE *file) {
-    fprintf(file, "IDIV %s, %s, %s\n", destination, var1, var2);
+    fprintf(file, "IDIV %s %s %s\n", destination, var1, var2);
 }
 
 void generate_move(char *source, char *destination, FILE *file) {
@@ -137,27 +139,27 @@ void generate_move(char *source, char *destination, FILE *file) {
 }
 
 void generate_lt(char *var1, char *var2, char *destination, FILE *file) {
-    fprintf(file, "LT %s, %s, %s\n", destination, var1, var2);
+    fprintf(file, "LT %s %s %s\n", destination, var1, var2);
 }
 
 void generate_gt(char *var1, char *var2, char *destination, FILE *file) {
-    fprintf(file, "GT %s, %s, %s\n", destination, var1, var2);
+    fprintf(file, "GT %s %s %s\n", destination, var1, var2);
 }
 
 void generate_eq(char *var1, char *var2, char *destination, FILE *file) {
-    fprintf(file, "EQ %s, %s, %s\n", destination, var1, var2);
+    fprintf(file, "EQ %s %s %s\n", destination, var1, var2);
 }
 
 void generate_and(char *var1, char *var2, char *destination, FILE *file) {
-    fprintf(file, "AND %s, %s, %s\n", destination, var1, var2);
+    fprintf(file, "AND %s %s %s\n", destination, var1, var2);
 }
 
 void generate_or(char *var1, char *var2, char *destination, FILE *file) {
-    fprintf(file, "OR %s, %s, %s\n", destination, var1, var2);
+    fprintf(file, "OR %s %s %s\n", destination, var1, var2);
 }
 
 void generate_not(char *source, char *destination, FILE *file) {
-    fprintf(file, "NOT %s, %s\n", destination, source);
+    fprintf(file, "NOT %s %s\n", destination, source);
 }
 
 void generate_createframe(FILE *file) { fprintf(file, "CREATEFRAME\n"); }
@@ -183,45 +185,45 @@ void generate_pops(char *var, FILE *file) { fprintf(file, "POPS %s\n", var); }
 void generate_clears(FILE *file) { fprintf(file, "CLEARS\n"); }
 
 void generate_int2float(char *source, char *destination, FILE *file) {
-    fprintf(file, "INT2FLOAT %s, %s\n", destination, source);
+    fprintf(file, "INT2FLOAT %s %s\n", destination, source);
 }
 
 void generate_float2int(char *source, char *destination, FILE *file) {
-    fprintf(file, "FLOAT2INT %s, %s\n", destination, source);
+    fprintf(file, "FLOAT2INT %s %s\n", destination, source);
 }
 
 void generate_int2char(char *source, char *destination, FILE *file) {
-    fprintf(file, "INT2CHAR %s, %s\n", destination, source);
+    fprintf(file, "INT2CHAR %s %s\n", destination, source);
 }
 
 void generate_stri2int(char *var1, char *var2, char *destination, FILE *file) {
-    fprintf(file, "STRI2INT %s, %s, %s\n", destination, var1, var2);
+    fprintf(file, "STRI2INT %s %s %s\n", destination, var1, var2);
 }
 
 void generate_read(char *var, char *type, FILE *file) {
-    fprintf(file, "READ %s, %s\n", var, type);
+    fprintf(file, "READ %s %s\n", var, type);
 }
 
 void generate_write(char *var, FILE *file) { fprintf(file, "WRITE %s\n", var); }
 
 void generate_concat(char *var1, char *var2, char *destination, FILE *file) {
-    fprintf(file, "CONCAT %s, %s, %s\n", destination, var1, var2);
+    fprintf(file, "CONCAT %s %s %s\n", destination, var1, var2);
 }
 
 void generate_strlen(char *source, char *destination, FILE *file) {
-    fprintf(file, "STRLEN %s, %s\n", destination, source);
+    fprintf(file, "STRLEN %s %s\n", destination, source);
 }
 
 void generate_getchar(char *var, char *pos, char *destination, FILE *file) {
-    fprintf(file, "GETCHAR %s, %s, %s\n", destination, var, pos);
+    fprintf(file, "GETCHAR %s %s %s\n", destination, var, pos);
 }
 
 void generate_setchar(char *var, char *pos, char *ch, FILE *file) {
-    fprintf(file, "SETCHAR %s, %s, %s\n", var, pos, ch);
+    fprintf(file, "SETCHAR %s %s %s\n", var, pos, ch);
 }
 
 void generate_type(char *source, char *destination, FILE *file) {
-    fprintf(file, "TYPE %s, %s\n", destination, source);
+    fprintf(file, "TYPE %s %s\n", destination, source);
 }
 
 void generate_label(char *label, FILE *file) {
@@ -233,11 +235,11 @@ void generate_jump(char *label, FILE *file) {
 }
 
 void generate_jumpifeq(char *label, char *var1, char *var2, FILE *file) {
-    fprintf(file, "JUMPIFEQ %s, %s, %s\n", label, var1, var2);
+    fprintf(file, "JUMPIFEQ %s %s %s\n", label, var1, var2);
 }
 
 void generate_jumpifneq(char *label, char *var1, char *var2, FILE *file) {
-    fprintf(file, "JUMPIFNEQ %s, %s, %s\n", label, var1, var2);
+    fprintf(file, "JUMPIFNEQ %s %s %s\n", label, var1, var2);
 }
 
 void generate_exit(char *var, FILE *file) { fprintf(file, "EXIT %s\n", var); }
