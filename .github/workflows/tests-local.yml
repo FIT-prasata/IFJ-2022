@@ -24,4 +24,4 @@ jobs:
           make compile
       - name: run e2e tests
         run: |
-          python py_tests.py
+          python py_test.py
