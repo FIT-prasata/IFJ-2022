@@ -324,7 +324,7 @@ int float_handler(DString_t *dString, Token_t *token) {
     token->type = T_FLOAT;
     // insert float value into token.attribute.string
     char output[100] = {0};
-    snprintf(output, 100, "%f", decimal);
+    snprintf(output, 100, "%a", decimal);
     token->attribute.string = malloc(sizeof(char) * (strlen(output) + 1));
     if (token->attribute.string == NULL) {
         return INTERNAL_ERR;
