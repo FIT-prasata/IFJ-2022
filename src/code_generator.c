@@ -432,6 +432,7 @@ int const_convert(Symbol_t *constant, DString_t *converted_const) {
         CHECK_OK(d_string_add_str(&string, constant->attribute));
     } else if (constant->const_type == FLOAT) {
         CHECK_OK(d_string_add_str(&string, "float@"));
+        // TODO: buffer, sprintf %a, d_string_add_str
         CHECK_OK(d_string_add_str(&string, constant->attribute));
     } else if (constant->const_type == STRING) {
         CHECK_OK(string_convert(constant, converted_const));
