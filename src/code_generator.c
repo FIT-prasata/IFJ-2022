@@ -508,3 +508,110 @@ int string_convert(Symbol_t *string, DString_t *converted_str) {
     }
     return OK;
 }
+
+// Build-in functions
+
+void built_in_floatval(FILE *file){
+    fprintf(file, "JUMP $end_floatval\n");
+    fprintf(file, "LABEL .floatval\n");
+    fprintf(file, "CREATEFRAME\n");
+    fprintf(file, "PUSHFRAME\n");
+    fprintf(file, "DEFVAR LF@%%fvl_retval\n");
+    fprintf(file, "DEFVAR LF@%%fvl_tmp1\n");
+    fprintf(file, "DEFVAR LF@%%fvl_symb\n");
+
+    fprintf(file, "POPS LF@%%fvl_tmp1\n");
+    fprintf(file, "TYPE LF@%%fvl_symb LF@%%fvl_tmp1\n");
+    fprintf(file, "JUMPIFEQ $floatval_int LF@%%fvl_symb string@int\n");
+    fprintf(file, "JUMPIFEQ $floatval_float LF@%%fvl_symb string@float\n");
+    fprintf(file, "JUMPIFEQ $floatval_nil LF@%%fvl_symb string@nil\n");
+    fprintf(file, "MOVE LF@%%fvl_retval float@0x0p+0\n");
+    fprintf(file, "JUMP $floatval$end\n");
+
+    fprintf(file, "LABEL $floatval_int\n");
+    fprintf(file, "FLOAT2INT LF@%%fvl_retval LF@%%fvl_tmp1\n");
+    fprintf(file, "JUMP $floatval$end\n");
+
+    fprintf(file, "LABEL $floatval_float\n");
+    fprintf(file, "MOVE LF@%%fvl_retval LF@%%fvl_tmp1\n");
+    fprintf(file, "JUMP $floatval$end\n");
+
+    fprintf(file, "LABEL $floatval_nil\n");
+    fprintf(file, "MOVE LF@%%fvl_retval float@0x0p+0\n");
+    fprintf(file, "JUMP $floatval$end\n");
+
+    fprintf(file, "LABEL $floatval$end\n");
+    fprintf(file, "PUSHS LF@%%fvl_retval\n");
+    fprintf(file, "POPFRAME\n");
+    fprintf(file, "RETURN\n");
+    fprintf(file, "LABEL $end_floatval\n");
+}
+
+void built_in_intval(FILE *file){
+    fprintf(file, "JUMP $end_intval\n");
+    fprintf(file, "LABEL .intval\n");
+    fprintf(file, "CREATEFRAME\n");
+    fprintf(file, "PUSHFRAME\n");
+    fprintf(file, "DEFVAR LF@%%ivl_retval\n");
+    fprintf(file, "DEFVAR LF@%%ivl_tmp1\n");
+    fprintf(file, "DEFVAR LF@%%ivl_symb\n");
+
+    fprintf(file, "POPS LF@%%ivl_tmp1\n");
+    fprintf(file, "TYPE LF@%%ivl_symb LF@%%ivl_tmp1\n");
+    fprintf(file, "JUMPIFEQ $intval_int LF@%%ivl_symb string@int\n");
+    fprintf(file, "JUMPIFEQ $intval_float LF@%%ivl_symb string@float\n");
+    fprintf(file, "JUMPIFEQ $intval_nil LF@%%ivl_symb string@nil\n");
+    fprintf(file, "MOVE LF@%%ivl_retval int@0\n");
+    fprintf(file, "JUMP $intval$end\n");
+
+    fprintf(file, "LABEL $intval_int\n");
+    fprintf(file, "MOVE LF@%%ivl_retval LF@%%ivl_tmp1\n");
+    fprintf(file, "JUMP $intval$end\n");
+
+    fprintf(file, "LABEL $intval_float\n");
+    fprintf(file, "FLOAT2INT LF@%%ivl_retval LF@%%ivl_tmp1\n");
+    fprintf(file, "JUMP $intval$end\n");
+
+    fprintf(file, "LABEL $intval_nil\n");
+    fprintf(file, "MOVE LF@%%ivl_retval int@0\n");
+    fprintf(file, "JUMP $intval$end\n");
+
+    fprintf(file, "LABEL $intval$end\n");
+    fprintf(file, "PUSHS LF@%%ivl_retval\n");
+    fprintf(file, "POPFRAME\n");
+    fprintf(file, "RETURN\n");
+    fprintf(file, "LABEL $end_intval\n");
+}
+
+
+void built_in_strval(FILE *file){
+    fprintf(file, "JUMP $end_strval\n");
+    fprintf(file, "LABEL .strval\n");
+    fprintf(file, "CREATEFRAME\n");
+    fprintf(file, "PUSHFRAME\n");
+    fprintf(file, "DEFVAR LF@%%svl_retval\n");
+    fprintf(file, "DEFVAR LF@%%svl_tmp1\n");
+    fprintf(file, "DEFVAR LF@%%svl_symb\n");
+
+    fprintf(file, "POPS LF@%%svl_tmp1\n");
+    fprintf(file, "TYPE LF@%%svl_symb LF@%%svl_tmp1\n");
+    fprintf(file, "JUMPIFEQ $strval_nil LF@%%svl_symb string@nil\n");
+    fprintf(file, "JUMPIFEQ $strval_string LF@%%svl_symb string@string\n");
+    fprintf(file, "MOVE LF@%%svl_retval string@\\000\n");
+    fprintf(file, "JUMP $strval$end\n");
+
+    fprintf(file, "LABEL $strval_nil\n");
+    fprintf(file, "MOVE LF@%%svl_retval string@\\000\n");
+    fprintf(file, "JUMP $strval$end\n");
+
+    fprintf(file, "LABEL $strval_string\n");
+    fprintf(file, "MOVE LF@%%svl_retval LF@%%svl_tmp1\n");
+    fprintf(file, "JUMP $strval$end\n");
+
+    fprintf(file, "LABEL $strval$end\n");
+    fprintf(file, "PUSHS LF@%%svl_retval\n");
+    fprintf(file, "POPFRAME\n");
+    fprintf(file, "RETURN\n");
+    fprintf(file, "LABEL $end_strval\n");
+}
+
