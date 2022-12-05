@@ -76,7 +76,7 @@ typedef enum Operation {
     CALL_FUNC,
     CALL_FUNC_ASSIGN,
     DEF_FUNC,
-
+    RETURN,
 } Operation_t;
 
 // TODO
@@ -288,7 +288,7 @@ void generate_call(char *label, FILE *file);
  *
  * @param file File to write the code to
  */
-void generate_return(FILE *file);
+void generate_return(Symbol_t *func, Symbol_type_t type, char *attribute, FILE *file);
 
 /**
  * @brief Generates code for pushs
