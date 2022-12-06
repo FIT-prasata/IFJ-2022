@@ -329,7 +329,7 @@ void generate_func_call_assign(char *destination, Symbol_t *func, FILE *file) {
     fprintf(file, "CALL .%s\n", func->attribute);
     fprintf(file, "POPS %s\n", destination);
 }
-
+// TODO: substring build-in function not implemented yet
 int generate_instruction(Operation_t operation, Symbol_t *dest_in,
                          Symbol_t *var_in_1, Symbol_t *var_in_2, int label,
                          FILE *file) {
@@ -438,6 +438,12 @@ int generate_instruction(Operation_t operation, Symbol_t *dest_in,
         case IN_STRLEN:  // built-in strlen function
             generate_strlen(var1.str, dest.str, file);  // snad OK
             break;
+        case IN_ORD: // TODO: check if this is OK
+            generate_stri2int(var1.str, "int@0", dest.str, file);
+            break;
+        case IN_CHR: // TODO: check if this is OK
+            generate_int2char(var1.str, dest.str, file);
+            break;
         case DEF_FUNC:
             generate_def_func(var_in_1, file);
             break;
@@ -453,6 +459,7 @@ int generate_instruction(Operation_t operation, Symbol_t *dest_in,
                 generate_return(var_in_2, 0, NULL, file);
             }
             break;
+
         default:
             return INTERNAL_ERR;
     }

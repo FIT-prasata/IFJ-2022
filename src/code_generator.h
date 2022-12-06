@@ -12,7 +12,7 @@
  *          <xzavad20> - Lukáš Zavadil
  *          <xsvetl07> - Adam Světlík
  */
-
+// TODO: add generate prolog and generate build in functions in main
 extern int tmp_var_count;
 #define INTERN_VAR_LEN 100
 
@@ -68,7 +68,8 @@ typedef enum Operation {
     WRITE,
     READ,
     IN_STRLEN,
-
+    IN_ORD,
+    IN_CHR,
     DEFVAR,
     ASSIGN,
     PROLOG,
