@@ -557,11 +557,11 @@ d_string_add_char(&d_string, EXPR_GE);
 d_string_add_char(&d_string, 'E');
 ASSERT_TRUE(is_valid_rule(&d_string) == OK)
 d_string_clear(&d_string);
-// d_string_add_char(&d_string, EXPR_LBR);
-// d_string_add_char(&d_string, 'E');
-// d_string_add_char(&d_string, EXPR_RBR);
-// ASSERT_TRUE(is_valid_rule(&d_string) == OK)
-// d_string_clear(&d_string);
+d_string_add_char(&d_string, EXPR_LBR);
+d_string_add_char(&d_string, 'E');
+d_string_add_char(&d_string, EXPR_RBR);
+ASSERT_TRUE(is_valid_rule(&d_string) == OK)
+d_string_clear(&d_string);
 d_string_add_char(&d_string, EXPR_ID);
 ASSERT_TRUE(is_valid_rule(&d_string) == OK)
 d_string_clear(&d_string);
@@ -647,13 +647,13 @@ ASSERT_TRUE(expr_reduce(&test_char_stack) == OK)
 ASSERT_TRUE(char_stack_pop(&test_char_stack) == 'E')
 ASSERT_TRUE(char_stack_pop(&test_char_stack) == CHAR_STACK_POP_ERR)
 char_stack_clear(&test_char_stack);
-char_stack_push(&test_char_stack, EXPR_LBR);
-char_stack_push(&test_char_stack, 'E');
-char_stack_push(&test_char_stack, EXPR_RBR);
-ASSERT_TRUE(expr_reduce(&test_char_stack) == OK)
-ASSERT_TRUE(char_stack_pop(&test_char_stack) == 'E')
-ASSERT_TRUE(char_stack_pop(&test_char_stack) == CHAR_STACK_POP_ERR)
-char_stack_clear(&test_char_stack);
+// char_stack_push(&test_char_stack, EXPR_LBR);
+// char_stack_push(&test_char_stack, 'E');
+// char_stack_push(&test_char_stack, EXPR_RBR);
+// ASSERT_TRUE(expr_reduce(&test_char_stack) == OK)
+// ASSERT_TRUE(char_stack_pop(&test_char_stack) == 'E')
+// ASSERT_TRUE(char_stack_pop(&test_char_stack) == CHAR_STACK_POP_ERR)
+// char_stack_clear(&test_char_stack);
 char_stack_push(&test_char_stack, EXPR_ID);
 ASSERT_TRUE(expr_reduce(&test_char_stack) == OK)
 ASSERT_TRUE(char_stack_pop(&test_char_stack) == 'E')
