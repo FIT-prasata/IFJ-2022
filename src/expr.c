@@ -48,6 +48,7 @@ char grammar_rules[RULES_NUM][MAX_RULE_LEN] = {
   {EXPR_NONTERM, EXPR_DIV, EXPR_NONTERM, '\0'},
   {EXPR_NONTERM, EXPR_DOT, EXPR_NONTERM, '\0'},
   {EXPR_ID, '\0'},
+  {EXPR_LBR, EXPR_NONTERM, EXPR_RBR, '\0'},
   {EXPR_NONTERM, EXPR_EQ, EXPR_NONTERM, '\0'},
   {EXPR_NONTERM, EXPR_NEQ, EXPR_NONTERM, '\0'},
   {EXPR_NONTERM, EXPR_LT, EXPR_NONTERM, '\0'},
@@ -96,28 +97,24 @@ int expr_reduce(Char_stack_t *c_stack/*, Token_stack_t *t_stack, Token_t *token*
 
   // Reduction of expression
   char head_char = char_stack_pop(c_stack);
-  while (head_char != CHAR_STACK_BOTTOM && head_char != '[') {
+  while (head_char != CHAR_STACK_POP_ERR && head_char != '[') {
     if (d_string_add_char(&d_string, head_char) == INTERNAL_ERR) {
       d_string_free_and_clear(&d_string);
       return INTERNAL_ERR;
     }
     head_char = char_stack_pop(c_stack);
-    if (is_valid_rule(&d_string) == INTERNAL_ERR) {
-      d_string_free_and_clear(&d_string);
-      return INTERNAL_ERR;
-    }
-    d_string_free_and_clear(&d_string);
-
-    // Pushing left hand side of rule
-    if (char_stack_push(c_stack, 'E') == INTERNAL_ERR) {
-      return INTERNAL_ERR;
-    }
-    return OK;
   }
+  if (is_valid_rule(&d_string) == INTERNAL_ERR) {
+    d_string_free_and_clear(&d_string);
+    return INTERNAL_ERR;
+  }
+  d_string_free_and_clear(&d_string);
 
-  return INTERNAL_ERR; // IDK CO SEM, just to get rid of errors
-
-
+  // Pushing left hand side of rule
+  if (char_stack_push(c_stack, 'E') == INTERNAL_ERR) {
+    return INTERNAL_ERR;
+  }
+  return OK;
 }
 
 int expr_special_shift(Char_stack_t *c_stack, char character) {
