@@ -118,9 +118,7 @@ int def_func_rule(Token_t *token, scope_t *scope_state, Htab_t *global_table) {
     if (func_ptr == NULL) return INTERNAL_ERR;
 
     // check if function wasn't already defined
-    // TODO temporarly disable cause default false in symtable caused for some
-    // idiotic reason segfault
-    //    if (func_ptr->data.type.func.defined != false) return UNDEF_FUNC_ERR;
+    if (func_ptr->data.type.func.defined != false) return UNDEF_FUNC_ERR;
 
     // store key of function in global variable
     if ((status =
