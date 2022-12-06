@@ -77,13 +77,15 @@ int is_valid_rule(DString_t *d_string);
 // 2. Load expression -> expr_load()
 // 3. Parse loaded expression -> expr_parse()
 // 4. Generate code based on the location of expression -> switch case statement
-int expr_main(Htab_t *table, Token_t *token /* int location */); // WE NEED CONTEXT FOR DECISION MAKING
+int expr_main(Htab_t *table, Token_t *token, int location );
 
 // Parses loaded expression
 // 1. Map token type to precedence table symbol enum
 // 2. Get terminal terminal from top of the stack and call ptable_get_symbol_from_char()
 // 3. Call ptable_get_next_move() with result symbol from function call as its input
 // 4. Based on the result of the function call, call expr_shift(), expr_reduce(), expr_special_shift()
-int expr_parse(Char_stack_t *c_stack, Token_stack_t *t_stack, Token_t *token);
+int expr_parse(Char_stack_t *c_stack, Token_stack_t *t_stack, Token_t *token, int location);
+
+int expr_instr_gen(Token_stack_t *t_stack, Token_t *token, char term);
 
 #endif // _EXPR_H_

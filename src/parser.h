@@ -27,11 +27,12 @@ extern int line_num;
 #include "scanner.h"
 #include "symtable.h"
 #include "code_generator.h"
+#include "expr.h"
 
 // Location of expression
-#define EXPR_RET 100
-#define EXPR_COND 101
-#define EXPR_ASSIGN 102
+#define EXPR_LOC_RET 100
+#define EXPR_LOC_COND 101
+#define EXPR_LOC_ASSIGN 102
 
 // scope check
 typedef struct {

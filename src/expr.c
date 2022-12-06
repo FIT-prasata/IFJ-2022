@@ -133,9 +133,11 @@ int is_valid_rule(DString_t *d_string) {
   return INTERNAL_ERR;
 }
 
-int expr_parse(Char_stack_t *c_stack, Token_stack_t *t_stack, Token_t *token) {
+int expr_parse(Char_stack_t *c_stack, Token_stack_t *t_stack, Token_t *token, int location) {
+  bool is_logical = false;
   ptable_symbol_t input;
-  // Handle edge cases inside assignment statement
+
+  // Handle logical operators inside assignment
   switch (token->type) {
     case T_EQ:
     case T_NEQ:
@@ -143,7 +145,9 @@ int expr_parse(Char_stack_t *c_stack, Token_stack_t *t_stack, Token_t *token) {
     case T_GT:
     case T_LEQ:
     case T_GEQ:
-      // Check for location (can´t be inside assignment or built in write function)
+      if (location == EXPR_LOC_ASSIGN) {
+        return SYNTAX_ERR;
+      }
       break;
     default:
       break;
@@ -172,34 +176,44 @@ int expr_parse(Char_stack_t *c_stack, Token_stack_t *t_stack, Token_t *token) {
       break;
     case T_EQ:
       input = EXPR_EQ;
+      is_logical = true;
       break;
     case T_NEQ:
       input = EXPR_NEQ;
+      is_logical = true;
       break;
     case T_LT:
       input = EXPR_LT;
+      is_logical = true;
       break;
     case T_GT:
       input = EXPR_GT;
+      is_logical = true;
       break;
     case T_LEQ:
       input = EXPR_LE;
+      is_logical = true;
       break;
     case T_GEQ:
       input = EXPR_GE;
+      is_logical = true;
       break;
     case T_ID:
       input = EXPR_ID;
       break;
     case T_INT:
     case T_FLOAT:
-    case T_STRING: // This may be way more complicated because of '.' operator ...
+    case T_STRING:
       input = EXPR_ID;
       token_stack_push(t_stack, token);
       break;
     case T_SEM:
-      // Check context, if inside return or assignment return EOEXPR
-      break;
+      if (location == EXPR_LOC_ASSIGN || location == EXPR_LOC_RET) {
+        return EOEXPR;
+      }
+      else {
+        return SYNTAX_ERR;
+      }
     default:
       if (token->type == EOEXPR) {
         input = EXPR_STACK_BOTTOM;
@@ -215,59 +229,56 @@ int expr_parse(Char_stack_t *c_stack, Token_stack_t *t_stack, Token_t *token) {
 
   switch (next_move) {
     case EXPR_SHIFT:
-      if (expr_shift(c_stack, input) == INTERNAL_ERR) {
-        return INTERNAL_ERR; // Not sure which error type to choose
-      }
-      return OK;
+      return expr_shift(c_stack, input);
     case EXPR_REDUCE:
-      if (expr_reduce(c_stack/*, t_stack, token*/) == INTERNAL_ERR) {
-        return INTERNAL_ERR; // Not sure which error type to choose
-      }
-      return OK;
+      return expr_reduce(c_stack/*, t_stack, token*/) == INTERNAL_ERR;
     case EXPR_SPECIAL_SHIFT:
-      if (expr_special_shift(c_stack, input) == INTERNAL_ERR) {
-        return INTERNAL_ERR; // Not sure which error type to choose
-      }
-      return OK;
+      return expr_special_shift(c_stack, input) == INTERNAL_ERR;
     case EXPR_ERROR:
-      return INTERNAL_ERR; // Not sure which error type to choose
+      return SYNTAX_ERR;
     default:
-      return INTERNAL_ERR; // Not sure which error type to choose
+      return INTERNAL_ERR; // Just how ...
   }
 }
 
-int expr_main(Htab_t *table, Token_t *token) {
+int expr_main(Htab_t *table, Token_t *token, int location) {
   Char_stack_t c_stack;
   Token_stack_t t_stack;
+  bool load_tokens = true;
   if (char_stack_init(&c_stack) == INTERNAL_ERR) {
     return INTERNAL_ERR;
   }
   if (token_stack_init(&t_stack) == INTERNAL_ERR) {
     return INTERNAL_ERR;
   }
-  if (char_stack_push(&c_stack, CHAR_STACK_BOTTOM) == INTERNAL_ERR) {
-    return INTERNAL_ERR;
-  }
   if (token == NULL) {
-    return INTERNAL_ERR; // Not sure which error type to choose
+    return INTERNAL_ERR;
   }
   if (table == NULL) {
     return INTERNAL_ERR; // Not sure which error type to choose
   }
-  if (token->type == T_ID) {
-    Htab_item_t *item;
-    if ((item = htab_find(table, token->attribute.string)) == NULL) {
-      return INTERNAL_ERR; // Not sure which error type to choose
+  while (load_tokens == true) {
+    if (token->type == T_ID) {
+      Htab_item_t *item;
+      if ((item = htab_find(table, token->attribute.string)) == NULL) {
+        return INTERNAL_ERR; // Not sure which error type to choose
+      }
+      if (token_stack_push(&t_stack, token) == INTERNAL_ERR) {
+        return INTERNAL_ERR; // Not sure which error type to choose
+      }
     }
-    if (token_stack_push(&t_stack, token) == INTERNAL_ERR) {
-      return INTERNAL_ERR; // Not sure which error type to choose
-    }
-  }
 
-  int status = expr_parse(&c_stack, &t_stack, token); // Might need location as well for context
-  if (status == EOEXPR) {
-    // TODO: handle
+    int status = expr_parse(&c_stack, &t_stack, token, location); // Might need location as well for context
+    if (status == EOEXPR) {
+      load_tokens = false;
+    }
+    else {
+      if (status != OK) {
+        return status;
+      }
+      // Get new token
+      if ((status = scan(token)) != OK) return status;
+    }
+    return INTERNAL_ERR; // Generate result instruction here
   }
-  // Too tired... will finish tomorrow
-  return INTERNAL_ERR; // Not sure which error type to choose TODO, just to get rid of warningss
 }
