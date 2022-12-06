@@ -267,7 +267,7 @@ int arg_list_rule(Token_t *current_token, Htab_t *global_table) {
 int param_rule(Token_t *token, Htab_t *global_table, bool func_call) {
     int status = OK;
     // handle <PARAM> -> <CONST>
-    if (const_rule(token, global_table) == OK) {
+    if (const_rule(token, global_table, false) == OK) {
         return OK;
     }
 
@@ -623,6 +623,23 @@ int stat_rule(Token_t *current_token, scope_t *scope_state,
         }
     }
 
+    // handle ... -> <FUNC_CALL>
+    if (current_token->type == T_FUNC_ID) {
+        // save function id to func_call_id
+        d_string_replace_str(&func_call_id, current_token->attribute.string);
+        if ((status = func_call_rule(current_token, scope_state,
+                                     global_table)) != OK)
+            return status;
+
+        // get func pointer
+        Htab_item_t *func_ptr = htab_find(global_table, func_call_id.str);
+
+        // generate instruction
+        if ((status = generate_instruction(CALL_FUNC, NULL, &func_ptr->data,
+                                           NULL, 0, stdout)) != OK)
+            return status;
+    }
+
     // handle ... -> T_RCBR
     if (current_token->type == T_RCBR) {
         // get new token
@@ -648,6 +665,17 @@ int assign_type_rule(Token_t *current_token, scope_t *scope_state,
 
         if ((status = func_call_rule(current_token, scope_state,
                                      global_table)) != OK)
+            return status;
+
+        // get variable from global table
+        Htab_item_t *variable = htab_find(global_table, variable_id.str);
+
+        // get function from global table
+        Htab_item_t *function = htab_find(global_table, func_call_id.str);
+
+        if ((status = generate_instruction(CALL_FUNC_ASSIGN, &variable->data,
+                                           &function->data, NULL, 0, stdout)) !=
+            OK)
             return status;
     }
 
