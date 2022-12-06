@@ -224,13 +224,21 @@ int expr_parse(Char_stack_t *c_stack, Token_stack_t *t_stack, Token_t *token, in
       break;
   }
   ptable_symbol_t stack = char_stack_get_closest_terminal(c_stack);
+  if (stack == EXPR_STACK_BOTTOM && input == EXPR_STACK_BOTTOM && c_stack->char_head == 'E' && char_stack_get_closest_terminal(c_stack) == EXPR_STACK_BOTTOM) {
+    return OK;
+  }
   ptable_move_t next_move = ptable_get_next_move(stack, input);
 
   switch (next_move) {
     case EXPR_SHIFT:
       return expr_shift(c_stack, input);
-    case EXPR_REDUCE:
-      return expr_reduce(c_stack/*, t_stack, token*/) == INTERNAL_ERR;
+    case EXPR_REDUCE: {
+      int ret;
+      if ((ret = expr_reduce(c_stack/*, t_stack, token*/)) != OK) {
+        return ret;
+      }
+      return expr_parse(c_stack, t_stack, token, location);
+    }
     case EXPR_SPECIAL_SHIFT:
       return expr_special_shift(c_stack, input) == INTERNAL_ERR;
     case EXPR_ERROR:
