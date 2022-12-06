@@ -639,6 +639,43 @@ void built_in_strval(FILE *file) {
     fprintf(file, "LABEL $end_strval\n");
 }
 
-void built_in_substr(FILE *file){
-    
+void built_in_substring(FILE *file){
+    fprintf(file, "JUMP $end_substring\n");
+    fprintf(file, "LABEL .substring\n");
+    fprintf(file, "CREATEFRAME\n");
+    fprintf(file, "PUSHFRAME\n");
+    fprintf(file, "DEFVAR LF@%%str_retval\n");
+    fprintf(file, "MOVE LF@%%str_retval string@\n");
+    fprintf(file, "DEFVAR LF@%%str_j\n");
+    fprintf(file, "DEFVAR LF@%%str_i\n");
+    fprintf(file, "DEFVAR LF@%%str_str\n");
+    fprintf(file, "POPS LF@%%str_str # str\n");
+    fprintf(file, "POPS LF@%%str_i\n");
+    fprintf(file, "POPS LF@%%str_j\n");
+    fprintf(file, "DEFVAR LF@%%str_bool_tmp1\n");
+    fprintf(file, "LT LF@%%str_bool_tmp1 LF@%%str_i int@0\n");
+    fprintf(file, "JUMPIFEQ .nil_ret LF@%%str_bool_tmp1 bool@true\n");
+    fprintf(file, "LT LF@%%str_bool_tmp1 LF@%%str_j int@0\n");
+    fprintf(file, "JUMPIFEQ .nil_ret LF@%%str_bool_tmp1 bool@true\n");
+    fprintf(file, "GT LF@%%str_bool_tmp1 LF@%%str_i LF@%%str_j\n");
+    fprintf(file, "JUMPIFEQ .nil_ret LF@%%str_bool_tmp1 bool@true\n");
+    fprintf(file, "DEFVAR LF@%%str_bool_tmp2\n");
+    fprintf(file, "DEFVAR LF@%%str_bool_tmp3\n");
+    fprintf(file, "DEFVAR LF@%%str_int_len\n");
+    fprintf(file, "STRLEN LF@%%str_int_len LF@%%str_str\n");
+    fprintf(file, "GT LF@%%str_bool_tmp2 LF@%%str_i LF@%%str_int_len\n");
+    fprintf(file, "EQ LF@%%str_bool_tmp3 LF@%%str_i LF@%%str_int_len\n");
+    fprintf(file, "OR LF@%%str_bool_tmp1 LF@%%str_bool_tmp2 LF@%%str_bool_tmp3\n");
+    fprintf(file, "JUMPIFEQ .nil_ret LF@%%str_bool_tmp1 bool@true\n");
+    fprintf(file, "GT LF@%%str_bool_tmp1 LF@%%str_j LF@%%str_int_len\n");
+    fprintf(file, "JUMPIFEQ .nil_ret LF@%%str_bool_tmp1 bool@true\n");
+    fprintf(file, "DEFVAR LF@%%str_curr_char\n");
+    fprintf(file, "LABEL .substr_loop\n");
+    fprintf(file, "GETCHAR LF@%%str_curr_char LF@%%str_str LF@%%str_i\n");
+    fprintf(file, "CONCAT LF@%%str_retval LF@%%str_retval LF@%%str_curr_char\n");
+    fprintf(file, "ADD LF@%%str_i LF@%%str_i int@1\n");
+    fprintf(file, "JUMPIFNEQ .substr_loop LF@%%str_i LF@%%str_j\n");
+    fprintf(file, "PUSHS LF@%%str_retval\n");
+    fprintf(file, "POPFRAME\n");
+    fprintf(file, "RETURN\n");
 }

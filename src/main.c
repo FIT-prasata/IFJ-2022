@@ -26,8 +26,8 @@ int tmp_var_count = 1;
 int main(void) {
     int status = OK;
 
-    FILE *file = fopen("test.out", "w");
-    built_in_strval(file);
+    FILE *file = fopen("test.ifjcode", "w");
+    built_in_substring(file);
 
     fclose(file);
 

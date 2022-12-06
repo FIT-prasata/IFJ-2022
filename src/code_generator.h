@@ -529,5 +529,6 @@ int generate_instruction(Operation_t operation, Symbol_t *dest_in,
 void built_in_floatval(FILE *file);
 void built_in_intval(FILE *file);
 void built_in_strval(FILE *file);
+void built_in_substring(FILE *file);
 
 #endif // _CODE_GENERATOR_H_
