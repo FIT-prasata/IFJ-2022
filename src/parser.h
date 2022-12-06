@@ -113,7 +113,7 @@ int arg_list_rule(Token_t *current_token, Htab_t *global_table);
  * @param global_table
  * @return
  */
-int param_rule(Token_t *current_token, Htab_t *global_table);
+int param_rule(Token_t *current_token, Htab_t *global_table, bool func_call);
 
 /**
  * @brief   RULES
@@ -142,7 +142,7 @@ int type_rule(Token_t *current_token, Htab_t *global_table, bool is_func_def, bo
  * @param global_table
  * @return
  */
-int const_rule(Token_t *current_token, Htab_t *global_table);
+int const_rule(Token_t *current_token, Htab_t *global_table, bool func_call);
 
 /**
  * @brief   RULES
@@ -183,7 +183,7 @@ int assign_type_rule(Token_t *current_token, scope_t *scope_state, Htab_t *globa
  * @param global_table
  * @return
  */
-int func_call_rule(Token_t *current_token, scope_t *scope_state, Htab_t *global_table, Htab_item_t *function);
+int func_call_rule(Token_t *current_token, scope_t *scope_state, Htab_t *global_table);
 
 /**
  * @brief EXPR -> precedent analysis -> bottom up parser
