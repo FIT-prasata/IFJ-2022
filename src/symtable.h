@@ -20,7 +20,9 @@
 #include <stdint.h>
 
 #include "scanner.h"
-#include "stack.h"
+//#include "stack.h"
+#include <stdint.h>
+
 
 // line counting
 extern int line_num;
