@@ -26,9 +26,10 @@ int tmp_var_count = 1;
 int main(void) {
     int status = OK;
 
-    if ((status = parse()) != OK) {
-        error_display(status, 0);
-    }
+    FILE *file = fopen("test.out", "w");
+    built_in_strval(file);
+
+    fclose(file);
 
     return 0;
 }

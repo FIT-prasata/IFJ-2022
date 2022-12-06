@@ -1,5 +1,8 @@
 #pragma once
 
+#ifndef _CODE_GENERATOR_H_
+#define _CODE_GENERATOR_H_
+
 /**
  * @headerfile code_generator.h
  * @project IFJ 2022/2023
@@ -522,3 +525,9 @@ int string_convert(Symbol_t *string, DString_t *converted_str);
 int generate_instruction(Operation_t operation, Symbol_t *dest_in,
                          Symbol_t *var_in_1, Symbol_t *var_in_2, int label,
                          FILE *file);
+
+void built_in_floatval(FILE *file);
+void built_in_intval(FILE *file);
+void built_in_strval(FILE *file);
+
+#endif // _CODE_GENERATOR_H_

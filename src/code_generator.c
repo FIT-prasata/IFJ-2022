@@ -554,7 +554,7 @@ void built_in_floatval(FILE *file) {
     fprintf(file, "JUMP $floatval$end\n");
 
     fprintf(file, "LABEL $floatval_int\n");
-    fprintf(file, "FLOAT2INT LF@%%fvl_retval LF@%%fvl_tmp1\n");
+    fprintf(file, "INT2FLOAT LF@%%fvl_retval LF@%%fvl_tmp1\n");
     fprintf(file, "JUMP $floatval$end\n");
 
     fprintf(file, "LABEL $floatval_float\n");
@@ -637,4 +637,8 @@ void built_in_strval(FILE *file) {
     fprintf(file, "POPFRAME\n");
     fprintf(file, "RETURN\n");
     fprintf(file, "LABEL $end_strval\n");
+}
+
+void built_in_substr(FILE *file){
+    
 }
