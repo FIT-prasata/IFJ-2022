@@ -83,6 +83,7 @@ int htab_insert_item(Htab_t *table, Token_t *token) {
         item->data.func = NULL;
         item->data.const_type = NIL;
     } else if (token->type == T_FUNC_ID) {
+
         item->data.symbol_type = FUNCTION;
         item->data.func = malloc(sizeof(Func_t));
         if (item->data.func == NULL) {
@@ -97,6 +98,7 @@ int htab_insert_item(Htab_t *table, Token_t *token) {
         item->data.func->used = false;
         item->data.var = NULL;
         item->data.const_type = NIL;
+
     } else {
         free(item->data.attribute);
         free(item);
