@@ -154,6 +154,36 @@ void generate_move(char *source, char *destination, FILE *file) {
     fprintf(file, "MOVE %s %s\n", destination, source);
 }
 
+void generate_lt(char *var1, char *var2, char *destination, FILE *file) {
+    fprintf(file, "LT %s %s %s\n", destination, var1, var2);
+}
+
+void generate_gt(char *var1, char *var2, char *destination, FILE *file) {
+    fprintf(file, "GT %s %s %s\n", destination, var1, var2);
+}
+
+void generate_eq(char *var1, char *var2, char *destination, FILE *file) {
+    fprintf(file, "EQ %s %s %s\n", destination, var1, var2);
+}
+
+void generate_and(char *var1, char *var2, char *destination, FILE *file) {
+    fprintf(file, "AND %s %s %s\n", destination, var1, var2);
+}
+
+void generate_or(char *var1, char *var2, char *destination, FILE *file) {
+    fprintf(file, "OR %s %s %s\n", destination, var1, var2);
+}
+
+void generate_not(char *source, char *destination, FILE *file) {
+    fprintf(file, "NOT %s %s\n", destination, source);
+}
+
+void generate_createframe(FILE *file) { fprintf(file, "CREATEFRAME\n"); }
+
+void generate_pushframe(FILE *file) { fprintf(file, "PUSHFRAME\n"); }
+
+void generate_popframe(FILE *file) { fprintf(file, "POPFRAME\n"); }
+
 void generate_defvar(char *var, FILE *file) {
     fprintf(file, "DEFVAR %s\n", var);
 }
@@ -161,6 +191,12 @@ void generate_defvar(char *var, FILE *file) {
 void generate_call(char *label, FILE *file) {
     fprintf(file, "CALL %s\n", label);
 }
+
+void generate_pushs(char *var, FILE *file) { fprintf(file, "PUSHS %s\n", var); }
+
+void generate_pops(char *var, FILE *file) { fprintf(file, "POPS %s\n", var); }
+
+void generate_clears(FILE *file) { fprintf(file, "CLEARS\n"); }
 
 void generate_int2float(char *source, char *destination, FILE *file) {
     fprintf(file, "INT2FLOAT %s %s\n", destination, source);
@@ -202,6 +238,22 @@ void generate_setchar(char *var, char *pos, char *ch, FILE *file) {
 
 void generate_type(char *source, char *destination, FILE *file) {
     fprintf(file, "TYPE %s %s\n", destination, source);
+}
+
+void generate_label(char *label, FILE *file) {
+    fprintf(file, "LABEL %s\n", label);
+}
+
+void generate_jump(char *label, FILE *file) {
+    fprintf(file, "JUMP %s\n", label);
+}
+
+void generate_jumpifeq(char *label, char *var1, char *var2, FILE *file) {
+    fprintf(file, "JUMPIFEQ %s %s %s\n", label, var1, var2);
+}
+
+void generate_jumpifneq(char *label, char *var1, char *var2, FILE *file) {
+    fprintf(file, "JUMPIFNEQ %s %s %s\n", label, var1, var2);
 }
 
 void generate_exit(char *var, FILE *file) { fprintf(file, "EXIT %s\n", var); }
@@ -587,6 +639,43 @@ void built_in_strval(FILE *file) {
     fprintf(file, "LABEL $end_strval\n");
 }
 
-void built_in_substr(FILE *file){
-    
+void built_in_substring(FILE *file){
+    fprintf(file, "JUMP $end_substring\n");
+    fprintf(file, "LABEL .substring\n");
+    fprintf(file, "CREATEFRAME\n");
+    fprintf(file, "PUSHFRAME\n");
+    fprintf(file, "DEFVAR LF@%%str_retval\n");
+    fprintf(file, "MOVE LF@%%str_retval string@\n");
+    fprintf(file, "DEFVAR LF@%%str_j\n");
+    fprintf(file, "DEFVAR LF@%%str_i\n");
+    fprintf(file, "DEFVAR LF@%%str_str\n");
+    fprintf(file, "POPS LF@%%str_str # str\n");
+    fprintf(file, "POPS LF@%%str_i\n");
+    fprintf(file, "POPS LF@%%str_j\n");
+    fprintf(file, "DEFVAR LF@%%str_bool_tmp1\n");
+    fprintf(file, "LT LF@%%str_bool_tmp1 LF@%%str_i int@0\n");
+    fprintf(file, "JUMPIFEQ .nil_ret LF@%%str_bool_tmp1 bool@true\n");
+    fprintf(file, "LT LF@%%str_bool_tmp1 LF@%%str_j int@0\n");
+    fprintf(file, "JUMPIFEQ .nil_ret LF@%%str_bool_tmp1 bool@true\n");
+    fprintf(file, "GT LF@%%str_bool_tmp1 LF@%%str_i LF@%%str_j\n");
+    fprintf(file, "JUMPIFEQ .nil_ret LF@%%str_bool_tmp1 bool@true\n");
+    fprintf(file, "DEFVAR LF@%%str_bool_tmp2\n");
+    fprintf(file, "DEFVAR LF@%%str_bool_tmp3\n");
+    fprintf(file, "DEFVAR LF@%%str_int_len\n");
+    fprintf(file, "STRLEN LF@%%str_int_len LF@%%str_str\n");
+    fprintf(file, "GT LF@%%str_bool_tmp2 LF@%%str_i LF@%%str_int_len\n");
+    fprintf(file, "EQ LF@%%str_bool_tmp3 LF@%%str_i LF@%%str_int_len\n");
+    fprintf(file, "OR LF@%%str_bool_tmp1 LF@%%str_bool_tmp2 LF@%%str_bool_tmp3\n");
+    fprintf(file, "JUMPIFEQ .nil_ret LF@%%str_bool_tmp1 bool@true\n");
+    fprintf(file, "GT LF@%%str_bool_tmp1 LF@%%str_j LF@%%str_int_len\n");
+    fprintf(file, "JUMPIFEQ .nil_ret LF@%%str_bool_tmp1 bool@true\n");
+    fprintf(file, "DEFVAR LF@%%str_curr_char\n");
+    fprintf(file, "LABEL .substr_loop\n");
+    fprintf(file, "GETCHAR LF@%%str_curr_char LF@%%str_str LF@%%str_i\n");
+    fprintf(file, "CONCAT LF@%%str_retval LF@%%str_retval LF@%%str_curr_char\n");
+    fprintf(file, "ADD LF@%%str_i LF@%%str_i int@1\n");
+    fprintf(file, "JUMPIFNEQ .substr_loop LF@%%str_i LF@%%str_j\n");
+    fprintf(file, "PUSHS LF@%%str_retval\n");
+    fprintf(file, "POPFRAME\n");
+    fprintf(file, "RETURN\n");
 }
