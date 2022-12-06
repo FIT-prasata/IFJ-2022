@@ -91,10 +91,10 @@ int char_stack_push(Char_stack_t *c_stack, char character) {
 
 char char_stack_pop(Char_stack_t *c_stack) {
     if (c_stack == NULL) {
-        return CHAR_STACK_POP_ERR;
+        return INTERNAL_ERR;
     }
     if (c_stack->char_head == CHAR_STACK_BOTTOM) {
-        return CHAR_STACK_POP_ERR;
+        return EXPR_STACK_BOTTOM;
     }
     char result = c_stack->char_head;
     Char_stack_t *tmp = c_stack->next_char;
@@ -105,7 +105,7 @@ char char_stack_pop(Char_stack_t *c_stack) {
 }
 
 void char_stack_clear(Char_stack_t *c_stack) {
-    while (char_stack_pop(c_stack) != CHAR_STACK_POP_ERR);
+    while (char_stack_pop(c_stack) != EXPR_STACK_BOTTOM);
 }
 
 ptable_symbol_t char_stack_get_closest_terminal(Char_stack_t *c_stack) {
@@ -120,7 +120,7 @@ ptable_symbol_t char_stack_get_closest_terminal(Char_stack_t *c_stack) {
         }
         c_stack = c_stack->next_char;
     }
-    return CHAR_STACK_BOTTOM;
+    return EXPR_STACK_BOTTOM;
 }
 
 int char_stack_push_shift(Char_stack_t *c_stack) {
