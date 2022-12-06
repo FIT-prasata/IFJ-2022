@@ -10,7 +10,5 @@ example.txt
 *.dll
 README
 *.code
-src/scanner_old.c
-__pycache__/
-IFJcode22_examples/*
 ic22int
+IFJcode22_examples/*
