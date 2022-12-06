@@ -98,7 +98,7 @@ int expr_reduce(Char_stack_t *c_stack/*, Token_stack_t *t_stack, Token_t *token*
   // Reduction of expression
   char head_char = char_stack_pop(c_stack);
   while (head_char != CHAR_STACK_POP_ERR && head_char != '[') {
-    if (d_string_add_char(&d_string, head_char) == INTERNAL_ERR) {
+    if (d_string_insert_before(&d_string, head_char) == INTERNAL_ERR) {
       d_string_free_and_clear(&d_string);
       return INTERNAL_ERR;
     }
