@@ -96,4 +96,10 @@ int get_d_string_value_to_double(DString_t *d_string, double *value);
 // @return - status code
 int d_string_replace_str(DString_t *d_string, const char *c_str);
 
+// insert char to the beginning of the string
+// @param d_string - pointer to dynamic string
+// @param c - char to be inserted
+// @return - status code
+int d_string_insert_before(DString_t *d_string, char c);
+
 #endif  // _DYNAMIC_STRING_H_

@@ -22,9 +22,9 @@ D_FREE
 ENDTEST
 
 // Test - dynamic string init with pointer set to NULL
-// Expected result - INTERNAL_ERR 
+// Expected result - INTERNAL_ERR
 TEST(T_d_string_init_NULL)
-DString_t *d_string = NULL;
+DString_t* d_string = NULL;
 ASSERT_TRUE(d_string_init(d_string) == INTERNAL_ERR);
 ENDTEST
 
@@ -137,6 +137,17 @@ ASSERT_TRUE(get_d_string_value_to_double(&d_string, &value) == INTERNAL_ERR);
 D_FREE
 ENDTEST
 
+// Test - d_string_insert_before function
+// Expected result - OK
+TEST(T_d_string_insert_before)
+D_INIT
+d_string_add_str(&d_string, "hoj mami");
+ASSERT_TRUE(strcmp(d_string.str, "hoj mami") == 0);
+ASSERT_TRUE(d_string_insert_before(&d_string, 'A') == OK);
+ASSERT_TRUE(strcmp(d_string.str, "Ahoj mami") == 0);
+D_FREE
+ENDTEST
+
 int run_d_string_tests() {
     int errors = 0;
     printf("\nRunning dynamic string tests...\n");
@@ -152,5 +163,6 @@ int run_d_string_tests() {
     errors += T_d_string_copy();
     errors += T_get_d_string_value_to_integer();
     errors += T_get_d_string_value_to_double();
+    errors += T_d_string_insert_before();
     return errors;
 }

@@ -157,3 +157,25 @@ int d_string_replace_str(DString_t *d_string, const char *c_str) {
     }
     return OK;
 }
+
+int d_string_insert_before(DString_t *d_string, char c) {
+    if (d_string == NULL) {
+        return INTERNAL_ERR;
+    }
+    if (d_string->length + 1 >= d_string->allocated_size) {
+        d_string->allocated_size += DYNAMIC_STRING_INIT_SIZE;
+        d_string->str =
+            (char *)realloc(d_string->str, d_string->allocated_size);
+        if (d_string->str == NULL) {
+            return INTERNAL_ERR;
+        }
+    }
+    for (int i = d_string->length; i > 0; i--) {
+        d_string->str[i] = d_string->str[i - 1];
+    }
+    d_string->str[0] = c;
+    d_string->length++;
+    d_string->str[d_string->length] = '\0';
+
+    return OK;
+}
