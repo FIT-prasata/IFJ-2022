@@ -154,36 +154,6 @@ void generate_move(char *source, char *destination, FILE *file) {
     fprintf(file, "MOVE %s %s\n", destination, source);
 }
 
-void generate_lt(char *var1, char *var2, char *destination, FILE *file) {
-    fprintf(file, "LT %s %s %s\n", destination, var1, var2);
-}
-
-void generate_gt(char *var1, char *var2, char *destination, FILE *file) {
-    fprintf(file, "GT %s %s %s\n", destination, var1, var2);
-}
-
-void generate_eq(char *var1, char *var2, char *destination, FILE *file) {
-    fprintf(file, "EQ %s %s %s\n", destination, var1, var2);
-}
-
-void generate_and(char *var1, char *var2, char *destination, FILE *file) {
-    fprintf(file, "AND %s %s %s\n", destination, var1, var2);
-}
-
-void generate_or(char *var1, char *var2, char *destination, FILE *file) {
-    fprintf(file, "OR %s %s %s\n", destination, var1, var2);
-}
-
-void generate_not(char *source, char *destination, FILE *file) {
-    fprintf(file, "NOT %s %s\n", destination, source);
-}
-
-void generate_createframe(FILE *file) { fprintf(file, "CREATEFRAME\n"); }
-
-void generate_pushframe(FILE *file) { fprintf(file, "PUSHFRAME\n"); }
-
-void generate_popframe(FILE *file) { fprintf(file, "POPFRAME\n"); }
-
 void generate_defvar(char *var, FILE *file) {
     fprintf(file, "DEFVAR %s\n", var);
 }
@@ -191,12 +161,6 @@ void generate_defvar(char *var, FILE *file) {
 void generate_call(char *label, FILE *file) {
     fprintf(file, "CALL %s\n", label);
 }
-
-void generate_pushs(char *var, FILE *file) { fprintf(file, "PUSHS %s\n", var); }
-
-void generate_pops(char *var, FILE *file) { fprintf(file, "POPS %s\n", var); }
-
-void generate_clears(FILE *file) { fprintf(file, "CLEARS\n"); }
 
 void generate_int2float(char *source, char *destination, FILE *file) {
     fprintf(file, "INT2FLOAT %s %s\n", destination, source);
@@ -238,22 +202,6 @@ void generate_setchar(char *var, char *pos, char *ch, FILE *file) {
 
 void generate_type(char *source, char *destination, FILE *file) {
     fprintf(file, "TYPE %s %s\n", destination, source);
-}
-
-void generate_label(char *label, FILE *file) {
-    fprintf(file, "LABEL %s\n", label);
-}
-
-void generate_jump(char *label, FILE *file) {
-    fprintf(file, "JUMP %s\n", label);
-}
-
-void generate_jumpifeq(char *label, char *var1, char *var2, FILE *file) {
-    fprintf(file, "JUMPIFEQ %s %s %s\n", label, var1, var2);
-}
-
-void generate_jumpifneq(char *label, char *var1, char *var2, FILE *file) {
-    fprintf(file, "JUMPIFNEQ %s %s %s\n", label, var1, var2);
 }
 
 void generate_exit(char *var, FILE *file) { fprintf(file, "EXIT %s\n", var); }

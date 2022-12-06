@@ -12,3 +12,5 @@ README
 *.code
 ic22int
 IFJcode22_examples/*
+*.IFJcode22
+*.ifjc22
