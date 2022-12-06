@@ -4,6 +4,7 @@
 
 // GLOBAL line number - same variable asi in main.c, but main.c is not compiled into tests
 int line_num = 1;
+int tmp_var_count = 1;
 
 int main(void) {
     int errors = 0;

@@ -168,7 +168,7 @@ int def_func_rule(Token_t *token, scope_t *scope_state, Htab_t *global_table) {
         return status;
 
     // set function as defined
-    func_ptr->data.type.func.defined = true;
+    func_ptr->data.func->defined = true;
 
     // update scope
     scope_state->in_func = false;

@@ -12,6 +12,9 @@
  *          <xzavad20> - Lukáš Zavadil
  *          <xsvetl07> - Adam Světlík
  */
+// TODO: add generate prolog and generate build in functions in main
+extern int tmp_var_count;
+#define INTERN_VAR_LEN 100
 
 // Local includes
 #include "dynamic_string.h"
@@ -32,8 +35,6 @@
 
 #define CHECK_NULL(_func) \
     if (_func == NULL) return INTERNAL_ERR
-
-typedef enum Frame { GF, LF, TF, NO } Frame_t;
 
 typedef enum Operation {
     // IF
@@ -66,11 +67,16 @@ typedef enum Operation {
     // BUILD-IN FUNCTIONS
     WRITE,
     READ,
-
+    IN_STRLEN,
+    IN_ORD,
+    IN_CHR,
     DEFVAR,
     ASSIGN,
     PROLOG,
-
+    CALL_FUNC,
+    CALL_FUNC_ASSIGN,
+    DEF_FUNC,
+    RETURN,
 } Operation_t;
 
 // TODO
@@ -282,7 +288,8 @@ void generate_call(char *label, FILE *file);
  *
  * @param file File to write the code to
  */
-void generate_return(FILE *file);
+void generate_return(Symbol_t *func, Symbol_type_t type, char *attribute,
+                     FILE *file);
 
 /**
  * @brief Generates code for pushs
@@ -477,7 +484,7 @@ void generate_dprint(char *var, FILE *file);
  *
  * @return status code
  */
-int variable_convert(char *item, Frame_t frame, DString_t *converted_var);
+int variable_convert(Symbol_t *variable, DString_t *converted_var);
 
 /**
  * @brief Converts constant from IFJ22 to IFJcode22 format
@@ -487,7 +494,7 @@ int variable_convert(char *item, Frame_t frame, DString_t *converted_var);
  *
  * @return status code
  */
-int const_convert(Token_t *token, DString_t *converted_const);
+int const_convert(Symbol_t *constant, DString_t *converted_const);
 
 /**
  * @brief Converts string from IFJ22 to IFJcode22 format
@@ -497,7 +504,7 @@ int const_convert(Token_t *token, DString_t *converted_const);
  *
  * @return status code
  */
-int string_convert(Token_t *token, DString_t *converted_str);
+int string_convert(Symbol_t *string, DString_t *converted_str);
 
 /**
  * @brief Generates IFJcode22 code
@@ -512,5 +519,6 @@ int string_convert(Token_t *token, DString_t *converted_str);
  *
  * @todo not implemented yet
  */
-int generate(Operation_t operation, Token_t *dest_in, Token_t *var_in_1,
-             Token_t *var_in_2, int label, Frame_t frame, FILE *file);
+int generate_instruction(Operation_t operation, Symbol_t *dest_in,
+                         Symbol_t *var_in_1, Symbol_t *var_in_2, int label,
+                         FILE *file);

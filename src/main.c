@@ -13,7 +13,7 @@
 
 // GLOBAL line number
 int line_num = 1;
-
+int tmp_var_count = 1;
 // LOCAL INCLUDES - tohletoto legacy code nechat v tomto poradi plsky
 #include "code_generator.h"
 #include "dynamic_string.h"

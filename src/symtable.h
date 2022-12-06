@@ -35,7 +35,10 @@ typedef struct Symbol Symbol_t;
  * @brief Variable types
  * @note Used in Symbol_t
  */
-typedef enum { INT, STRING, BOOL, FLOAT, NONE } Var_type_t;
+typedef enum Value_type { INT, STRING, BOOL, FLOAT, NIL } Value_type_t;
+
+// TODO: add comment to frame + update symbol_t comment
+typedef enum Frame { GF, LF, TF, UNDEF } Frame_t;
 
 /**
  * @brief Variable structure
@@ -46,9 +49,10 @@ typedef enum { INT, STRING, BOOL, FLOAT, NONE } Var_type_t;
  * @note Used in Symbol_t
  */
 typedef struct Var {
-    Var_type_t type;
+    Value_type_t var_type;
     bool asigned;
-    // TODO dString scope - main/func name
+    Frame_t frame;
+    bool used;
 } Var_t;
 
 /**
@@ -63,20 +67,23 @@ typedef struct Var {
  */
 typedef struct Function {
     int argc;
-    Var_type_t *argv;
-    Var_type_t return_type;
+    Symbol_t *argv;
+    Value_type_t return_type;
     bool defined;
+    bool used;
 } Func_t;
 
 /**
  * @brief Symbol types
  *
- * @param var Variable
+ * @param var Variable0
  * @param func Function
  */
-typedef union {
-    Var_t var;
-    Func_t func;
+typedef enum Symbol_type {
+    VARIABLE,
+    FUNCTION,
+    CONSTANT,
+    INTERN_VAR
 } Symbol_type_t;
 
 /**
@@ -90,9 +97,11 @@ typedef union {
  * @note Used in Htab_item_t
  */
 typedef struct Symbol {
-    const char *name;
-    Symbol_type_t type;
-    bool used;
+    char *attribute;
+    Symbol_type_t symbol_type;
+    Var_t *var;
+    Func_t *func;
+    Value_type_t const_type;
     Symbol_t *next;
 } Symbol_t;
 
