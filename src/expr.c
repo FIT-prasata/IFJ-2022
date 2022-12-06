@@ -223,7 +223,6 @@ int expr_parse(Char_stack_t *c_stack, Token_stack_t *t_stack, Token_t *token, in
       }
       break;
   }
-
   ptable_symbol_t stack = char_stack_get_closest_terminal(c_stack);
   ptable_move_t next_move = ptable_get_next_move(stack, input);
 
@@ -255,20 +254,20 @@ int expr_main(Htab_t *table, Token_t *token, int location) {
     return INTERNAL_ERR;
   }
   if (table == NULL) {
-    return INTERNAL_ERR; // Not sure which error type to choose
+    return INTERNAL_ERR;
   }
   while (load_tokens == true) {
     if (token->type == T_ID) {
       Htab_item_t *item;
       if ((item = htab_find(table, token->attribute.string)) == NULL) {
-        return INTERNAL_ERR; // Not sure which error type to choose
+        return UNDEF_VAR_ERR;
       }
       if (token_stack_push(&t_stack, token) == INTERNAL_ERR) {
-        return INTERNAL_ERR; // Not sure which error type to choose
+        return INTERNAL_ERR;
       }
     }
 
-    int status = expr_parse(&c_stack, &t_stack, token, location); // Might need location as well for context
+    int status = expr_parse(&c_stack, &t_stack, token, location);
     if (status == EOEXPR) {
       load_tokens = false;
     }

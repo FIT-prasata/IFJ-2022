@@ -690,6 +690,44 @@ TEST(T_expr_special_shift_null_stack)
 ASSERT_TRUE(expr_special_shift(NULL, EXPR_RBR) == INTERNAL_ERR)
 ENDTEST
 
+TEST(T_expr_parse)
+Char_stack_t test_char_stack;
+char_stack_init(&test_char_stack);
+Token_stack_t test_token_stack;
+token_stack_init(&test_token_stack);
+Token_t test_token;
+test_token.type = T_ID;
+int location = EXPR_LOC_ASSIGN;
+ASSERT_TRUE(expr_parse(&test_char_stack, &test_token_stack, &test_token, location) == OK)
+ASSERT_TRUE(char_stack_pop(&test_char_stack) == EXPR_ID)
+ASSERT_TRUE(char_stack_pop(&test_char_stack) == '[')
+ASSERT_TRUE(char_stack_pop(&test_char_stack) == EXPR_STACK_BOTTOM)
+ENDTEST
+
+TEST(T_expr_parse_sem)
+Char_stack_t test_char_stack;
+char_stack_init(&test_char_stack);
+Token_stack_t test_token_stack;
+token_stack_init(&test_token_stack);
+Token_t test_token;
+test_token.type = T_SEM;
+int location = EXPR_LOC_ASSIGN;
+ASSERT_TRUE(expr_parse(&test_char_stack, &test_token_stack, &test_token, location) == EOEXPR)
+ASSERT_TRUE(char_stack_pop(&test_char_stack) == EXPR_STACK_BOTTOM)
+ENDTEST
+
+TEST(T_expr_parse_logical_operator_in_assignment)
+Char_stack_t test_char_stack;
+char_stack_init(&test_char_stack);
+Token_stack_t test_token_stack;
+token_stack_init(&test_token_stack);
+Token_t test_token;
+test_token.type = T_EQ;
+int location = EXPR_LOC_ASSIGN;
+ASSERT_TRUE(expr_parse(&test_char_stack, &test_token_stack, &test_token, location) == SYNTAX_ERR)
+ASSERT_TRUE(char_stack_pop(&test_char_stack) == EXPR_STACK_BOTTOM)
+ENDTEST
+
 int run_expr_tests() {
     int errors = 0;
     printf("Running expression parser tests...\n");
@@ -702,5 +740,8 @@ int run_expr_tests() {
     errors += T_expr_special_shift();
     errors += T_expr_special_shift_stack_bottom();
     errors += T_expr_special_shift_null_stack();
+    errors += T_expr_parse();
+    errors += T_expr_parse_sem();
+    errors += T_expr_parse_logical_operator_in_assignment();
     return errors;
 }
