@@ -78,6 +78,10 @@ int program_rule(Token_t *token, scope_t *scope_state, Htab_t *global_table) {
     // <PROGRAM> -> EOF
     switch (token->type) {
         case T_EOF:
+            // check if values in scope are ok
+            if (scope_state->count_if != 0 || scope_state->count_while != 0) {
+                return SYNTAX_ERR; // TODO check if relly syntax error or something else
+            }
             return OK;  // TODO: maybe we want to throw error in some cases
         case K_FUNC:
             if ((status = def_func_rule(token, scope_state, global_table)) !=
@@ -97,6 +101,7 @@ int program_rule(Token_t *token, scope_t *scope_state, Htab_t *global_table) {
     }
     // handle
     // ... -> ... <PROGRAM>
+
     return program_rule(token, scope_state, global_table);
 }
 
@@ -118,12 +123,15 @@ int def_func_rule(Token_t *token, scope_t *scope_state, Htab_t *global_table) {
     if (func_ptr == NULL) return INTERNAL_ERR;
 
     // check if function wasn't already defined
-    if (func_ptr->data.type.func.defined != false) return UNDEF_FUNC_ERR;
+    if (func_ptr->data.func->defined != false) return UNDEF_FUNC_ERR;
 
     // store key of function in global variable
     if ((status =
              d_string_replace_str(&function_id, token->attribute.string)) != OK)
         return status;
+
+    // set function name
+    func_ptr->data.attribute = function_id.str;
 
     // get new token
     if ((status = scan(token)) != OK) return status;
@@ -147,7 +155,8 @@ int def_func_rule(Token_t *token, scope_t *scope_state, Htab_t *global_table) {
     if ((status = scan(token)) != OK) return status;
 
     // handle ... -> ... <TYPE>
-    if ((status = type_rule(token, global_table)) != OK) return status;
+    if ((status = type_rule(token, global_table, false, true)) != OK)
+        return status;
 
     // get new token
     if ((status = scan(token)) != OK) return status;
@@ -157,6 +166,11 @@ int def_func_rule(Token_t *token, scope_t *scope_state, Htab_t *global_table) {
 
     // set scope to function
     scope_state->in_func = true;
+
+    // generate function header
+    if ((status = generate_instruction(DEF_FUNC, NULL, &(func_ptr->data), NULL,
+                                       0, stdout)) != OK)
+        return status;
 
     // get new token
     if ((status = scan(token)) != OK) return status;
@@ -180,8 +194,16 @@ int arg_rule(Token_t *token, Htab_t *global_table) {
     // handle <ARG> -> T_RBR (end of arguments)
     if (token->type == T_RBR) return OK;
 
+    // get function pointer
+    Htab_item_t *func_ptr = htab_find(global_table, function_id.str);
+    if (func_ptr == NULL) return INTERNAL_ERR;
+
+    // inc argc
+    func_ptr->data.func->argc++;
+
     // handle ... -> <TYPE>
-    if ((status = type_rule(token, global_table)) != OK) return status;
+    if ((status = type_rule(token, global_table, true, false)) != OK)
+        return status;
 
     // get new token
     if ((status = scan(token)) != OK) return status;
@@ -234,6 +256,13 @@ int param_rule(Token_t *token, Htab_t *global_table) {
     // get/set id
     Htab_item_t *id_ptr = htab_lookup_add(global_table, token);
     if (id_ptr == NULL) return INTERNAL_ERR;
+    // get function pointer
+    Htab_item_t *func_ptr = htab_find(global_table, function_id.str);
+    if (func_ptr == NULL) return INTERNAL_ERR;
+
+    func_ptr->data.func->argv[func_ptr->data.func->argc - 1].attribute =
+        id_ptr->data.attribute;
+    func_ptr->data.func->argv[func_ptr->data.func->argc - 1].var->frame = LF;
 
     return status;
 }
@@ -263,17 +292,83 @@ int param_list_rule(Token_t *current_token, Htab_t *global_table) {
     return status;
 }
 
-int type_rule(Token_t *token, Htab_t *global_table) {
+int type_rule(Token_t *token, Htab_t *global_table, bool is_func_def,
+              bool is_func_type) {
     int status = OK;
+
+    Htab_item_t *func_pointer = NULL;
+    if (is_func_def == true) {
+        // get function pointer
+        Htab_item_t *func_ptr = htab_find(global_table, function_id.str);
+        if (func_ptr == NULL) return INTERNAL_ERR;
+    }
 
     switch (token->type) {
         case K_STR:
+            if (is_func_def == true) {
+                func_pointer->data.func->argv[func_pointer->data.func->argc - 1]
+                    .var->var_type = STRING;
+            }
+            if (is_func_type == true) {
+                func_pointer->data.func->return_type = STRING;
+            }
+            break;
         case K_INT:
+            if (is_func_def == true) {
+                func_pointer->data.func->argv[func_pointer->data.func->argc - 1]
+                    .var->var_type = INT;
+            }
+            if (is_func_type == true) {
+                func_pointer->data.func->return_type = INT;
+            }
+            break;
         case K_FLOAT:
+            if (is_func_def == true) {
+                func_pointer->data.func->argv[func_pointer->data.func->argc - 1]
+                    .var->var_type = FLOAT;
+            }
+            if (is_func_type == true) {
+                func_pointer->data.func->return_type = FLOAT;
+            }
+            break;
         case K_FLOAT_NULL:
+            if (is_func_def == true) {
+                func_pointer->data.func->argv[func_pointer->data.func->argc - 1]
+                    .var->var_type = FLOAT;  // TODO FLOAT_NULL mby
+            }
+            if (is_func_type == true) {
+                func_pointer->data.func->return_type =
+                    FLOAT;  // TODO FLOAT_NULL mby
+            }
+            break;
         case K_INT_NULL:
+            if (is_func_def == true) {
+                func_pointer->data.func->argv[func_pointer->data.func->argc - 1]
+                    .var->var_type = INT;  // TODO INT_NULL mby
+            }
+            if (is_func_type == true) {
+                func_pointer->data.func->return_type =
+                    INT;  // TODO INT_NULL mby
+            }
+            break;
         case K_STR_NULL:
+            if (is_func_def == true) {
+                func_pointer->data.func->argv[func_pointer->data.func->argc - 1]
+                    .var->var_type = STRING;  // TODO STR_NULL mby
+            }
+            if (is_func_type == true) {
+                func_pointer->data.func->return_type =
+                    STRING;  // TODO STR_NULL mby
+            }
+            break;
         case K_NULL:
+            if (is_func_def == true) {
+                func_pointer->data.func->argv[func_pointer->data.func->argc - 1]
+                    .var->var_type = NIL;
+            }
+            if (is_func_type == true) {
+                func_pointer->data.func->return_type = NIL;
+            }
             return OK;
         default:
             return SYNTAX_ERR;
@@ -443,7 +538,8 @@ int stat_rule(Token_t *current_token, scope_t *scope_state,
         }
         // handle ... -> ...<TYPE>
         else {
-            if ((status = type_rule(current_token, global_table)) != OK)
+            if ((status = type_rule(current_token, global_table, false,
+                                    false)) != OK)
                 return status;
 
             // get new token

@@ -26,6 +26,7 @@ extern int line_num;
 #include "error.h"
 #include "scanner.h"
 #include "symtable.h"
+#include "code_generator.h"
 
 // scope check
 typedef struct {
@@ -126,7 +127,7 @@ int param_list_rule(Token_t *current_token, Htab_t *global_table);
  * @param global_table
  * @return
  */
-int type_rule(Token_t *current_token, Htab_t *global_table);
+int type_rule(Token_t *current_token, Htab_t *global_table, bool is_func_def, bool is_func_type);
 
 /**
  * @brief   RULES
