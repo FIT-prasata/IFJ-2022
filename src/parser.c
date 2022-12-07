@@ -256,14 +256,15 @@ int arg_list_rule(Token_t *current_token, Htab_t *global_table) {
     // get new token
     if ((status = scan(current_token)) != OK) return status;
 
+    if (current_token->type == T_RBR) return SYNTAX_ERR;
     // handle ... -> ... <ARG>
     if ((status = arg_rule(current_token, global_table)) != OK) return status;
 
     // get new token
-    if ((status = scan(current_token)) != OK) return status;
+    //    if ((status = scan(current_token)) != OK) return status;
 
     // handle ... -> ... <ARGLIST>
-    if ((status = arg_list_rule(current_token, global_table)) != OK) return status;
+    //    if ((status = arg_list_rule(current_token, global_table)) != OK) return status;
 
     return status;
 }
@@ -271,8 +272,10 @@ int arg_list_rule(Token_t *current_token, Htab_t *global_table) {
 int param_rule(Token_t *token, Htab_t *global_table, bool func_call) {
     int status = OK;
     // handle <PARAM> -> <CONST>
-    if (const_rule(token, global_table, func_call) == OK) {
-        return OK;
+    if (func_call == true) {
+        if (const_rule(token, global_table, func_call) == OK) {
+            return OK;
+        }
     }
 
     // handle <PARAM> -> T_ID

@@ -94,7 +94,7 @@ int arg_rule(Token_t *current_token, Htab_t *global_table);
 
 /**
  * @brief   RULES
- *          ARGLIST -> T_COMMA <ARG> <ARGLIST>
+ *          ARGLIST -> T_COMMA <ARG>
  *          ARGLIST -> T_RBR
  *
  * @param current_token

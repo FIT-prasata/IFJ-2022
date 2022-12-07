@@ -81,3 +81,11 @@ class ParserTestCases(unittest.TestCase):
         }
         """
         self.assertEqual(execute_programme(stdin)[0], 2)
+
+    def test_valid_funcdef_2(self):
+        stdin = """<?php
+            declare(strict_types=1);
+            function hello_world(int $x, int $z): null {
+                }
+        """
+        self.assertEqual(execute_programme(stdin)[0], 0)
