@@ -391,6 +391,7 @@ int type_rule(Token_t *token, Htab_t *global_table, bool is_func_def, bool is_fu
     int status = OK;
 
     Htab_item_t *func_pointer = htab_find(global_table, function_id.str);
+    Htab_item_t *variable = htab_find(global_table, variable_id.str);
 
     if (is_func_def == true) {
         // get function pointer
@@ -405,6 +406,13 @@ int type_rule(Token_t *token, Htab_t *global_table, bool is_func_def, bool is_fu
             if (is_func_type == true) {
                 func_pointer->data.func->return_type = STRING;
             }
+            if (!is_func_def && !is_func_type) {
+                variable->data.var->var_type = STRING;
+                if (variable->data.var->asigned == false){
+                    if ((status = generate_instruction(DEFVAR, NULL, &variable->data, NULL, 0, stdout)) != OK) return status;
+                    variable->data.var->asigned = true;
+                }
+            }
             return OK;
         case K_INT:
             if (is_func_def == true) {
@@ -412,6 +420,13 @@ int type_rule(Token_t *token, Htab_t *global_table, bool is_func_def, bool is_fu
             }
             if (is_func_type == true) {
                 func_pointer->data.func->return_type = INT;
+            }
+            if (!is_func_def && !is_func_type) {
+                variable->data.var->var_type = INT;
+                if (variable->data.var->asigned == false){
+                    if ((status = generate_instruction(DEFVAR, NULL, &variable->data, NULL, 0, stdout)) != OK) return status;
+                    variable->data.var->asigned = true;
+                }
             }
             return OK;
         case K_FLOAT:
@@ -421,13 +436,27 @@ int type_rule(Token_t *token, Htab_t *global_table, bool is_func_def, bool is_fu
             if (is_func_type == true) {
                 func_pointer->data.func->return_type = FLOAT;
             }
+            if (!is_func_def && !is_func_type) {
+                variable->data.var->var_type = FLOAT;
+                if (variable->data.var->asigned == false){
+                    if ((status = generate_instruction(DEFVAR, NULL, &variable->data, NULL, 0, stdout)) != OK) return status;
+                    variable->data.var->asigned = true;
+                }
+            }
             return OK;
         case K_FLOAT_NULL:
             if (is_func_def == true) {
                 func_pointer->data.func->argv[func_pointer->data.func->argc - 1].var->var_type = FLOAT;  // TODO FLOAT_NULL mby
             }
             if (is_func_type == true) {
-                func_pointer->data.func->return_type = FLOAT;  // TODO FLOAT_NULL mby
+                func_pointer->data.func->return_type = FLOAT;
+            }
+            if (!is_func_def && !is_func_type) {
+                variable->data.var->var_type = FLOAT;
+                if (variable->data.var->asigned == false){
+                    if ((status = generate_instruction(DEFVAR, NULL, &variable->data, NULL, 0, stdout)) != OK) return status;
+                    variable->data.var->asigned = true;
+                }
             }
             return OK;
         case K_INT_NULL:
@@ -435,7 +464,14 @@ int type_rule(Token_t *token, Htab_t *global_table, bool is_func_def, bool is_fu
                 func_pointer->data.func->argv[func_pointer->data.func->argc - 1].var->var_type = INT;  // TODO INT_NULL mby
             }
             if (is_func_type == true) {
-                func_pointer->data.func->return_type = INT;  // TODO INT_NULL mby
+                func_pointer->data.func->return_type = INT;
+            }
+            if (!is_func_def && !is_func_type) {
+                variable->data.var->var_type = INT;
+                if (variable->data.var->asigned == false){
+                    if ((status = generate_instruction(DEFVAR, NULL, &variable->data, NULL, 0, stdout)) != OK) return status;
+                    variable->data.var->asigned = true;
+                }
             }
             return OK;
         case K_STR_NULL:
@@ -443,7 +479,14 @@ int type_rule(Token_t *token, Htab_t *global_table, bool is_func_def, bool is_fu
                 func_pointer->data.func->argv[func_pointer->data.func->argc - 1].var->var_type = STRING;  // TODO STR_NULL mby
             }
             if (is_func_type == true) {
-                func_pointer->data.func->return_type = STRING;  // TODO STR_NULL mby
+                func_pointer->data.func->return_type = STRING;
+            }
+            if (!is_func_def && !is_func_type) {
+                variable->data.var->var_type = STRING;
+                if (variable->data.var->asigned == false){
+                    if ((status = generate_instruction(DEFVAR, NULL, &variable->data, NULL, 0, stdout)) != OK) return status;
+                    variable->data.var->asigned = true;
+                }
             }
             return OK;
         case K_NULL:
@@ -452,6 +495,12 @@ int type_rule(Token_t *token, Htab_t *global_table, bool is_func_def, bool is_fu
             }
             if (is_func_type == true) {
                 //                func_pointer->data.func->return_type = NIL;
+            }if (!is_func_def && !is_func_type) {
+                variable->data.var->var_type = NIL;
+                if (variable->data.var->asigned == false){
+                    if ((status = generate_instruction(DEFVAR, NULL, &variable->data, NULL, 0, stdout)) != OK) return status;
+                    variable->data.var->asigned = true;
+                }
             }
             return OK;
         default:
@@ -741,6 +790,10 @@ int assign_type_rule(Token_t *current_token, scope_t *scope_state, Htab_t *globa
         Htab_item_t *function = htab_find(global_table, func_call_id.str);
         Htab_item_t *variable = htab_find(global_table, variable_id.str);
 
+        if (variable->data.var->asigned == false){
+            if ((status = generate_instruction(DEFVAR, NULL, &variable->data, NULL, 0, stdout)) != OK) return status;
+            variable->data.var->asigned = true;
+        }
         if ((status = generate_instruction(CALL_FUNC_ASSIGN, &variable->data, &function->data, NULL, 0, stdout)) != OK) return status;
         return status;
     }
@@ -756,6 +809,11 @@ int assign_type_rule(Token_t *current_token, scope_t *scope_state, Htab_t *globa
         variable = htab_find(local_table, variable_id.str);
     }
     if (variable == NULL) return SYNTAX_ERR;
+    if (variable->data.var->asigned == false){
+        if ((status = generate_instruction(DEFVAR, NULL, &variable->data, NULL, 0, stdout)) != OK) return status;
+        variable->data.var->asigned = true;
+    }
+
     if ((status = generate_instruction(POPS, NULL, &variable->data, NULL, 0, stdout)) != OK) return status;
 
     return status;

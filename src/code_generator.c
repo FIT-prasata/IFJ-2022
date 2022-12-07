@@ -130,7 +130,7 @@ void generate_concat(FILE *file) {
     fprintf(file, "DEFVAR GF@%%tmp_concat%d\n", tmp_var_count++);
     fprintf(file, "POPS GF@%%tmp_concat%d\n", tmp_var_count - 2);
     fprintf(file, "POPS GF@%%tmp_concat%d\n", tmp_var_count - 3);
-    fprintf(file, "CONCAT GF@%%tmp_concat%d %GF@%%tmp_concat%d %GF@%%tmp_concat%d\n", tmp_var_count - 1, tmp_var_count - 3, tmp_var_count - 2);
+    fprintf(file, "CONCAT GF@%%tmp_concat%d GF@%%tmp_concat%d GF@%%tmp_concat%d\n", tmp_var_count - 1, tmp_var_count - 3, tmp_var_count - 2);
     fprintf(file, "PUSHS GF@%%tmp_concat%d\n", tmp_var_count - 1);
 }
 
