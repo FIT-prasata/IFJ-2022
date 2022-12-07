@@ -20,6 +20,7 @@
 #include "scanner.h"
 #include "stack.h"
 #include "symtable.h"
+#include "code_generator.h"
 
 #define P_TABLE_SIZE 15   // Size of precedence table
 #define EOEXPR 999        // End of expression
@@ -59,8 +60,7 @@ int expr_shift(Char_stack_t *c_stack, char character);
 // 6. Check if the string matches any of the rules
 // 7. Push the left hand side of the rule on top of the stack ('E')
 // 8. Return status code
-int expr_reduce(
-    Char_stack_t *c_stack /*, Token_stack_t *t_stack, Token_t *token */);
+int expr_reduce(Htab_t *table, Char_stack_t *c_stack, Token_stack_t *t_stack, Token_t *token);
 
 // Special shift operation
 // 1. Push terminal on stack
@@ -87,9 +87,12 @@ int expr_main(Htab_t *table, Token_t *token, int location);
 // input
 // 4. Based on the result of the function call, call expr_shift(),
 // expr_reduce(), expr_special_shift()
-int expr_parse(Char_stack_t *c_stack, Token_stack_t *t_stack, Token_t *token,
-               int location);
+int expr_parse(Htab_t *table, Char_stack_t *c_stack, Token_stack_t *t_stack, Token_t *token, int location);
 
-int expr_instr_gen(Token_stack_t *t_stack, Token_t *token, char term);
+// Generates instruction when reducing
+int expr_instr_gen(Htab_t *table, Token_stack_t *t_stack, Token_t *token, char term);
+
+// Validates first token of expression
+int expr_validate_first(Token_t *token);
 
 #endif  // _EXPR_H_

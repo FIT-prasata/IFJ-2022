@@ -573,89 +573,89 @@ char_stack_init(&test_char_stack);
 char_stack_push(&test_char_stack, 'E');
 char_stack_push(&test_char_stack, EXPR_ADD);
 char_stack_push(&test_char_stack, 'E');
-ASSERT_TRUE(expr_reduce(&test_char_stack) == OK)
+ASSERT_TRUE(expr_reduce(&test_char_stack, NULL, NULL) == OK)
 ASSERT_TRUE(char_stack_pop(&test_char_stack) == 'E')
 ASSERT_TRUE(char_stack_pop(&test_char_stack) == CHAR_STACK_POP_ERR)
 char_stack_clear(&test_char_stack);
 char_stack_push(&test_char_stack, 'E');
 char_stack_push(&test_char_stack, EXPR_SUB);
 char_stack_push(&test_char_stack, 'E');
-ASSERT_TRUE(expr_reduce(&test_char_stack) == OK)
+ASSERT_TRUE(expr_reduce(&test_char_stack, NULL, NULL) == OK)
 ASSERT_TRUE(char_stack_pop(&test_char_stack) == 'E')
 ASSERT_TRUE(char_stack_pop(&test_char_stack) == CHAR_STACK_POP_ERR)
 char_stack_clear(&test_char_stack);
 char_stack_push(&test_char_stack, 'E');
 char_stack_push(&test_char_stack, EXPR_MUL);
 char_stack_push(&test_char_stack, 'E');
-ASSERT_TRUE(expr_reduce(&test_char_stack) == OK)
+ASSERT_TRUE(expr_reduce(&test_char_stack, NULL, NULL) == OK)
 ASSERT_TRUE(char_stack_pop(&test_char_stack) == 'E')
 ASSERT_TRUE(char_stack_pop(&test_char_stack) == CHAR_STACK_POP_ERR)
 char_stack_clear(&test_char_stack);
 char_stack_push(&test_char_stack, 'E');
 char_stack_push(&test_char_stack, EXPR_DIV);
 char_stack_push(&test_char_stack, 'E');
-ASSERT_TRUE(expr_reduce(&test_char_stack) == OK)
+ASSERT_TRUE(expr_reduce(&test_char_stack, NULL, NULL) == OK)
 ASSERT_TRUE(char_stack_pop(&test_char_stack) == 'E')
 ASSERT_TRUE(char_stack_pop(&test_char_stack) == CHAR_STACK_POP_ERR)
 char_stack_clear(&test_char_stack);
 char_stack_push(&test_char_stack, 'E');
 char_stack_push(&test_char_stack, EXPR_DOT);
 char_stack_push(&test_char_stack, 'E');
-ASSERT_TRUE(expr_reduce(&test_char_stack) == OK)
+ASSERT_TRUE(expr_reduce(&test_char_stack, NULL, NULL) == OK)
 ASSERT_TRUE(char_stack_pop(&test_char_stack) == 'E')
 ASSERT_TRUE(char_stack_pop(&test_char_stack) == CHAR_STACK_POP_ERR)
 char_stack_clear(&test_char_stack);
 char_stack_push(&test_char_stack, 'E');
 char_stack_push(&test_char_stack, EXPR_EQ);
 char_stack_push(&test_char_stack, 'E');
-ASSERT_TRUE(expr_reduce(&test_char_stack) == OK)
+ASSERT_TRUE(expr_reduce(&test_char_stack, NULL, NULL) == OK)
 ASSERT_TRUE(char_stack_pop(&test_char_stack) == 'E')
 ASSERT_TRUE(char_stack_pop(&test_char_stack) == CHAR_STACK_POP_ERR)
 char_stack_clear(&test_char_stack);
 char_stack_push(&test_char_stack, 'E');
 char_stack_push(&test_char_stack, EXPR_NEQ);
 char_stack_push(&test_char_stack, 'E');
-ASSERT_TRUE(expr_reduce(&test_char_stack) == OK)
+ASSERT_TRUE(expr_reduce(&test_char_stack, NULL, NULL) == OK)
 ASSERT_TRUE(char_stack_pop(&test_char_stack) == 'E')
 ASSERT_TRUE(char_stack_pop(&test_char_stack) == CHAR_STACK_POP_ERR)
 char_stack_clear(&test_char_stack);
 char_stack_push(&test_char_stack, 'E');
 char_stack_push(&test_char_stack, EXPR_LT);
 char_stack_push(&test_char_stack, 'E');
-ASSERT_TRUE(expr_reduce(&test_char_stack) == OK)
+ASSERT_TRUE(expr_reduce(&test_char_stack, NULL, NULL) == OK)
 ASSERT_TRUE(char_stack_pop(&test_char_stack) == 'E')
 ASSERT_TRUE(char_stack_pop(&test_char_stack) == CHAR_STACK_POP_ERR)
 char_stack_clear(&test_char_stack);
 char_stack_push(&test_char_stack, 'E');
 char_stack_push(&test_char_stack, EXPR_GT);
 char_stack_push(&test_char_stack, 'E');
-ASSERT_TRUE(expr_reduce(&test_char_stack) == OK)
+ASSERT_TRUE(expr_reduce(&test_char_stack, NULL, NULL) == OK)
 ASSERT_TRUE(char_stack_pop(&test_char_stack) == 'E')
 ASSERT_TRUE(char_stack_pop(&test_char_stack) == CHAR_STACK_POP_ERR)
 char_stack_clear(&test_char_stack);
 char_stack_push(&test_char_stack, 'E');
 char_stack_push(&test_char_stack, EXPR_LE);
 char_stack_push(&test_char_stack, 'E');
-ASSERT_TRUE(expr_reduce(&test_char_stack) == OK)
+ASSERT_TRUE(expr_reduce(&test_char_stack, NULL, NULL) == OK)
 ASSERT_TRUE(char_stack_pop(&test_char_stack) == 'E')
 ASSERT_TRUE(char_stack_pop(&test_char_stack) == CHAR_STACK_POP_ERR)
 char_stack_clear(&test_char_stack);
 char_stack_push(&test_char_stack, 'E');
 char_stack_push(&test_char_stack, EXPR_GE);
 char_stack_push(&test_char_stack, 'E');
-ASSERT_TRUE(expr_reduce(&test_char_stack) == OK)
+ASSERT_TRUE(expr_reduce(&test_char_stack, NULL, NULL) == OK)
 ASSERT_TRUE(char_stack_pop(&test_char_stack) == 'E')
 ASSERT_TRUE(char_stack_pop(&test_char_stack) == CHAR_STACK_POP_ERR)
 char_stack_clear(&test_char_stack);
 char_stack_push(&test_char_stack, EXPR_LBR);
 char_stack_push(&test_char_stack, 'E');
 char_stack_push(&test_char_stack, EXPR_RBR);
-ASSERT_TRUE(expr_reduce(&test_char_stack) == OK)
+ASSERT_TRUE(expr_reduce(&test_char_stack, NULL, NULL) == OK)
 ASSERT_TRUE(char_stack_pop(&test_char_stack) == 'E')
 ASSERT_TRUE(char_stack_pop(&test_char_stack) == CHAR_STACK_POP_ERR)
 char_stack_clear(&test_char_stack);
 char_stack_push(&test_char_stack, EXPR_ID);
-ASSERT_TRUE(expr_reduce(&test_char_stack) == OK)
+ASSERT_TRUE(expr_reduce(&test_char_stack, NULL, NULL) == OK)
 ASSERT_TRUE(char_stack_pop(&test_char_stack) == 'E')
 ASSERT_TRUE(char_stack_pop(&test_char_stack) == CHAR_STACK_POP_ERR)
 char_stack_clear(&test_char_stack);
