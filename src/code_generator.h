@@ -63,10 +63,6 @@ typedef enum Operation {
     MUL,
     DIV,
     IDIV,
-    // LOGICAL
-    AND,
-    OR,
-    NOT,
     // BUILD-IN FUNCTIONS
     WRITE,
     READ,
@@ -80,6 +76,7 @@ typedef enum Operation {
     CALL_FUNC_ASSIGN,
     DEF_FUNC,
     RETURN,
+    CONCAT
 } Operation_t;
 
 // TODO
@@ -530,5 +527,6 @@ void built_in_floatval(FILE *file);
 void built_in_intval(FILE *file);
 void built_in_strval(FILE *file);
 void built_in_substring(FILE *file);
+void print_built_in(FILE *file);
 
 #endif // _CODE_GENERATOR_H_

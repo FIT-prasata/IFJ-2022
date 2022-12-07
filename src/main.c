@@ -27,7 +27,7 @@ int main(void) {
     int status = OK;
 
     FILE *file = fopen("test.ifjcode", "w");
-    built_in_substring(file);
+    print_built_in(file);
 
     fclose(file);
 
