@@ -98,10 +98,10 @@ int expr_reduce(Htab_t *table, Char_stack_t *c_stack, Token_stack_t *t_stack, To
     };
     char term = char_stack_get_closest_terminal(c_stack);
 
-    if ((gen_res = expr_instr_gen(table, t_stack, token, term)) != OK) {
-        d_string_free_and_clear(&d_string);
-        return gen_res;
-    }
+    // if ((gen_res = expr_instr_gen(table, t_stack, token, term)) != OK) {
+    //     d_string_free_and_clear(&d_string);
+    //     return gen_res;
+    // }
 
     // Reduction of expression
     char head_char = char_stack_pop(c_stack);
