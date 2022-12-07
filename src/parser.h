@@ -72,6 +72,7 @@ int program_rule(Token_t *current_token, scope_t *scope_state,
 /**
  * @brief   RULES
  *          <DEFFUNC> -> K_FUNC T_FUNC_ID T_LBR <ARG> T_COL <TYPE> T_LCBR <STAT>
+ * T_RCBR T_RCBR
  *
  * @param current_token
  * @param global_table

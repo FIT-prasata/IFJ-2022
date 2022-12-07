@@ -112,7 +112,7 @@ int program_rule(Token_t *token, scope_t *scope_state, Htab_t *global_table) {
         case K_RET:
         case T_ID:
         case T_FUNC_ID:
-            if ((status = stat_rule(token, scope_state, global_table) != OK))
+            if ((status = stat_rule(token, scope_state, global_table)) != OK)
                 return status;
             break;
         default:
@@ -159,6 +159,9 @@ int def_func_rule(Token_t *token, scope_t *scope_state, Htab_t *global_table) {
     // handle ... -> ... T_LBR
     if (token->type != T_LBR) return SYNTAX_ERR;
 
+    // set function as defined
+    func_ptr->data.func->defined = true;
+
     // get new token
     if ((status = scan(token)) != OK) return status;
 
@@ -186,6 +189,7 @@ int def_func_rule(Token_t *token, scope_t *scope_state, Htab_t *global_table) {
 
     // set scope to function
     scope_state->in_func = true;
+    scope_state->in_global = false;
 
     // generate function header
     if ((status = generate_instruction(DEF_FUNC, NULL, &(func_ptr->data), NULL,
@@ -199,11 +203,9 @@ int def_func_rule(Token_t *token, scope_t *scope_state, Htab_t *global_table) {
     if ((status = stat_rule(token, scope_state, global_table)) != OK)
         return status;
 
-    // set function as defined
-    func_ptr->data.func->defined = true;
-
     // update scope
     scope_state->in_func = false;
+    scope_state->in_global = true;
 
     return OK;
 }
@@ -669,6 +671,12 @@ int stat_rule(Token_t *current_token, scope_t *scope_state,
         return status;
     }
 
+    if (!scope_state->in_global) {
+        if (current_token->type == T_EOF || current_token->type == K_FUNC) {
+            return SYNTAX_ERR;
+        }
+    }
+
     // end + ε
     return status;
 }
@@ -715,8 +723,7 @@ int func_call_rule(Token_t *current_token, scope_t *scope_state,
     Htab_item_t *function = htab_find(global_table, func_call_id.str);
 
     // check if func is defined
-    if (function->data.func->defined == false)
-        return UNDEF_FUNC_ERR;  // TODO maybe comment out
+    if (function == NULL) return UNDEF_FUNC_ERR;  // TODO maybe comment out
 
     // get new token
     if ((status = scan(current_token)) != OK) return status;
