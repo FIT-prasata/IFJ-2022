@@ -90,22 +90,24 @@ TEST(T_token_stack_pop)
 T_STACK_INIT
 Token_t *test_token = malloc(sizeof(Token_t));
 test_token->type = T_ID;
+Token_t *token_dd = malloc(sizeof(Token_t));
 Token_t *test_token2 = malloc(sizeof(Token_t));
 test_token2->type = T_MUL;
 ASSERT_TRUE(token_stack_push(&test_token_stack, test_token) != INTERNAL_ERR)
 ASSERT_TRUE(token_stack_push(&test_token_stack, test_token2) != INTERNAL_ERR)
-ASSERT_TRUE(token_stack_pop(&test_token_stack) == T_MUL)
+ASSERT_TRUE(token_stack_pop(&test_token_stack, token_dd) == T_MUL)
 ASSERT_TRUE(token_stack_get_head(&test_token_stack) == T_ID)
 T_STACK_FREE
 ENDTEST
 
 TEST(T_token_stack_pop_null_stack)
-ASSERT_TRUE(token_stack_pop(NULL) == INTERNAL_ERR)
+ASSERT_TRUE(token_stack_pop(NULL, NULL) == INTERNAL_ERR)
 ENDTEST
 
 TEST(T_token_stack_pop_empty_stack)
 T_STACK_INIT
-ASSERT_TRUE(token_stack_pop(&test_token_stack) == TOKEN_EMPTY_STACK)
+Token_t *token_dd = malloc(sizeof(Token_t));
+ASSERT_TRUE(token_stack_pop(&test_token_stack, token_dd) == TOKEN_EMPTY_STACK)
 T_STACK_FREE
 ENDTEST
 
@@ -121,14 +123,15 @@ Token_t *test_token4 = malloc(sizeof(Token_t));
 test_token4->type = T_ADD;
 Token_t *test_token5 = malloc(sizeof(Token_t));
 test_token5->type = T_ID;
+Token_t *token_dd = malloc(sizeof(Token_t));
 ASSERT_TRUE(token_stack_push(&test_token_stack, test_token) != INTERNAL_ERR)
 ASSERT_TRUE(token_stack_push(&test_token_stack, test_token2) != INTERNAL_ERR)
-ASSERT_TRUE(token_stack_pop(&test_token_stack) != INTERNAL_ERR)
+ASSERT_TRUE(token_stack_pop(&test_token_stack, token_dd) != INTERNAL_ERR)
 ASSERT_TRUE(token_stack_push(&test_token_stack, test_token3) != INTERNAL_ERR)
-ASSERT_TRUE(token_stack_pop(&test_token_stack) != INTERNAL_ERR)
+ASSERT_TRUE(token_stack_pop(&test_token_stack, token_dd) != INTERNAL_ERR)
 ASSERT_TRUE(token_stack_push(&test_token_stack, test_token4) != INTERNAL_ERR)
 ASSERT_TRUE(token_stack_push(&test_token_stack, test_token5) != INTERNAL_ERR)
-ASSERT_TRUE(token_stack_pop(&test_token_stack) != INTERNAL_ERR)
+ASSERT_TRUE(token_stack_pop(&test_token_stack, token_dd) != INTERNAL_ERR)
 ASSERT_TRUE(token_stack_get_head(&test_token_stack) == T_ADD)
 T_STACK_FREE
 ENDTEST

@@ -142,7 +142,7 @@ int is_valid_rule(DString_t *d_string) {
 }
 
 int expr_parse(Htab_t *table, Char_stack_t *c_stack, Token_stack_t *t_stack, Token_t *token, int location) {
-    bool is_logical = false;
+    bool is_logical = false; //TODO - commented because of warnings (never used)
     ptable_symbol_t input;
 
     // Handle logical operators inside assignment
@@ -321,33 +321,40 @@ int expr_main(Htab_t *table, Token_t *token, int location) {
 }
 
 int expr_instr_gen(Htab_t *table, Token_stack_t *t_stack, Token_t *token, char term) {
-    Token_t *tmp1 = token_stack_pop(t_stack);
-    Symbol_t *instr_var1 = malloc(sizeof(Symbol_t));
-    if (instr_var1 == NULL) {
+    Token_t *tmp1 = malloc(sizeof(Token_t));
+    if (tmp1 == NULL) {
         return INTERNAL_ERR;
     }
+    if(token_stack_pop(t_stack, tmp1)){
+        return INTERNAL_ERR;
+    }
+    Symbol_t *instr_var1 = malloc(sizeof(Symbol_t));
     switch (term) {
         case EXPR_ID:
             // GENERATE INSTRUCTION
+                if(instr_var1 == NULL) {
+                return INTERNAL_ERR;
+                }
             if (tmp1->type == T_INT || tmp1->type == T_FLOAT || tmp1->type == T_STRING) {
                 instr_var1->symbol_type = CONSTANT;
                 if (tmp1->type == T_INT) {
-                    instr_var1->const_type = INT;
+                instr_var1->const_type = INT;
                 } else if (tmp1->type == T_FLOAT) {
-                    instr_var1->const_type = FLOAT;
+                instr_var1->const_type = FLOAT;
                 } else if (tmp1->type == T_STRING) {
-                    instr_var1->const_type = STRING;
+                instr_var1->const_type = STRING;
                 }
                 strcpy(instr_var1->attribute, tmp1->attribute.string);
             } else if (tmp1->type == T_ID) {
                 instr_var1 = &(htab_find(table, tmp1->attribute.string)->data);
                 if (instr_var1 == NULL) {
-                    return INTERNAL_ERR;
+                return INTERNAL_ERR;
                 }
             } else {
                 return INTERNAL_ERR;
-            }
+            }      
             generate_instruction(PUSHS, instr_var1, NULL, NULL, 0, stdout);
+            break;
         case EXPR_ADD:
             // GENERATE INSTRUCTION
             generate_instruction(ADDS, NULL, NULL, NULL, 0, stdout);
@@ -395,7 +402,7 @@ int expr_instr_gen(Htab_t *table, Token_stack_t *t_stack, Token_t *token, char t
             generate_instruction(NOTS, NULL, NULL, NULL, 0, stdout);
             break;
         case EXPR_RBR:
-            // GENERATE INSTRUCTION
+            // GENERATE INSTRUCTION 
             break;
         default:
             return INTERNAL_ERR;
