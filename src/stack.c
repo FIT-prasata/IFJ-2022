@@ -40,7 +40,7 @@ int token_stack_push(Token_stack_t *t_stack, Token_t *token) {
     return OK;
 }
 
-T_type_t token_stack_pop(Token_stack_t *t_stack) {
+T_type_t token_stack_pop(Token_stack_t *t_stack, Token_t *token) {
     if (t_stack == NULL) {
         return INTERNAL_ERR;
     }
@@ -48,7 +48,8 @@ T_type_t token_stack_pop(Token_stack_t *t_stack) {
         return TOKEN_EMPTY_STACK;
     }
     T_type_t result = t_stack->token_head.type;
-    Token_stack_t *tmp = t_stack;
+    *token = t_stack->token_head;
+    Token_stack_t *tmp = t_stack->next_token;
     t_stack->token_head = t_stack->next_token->token_head;
     t_stack->next_token = t_stack->next_token->next_token;
     free(tmp);
@@ -56,8 +57,12 @@ T_type_t token_stack_pop(Token_stack_t *t_stack) {
 }
 
 void token_stack_clear(Token_stack_t *t_stack) {
-    while (token_stack_pop(t_stack) != TOKEN_EMPTY_STACK)
-        ;
+    Token_t *tmp = (Token_t *)malloc(sizeof(Token_t));
+    while (token_stack_pop(t_stack, tmp) != TOKEN_EMPTY_STACK){
+        free(tmp);
+        tmp = (Token_t *)malloc(sizeof(Token_t));
+    }
+        free(tmp);
 }
 
 // CHARACTER STACK

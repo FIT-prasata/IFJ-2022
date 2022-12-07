@@ -325,7 +325,8 @@ int expr_main(Htab_t *table, Token_t *token, int location) {
 }
 
 int expr_instr_gen(Htab_t *table, Token_stack_t *t_stack, Token_t *token, char term) {
-    Token_t *tmp1 = token_stack_pop(t_stack);
+    Token_t *tmp1 = malloc(sizeof(Token_t));
+    token_stack_pop(t_stack, tmp1);
     Symbol_t *instr_var1 = malloc(sizeof(Symbol_t));
     if (instr_var1 == NULL) {
         return INTERNAL_ERR;
@@ -352,6 +353,7 @@ int expr_instr_gen(Htab_t *table, Token_stack_t *t_stack, Token_t *token, char t
                 return INTERNAL_ERR;
             }
             generate_instruction(PUSHS, instr_var1, NULL, NULL, 0, stdout);
+            break;
         case EXPR_ADD:
             // GENERATE INSTRUCTION
             generate_instruction(ADDS, NULL, NULL, NULL, 0, stdout);
