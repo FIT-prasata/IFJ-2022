@@ -217,7 +217,9 @@ int expr_parse(Htab_t *table, Char_stack_t *c_stack, Token_stack_t *t_stack, Tok
             break;
         case T_SEM:
             if (location == EXPR_LOC_ASSIGN || location == EXPR_LOC_RET) {
-                if (char_stack_get_closest_terminal(c_stack) == EXPR_STACK_BOTTOM && char_stack_get_head(c_stack) == 'E') {
+                if (char_stack_get_closest_terminal(c_stack) ==
+                        EXPR_STACK_BOTTOM &&
+                    char_stack_get_head(c_stack) == 'E') {
                     return OK;
                 }
                 return EOEXPR;
@@ -233,10 +235,12 @@ int expr_parse(Htab_t *table, Char_stack_t *c_stack, Token_stack_t *t_stack, Tok
             break;
     }
     ptable_symbol_t stack = char_stack_get_closest_terminal(c_stack);
-    if (stack == EXPR_STACK_BOTTOM && input == EXPR_STACK_BOTTOM && c_stack->char_head == 'E') {
+    if (stack == EXPR_STACK_BOTTOM && input == EXPR_STACK_BOTTOM &&
+        c_stack->char_head == 'E') {
         return OK;
     }
-    if (stack == EXPR_STACK_BOTTOM && input == EXPR_RBR && c_stack->char_head == 'E') {
+    if (stack == EXPR_STACK_BOTTOM && input == EXPR_RBR &&
+        c_stack->char_head == 'E') {
         if (location == EXPR_LOC_COND) {
             return EOEXPR;
         } else {
