@@ -3,101 +3,81 @@ import unittest
 
 
 class ParserTestCases(unittest.TestCase):
-    def test_good_code(self):
-        """Tests that good code is accepted"""
+    def test_function_definition_and_call(self):
         stdin = """<?php
         declare(strict_types=1);
-
-        $x = "Hello world";
-        """
-        self.assertEqual(execute_programme(stdin)[0], 0)
-
-    def test_missing_dollar_sign_in_variable(self):
-        stdin = """<?php
-            declare(strict_types=1);
-            x = "Hello world"
-        """
-        self.assertEqual(execute_programme(stdin)[0], 2)
-
-    def test_missing_semicolon(self):
-        stdin = """<?php
-            declare(strict_types=1);
-            $x = "Hello world"
-        """
-        self.assertEqual(execute_programme(stdin)[0], 2)
-
-    def test_wrong_function_definition(self):
-        stdin = """<?php
-            declare(strict_types=1);
-            function hello_world( {
-                $x = "Hello world";
-            }
-        """
-        self.assertEqual(execute_programme(stdin)[0], 2)
-
-    def test_wrong_function_definition_2(self):
-        stdin = """<?php
-            declare(strict_types=1);
-            function hello_world) {
-                $x = "Hello world";
-            }
-        """
-        self.assertEqual(execute_programme(stdin)[0], 2)
-
-    def test_wrong_function_definition_3(self):
-        stdin = """<?php
-            declare(strict_types=1);
-            function hello_world(x) {
-                $x = "Hello world";
-            }
-        """
-        self.assertEqual(execute_programme(stdin)[0], 2)
-
-    def test_proper_function_definition(self):
-        stdin = """<?php
-                declare(strict_types=1);
-                function hello_world(int $x): int {
-                    return $x;
+                function hello_world(int $x): null {
                 }
+        hello_world(1);
         """
         self.assertEqual(execute_programme(stdin)[0], 0)
 
-    def test_function_call(self):
+    def test_undeclared_function_call(self):
         stdin = """<?php
-            declare(strict_types=1);
-            
-            function bar(string $x): string {
-                return $x;
-            }
-            
-            function foo(string $x):string {
-                return bar($x");
-            }
-            
-            foo("Hello world");
+        declare(strict_types=1);
+        hello_world(1);
         """
-        self.assertEqual(execute_programme(stdin)[0], 0)
+        self.assertEqual(execute_programme(stdin)[0], 3)
 
-    def test_factorial_code(self):
+    def test_invalid_function_definition_wrong_arg_format(self):
         stdin = """<?php
-                    declare(strict_types=1);
-                    // Program 1: Vypocet faktorialu (iterativne)
-                    // Hlavni telo programu
-                    write("Zadejte cislo pro vypocet faktorialu\n");
-                    $a = readi();
-                    if ($a === null) {
-                    write("Chyba pri nacitani celeho cisla!\n");
-                    } else {}
-                    if ($a < 0) {
-                    write("Faktorial nelze spocitat\n");
-                    } else {
-                    $vysl = 1;
-                    while ($a > 0) {
-                    11
-                    $vysl = $vysl * $a;
-                    $a = $a - 1;
-                    }
-                    write("Vysledek je: ", $vysl, "\n");
-                    }
+        declare(strict_types=1);
+        function hello_world(int x): null {
+        }
         """
-        self.assertEqual(execute_programme(stdin)[0], 0)
+        self.assertEqual(execute_programme(stdin)[0], 2)
+
+    def test_invalid_function_definition_wrong_arg_format_2(self):
+        stdin = """<?php
+        declare(strict_types=1);
+        function hello_world($x): null {
+        }
+        """
+        self.assertEqual(execute_programme(stdin)[0], 2)
+
+    def test_invalid_function_definition_wrong_arg_format_3(self):
+        stdin = """<?php
+        declare(strict_types=1);
+        function hello_world(int $x,): null {
+        }
+        """
+        self.assertEqual(execute_programme(stdin)[0], 2)
+
+    def test_invalid_function_definition_no_return_type(self):
+        stdin = """<?php
+        declare(strict_types=1);
+        function hello_world(int $x) {
+        }
+        """
+        self.assertEqual(execute_programme(stdin)[0], 2)
+
+    def test_invalid_function_definition_no_return_type_2(self):
+        stdin = """<?php
+        declare(strict_types=1);
+        function hello_world(int $x): {
+        }
+        """
+        self.assertEqual(execute_programme(stdin)[0], 2)
+
+    def test_invalid_function_definition_wrongly_typed_return_type(self):
+        stdin = """<?php
+        declare(strict_types=1);
+        function hello_world(int $x) int {
+        }
+        """
+        self.assertEqual(execute_programme(stdin)[0], 2)
+
+    def test_invalid_function_definition_missing_rcbracket(self):
+        stdin = """<?php
+        declare(strict_types=1);
+        function hello_world(int $x): null {
+        """
+        self.assertEqual(execute_programme(stdin)[0], 2)
+
+    def test_invalid_function_definition_missing_lcbracket(self):
+        stdin = """<?php
+        declare(strict_types=1);
+        function hello_world(int $x): null 
+        }
+        """
+        self.assertEqual(execute_programme(stdin)[0], 2)

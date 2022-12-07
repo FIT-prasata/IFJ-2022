@@ -23,9 +23,16 @@
 extern int line_num;
 
 // LOCAL INCLUDES
+#include "code_generator.h"
 #include "error.h"
+#include "expr.h"
 #include "scanner.h"
 #include "symtable.h"
+
+// Location of expression
+#define EXPR_LOC_RET 100
+#define EXPR_LOC_COND 101
+#define EXPR_LOC_ASSIGN 102
 
 // scope check
 typedef struct {
@@ -65,6 +72,7 @@ int program_rule(Token_t *current_token, scope_t *scope_state,
 /**
  * @brief   RULES
  *          <DEFFUNC> -> K_FUNC T_FUNC_ID T_LBR <ARG> T_COL <TYPE> T_LCBR <STAT>
+ * T_RCBR T_RCBR
  *
  * @param current_token
  * @param global_table
@@ -106,7 +114,7 @@ int arg_list_rule(Token_t *current_token, Htab_t *global_table);
  * @param global_table
  * @return
  */
-int param_rule(Token_t *current_token, Htab_t *global_table);
+int param_rule(Token_t *current_token, Htab_t *global_table, bool func_call);
 
 /**
  * @brief   RULES
@@ -126,7 +134,8 @@ int param_list_rule(Token_t *current_token, Htab_t *global_table);
  * @param global_table
  * @return
  */
-int type_rule(Token_t *current_token, Htab_t *global_table);
+int type_rule(Token_t *current_token, Htab_t *global_table, bool is_func_def,
+              bool is_func_type);
 
 /**
  * @brief   RULES
@@ -135,7 +144,7 @@ int type_rule(Token_t *current_token, Htab_t *global_table);
  * @param global_table
  * @return
  */
-int const_rule(Token_t *current_token, Htab_t *global_table);
+int const_rule(Token_t *current_token, Htab_t *global_table, bool func_call);
 
 /**
  * @brief   RULES
@@ -166,7 +175,8 @@ int stat_rule(Token_t *current_token, scope_t *scope_state,
  * @param global_table
  * @return
  */
-int assign_type_rule(Token_t *current_token, Htab_t *global_table);
+int assign_type_rule(Token_t *current_token, scope_t *scope_state,
+                     Htab_t *global_table);
 
 /**
  * @brief   RULES
@@ -176,7 +186,8 @@ int assign_type_rule(Token_t *current_token, Htab_t *global_table);
  * @param global_table
  * @return
  */
-int func_call_rule(Token_t *current_token, Htab_t *global_table);
+int func_call_rule(Token_t *current_token, scope_t *scope_state,
+                   Htab_t *global_table);
 
 /**
  * @brief EXPR -> precedent analysis -> bottom up parser
@@ -185,6 +196,6 @@ int func_call_rule(Token_t *current_token, Htab_t *global_table);
  * @param global_table
  * @return
  */
-int expr_rule(Token_t *current_token, Htab_t *global_table);
+int expr_rule(Token_t *current_token, Htab_t *global_table, int location, scope_t *scope_state);
 
 #endif  // _PARSER_H_

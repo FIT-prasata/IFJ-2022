@@ -16,3 +16,5 @@ IFJcode22_examples/*
 *.ifjc22
 *ifjcode
 docs/*
+*.ifjcode
+*.dotx

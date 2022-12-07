@@ -17,7 +17,7 @@ int tmp_var_count = 1;
 // LOCAL INCLUDES - tohletoto legacy code nechat v tomto poradi plsky
 #include "code_generator.h"
 #include "dynamic_string.h"
-#include "error.h"
+#include "expr.h"
 #include "parser.h"
 #include "scanner.h"
 #include "stack.h"
