@@ -74,7 +74,7 @@ T_type_t token_stack_get_head(Token_stack_t *t_stack);
 int token_stack_push(Token_stack_t *t_stack, Token_t *token);
 
 // Pops token from the stack
-T_type_t token_stack_pop(Token_stack_t *t_stack, Token_t *token);
+T_type_t token_stack_pop(Token_stack_t *t_stack);
 
 // Might be useful for debugging
 void token_stack_clear(Token_stack_t *t_stack);
