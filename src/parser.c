@@ -641,12 +641,26 @@ int stat_rule(Token_t *current_token, scope_t *scope_state,
                                      global_table)) != OK)
             return status;
 
+        // get new token
+        if ((status = scan(current_token)) != OK) return status;
+
+        // handle ... -> ... T_SEM
+        if (current_token->type != T_SEM) return SYNTAX_ERR;
+
         // get func pointer
         Htab_item_t *func_ptr = htab_find(global_table, func_call_id.str);
 
         // generate instruction
         if ((status = generate_instruction(CALL_FUNC, NULL, &func_ptr->data,
                                            NULL, 0, stdout)) != OK)
+            return status;
+
+        // get new token
+        if ((status = scan(current_token)) != OK) return status;
+
+        // handle ... -> ... <STAT>
+        if ((status = stat_rule(current_token, scope_state, global_table)) !=
+            OK)
             return status;
     }
 
