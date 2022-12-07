@@ -527,6 +527,13 @@ void built_in_floatval(FILE *file);
 void built_in_intval(FILE *file);
 void built_in_strval(FILE *file);
 void built_in_substring(FILE *file);
+void built_in_reads(FILE *file);
+void built_in_readi(FILE *file); 
+void built_in_readf(FILE *file);
+void built_in_write(FILE *file);
+void built_in_strlen(FILE *file);
+void built_in_ord(FILE *file);
+void built_in_chr(FILE *file);
 void print_built_in(FILE *file);
 
 #endif // _CODE_GENERATOR_H_

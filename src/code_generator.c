@@ -674,7 +674,7 @@ void built_in_reads(FILE *file){
     fprintf(file, "DEFVAR LF@%%reads_type\n");
     fprintf(file, "TYPE LF@%%reads_type LF@%%reads_retval\n");
     fprintf(file, "JUMPIFEQ .%%reads_no_err LF@%%reads_type string@string\n");
-    fprintf(file, "EXIT int@4\n");
+    fprintf(file, "MOVE LF@%%reads_retval nil@nil\n");
     fprintf(file, "LABEL .%%reads_no_err\n");
 
     fprintf(file, "PUSHS LF@%%reads_retval\n");
@@ -694,7 +694,7 @@ void built_in_readi(FILE *file){
     fprintf(file, "DEFVAR LF@%%readi_type\n");
     fprintf(file, "TYPE LF@%%readi_type LF@%%readi_retval\n");
     fprintf(file, "JUMPIFEQ .%%readi_no_err LF@%%readi_type string@int\n");
-    fprintf(file, "EXIT int@4\n");
+    fprintf(file, "MOVE LF@%%readi_retval nil@nil\n");
     fprintf(file, "LABEL .%%readi_no_err\n");
 
     fprintf(file, "PUSHS LF@%%readi_retval\n");
@@ -714,7 +714,7 @@ void built_in_readf(FILE *file){
     fprintf(file, "DEFVAR LF@%%readf_type\n");
     fprintf(file, "TYPE LF@%%readf_type LF@%%readf_retval\n");
     fprintf(file, "JUMPIFEQ .%%readf_no_err LF@%%readf_type string@float\n");
-    fprintf(file, "EXIT int@4\n");
+    fprintf(file, "MOVE LF@%%readf_retval nil@nil\n");
     fprintf(file, "LABEL .%%readf_no_err\n");
 
     fprintf(file, "PUSHS LF@%%readf_retval\n");
@@ -729,8 +729,15 @@ void built_in_write(FILE *file){
     fprintf(file, "CREATEFRAME\n");
     fprintf(file, "PUSHFRAME\n");
     fprintf(file, "DEFVAR LF@%%write_str\n");
+    fprintf(file, "DEFVAR LF@%%write_type\n");
     fprintf(file, "POPS LF@%%write_str\n");
+    fprintf(file, "TYPE LF@%%write_type LF@%%write_str\n");
+    fprintf(file, "JUMPIFEQ .%%write_empty_str LF@%%write_type string@nil\n");
     fprintf(file, "WRITE LF@%%write_str\n");
+    fprintf(file, "POPFRAME\n");
+    fprintf(file, "RETURN\n");
+    fprintf(file, "LABEL .%%write_empty_str\n");
+    fprintf(file, "WRITE string@\n");
     fprintf(file, "POPFRAME\n");
     fprintf(file, "RETURN\n");
     fprintf(file, "LABEL .%%end_write\n");
