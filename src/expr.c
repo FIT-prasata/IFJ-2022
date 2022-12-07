@@ -227,6 +227,11 @@ int expr_parse(Char_stack_t *c_stack, Token_stack_t *t_stack, Token_t *token,
             break;
         case T_SEM:
             if (location == EXPR_LOC_ASSIGN || location == EXPR_LOC_RET) {
+                if (char_stack_get_closest_terminal(c_stack) ==
+                        EXPR_STACK_BOTTOM &&
+                    char_stack_get_head(c_stack) == 'E') {
+                    return OK;
+                }
                 return EOEXPR;
             } else {
                 return SYNTAX_ERR;
@@ -241,13 +246,11 @@ int expr_parse(Char_stack_t *c_stack, Token_stack_t *t_stack, Token_t *token,
     }
     ptable_symbol_t stack = char_stack_get_closest_terminal(c_stack);
     if (stack == EXPR_STACK_BOTTOM && input == EXPR_STACK_BOTTOM &&
-        c_stack->char_head == 'E' &&
-        char_stack_get_closest_terminal(c_stack) == EXPR_STACK_BOTTOM) {
+        c_stack->char_head == 'E') {
         return OK;
     }
     if (stack == EXPR_STACK_BOTTOM && input == EXPR_RBR &&
-        c_stack->char_head == 'E' &&
-        char_stack_get_closest_terminal(c_stack) == EXPR_STACK_BOTTOM) {
+        c_stack->char_head == 'E') {
         if (location == EXPR_LOC_COND) {
             return EOEXPR;
         } else {
@@ -279,6 +282,8 @@ int expr_main(Htab_t *table, Token_t *token, int location) {
     Char_stack_t c_stack;
     Token_stack_t t_stack;
     bool load_tokens = true;
+    Token_t *eoexpr = malloc(sizeof(Token_t));
+    eoexpr->type = EOEXPR;
     if (char_stack_init(&c_stack) == INTERNAL_ERR) {
         return INTERNAL_ERR;
     }
@@ -321,6 +326,11 @@ int expr_main(Htab_t *table, Token_t *token, int location) {
             if ((status = scan(token)) != OK) return status;
         }
     }
-//    while (expr_parse(&c_stack, &t_stack, token, location) != )
-    return OK;  // Generate result instruction here
+    int status = OK;
+
+    while ((status = expr_parse(&c_stack, &t_stack, eoexpr, location)) ==
+           EOEXPR)
+        ;
+    free(eoexpr);
+    return status;  // Generate result instruction here
 }
