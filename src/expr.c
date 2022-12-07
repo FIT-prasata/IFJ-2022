@@ -24,8 +24,7 @@ char ptable[P_TABLE_SIZE][P_TABLE_SIZE] = {
         |
         v       $    i    +    -    *    /    .   ===  !==   <    >    <=   >=
       (    ) */
-    /*  $  */ {'!', '[', '[', '[', '[', '[', '[', '[', '[', '[', '[', '[', '[',
-               '[', '!'},
+    /*  $  */ {'!', '[', '[', '[', '[', '[', '[', '[', '[', '[', '[', '[', '[', '[', '!'},
     /*  i  */
     {']', '!', ']', ']', ']', ']', ']', ']', ']', ']', ']', ']', ']', '!', ']'},
     /*  +  */
@@ -53,29 +52,18 @@ char ptable[P_TABLE_SIZE][P_TABLE_SIZE] = {
     /*  (  */
     {'!', '[', '[', '[', '[', '[', '[', '[', '[', '[', '[', '[', '[', '[', '='},
     /*  )  */
-    {']', '!', ']', ']', ']', ']', ']', ']', ']', ']', ']', ']', ']', '!',
-     ']'}};
+    {']', '!', ']', ']', ']', ']', ']', ']', ']', ']', ']', ']', ']', '!', ']'}};
 
 // Right hand sides of rules
 char grammar_rules[RULES_NUM][MAX_RULE_LEN] = {
-    {EXPR_NONTERM, EXPR_ADD, EXPR_NONTERM, '\0'},
-    {EXPR_NONTERM, EXPR_SUB, EXPR_NONTERM, '\0'},
-    {EXPR_NONTERM, EXPR_MUL, EXPR_NONTERM, '\0'},
-    {EXPR_NONTERM, EXPR_DIV, EXPR_NONTERM, '\0'},
-    {EXPR_NONTERM, EXPR_DOT, EXPR_NONTERM, '\0'},
-    {EXPR_ID, '\0'},
-    {EXPR_LBR, EXPR_NONTERM, EXPR_RBR, '\0'},
-    {EXPR_NONTERM, EXPR_EQ, EXPR_NONTERM, '\0'},
-    {EXPR_NONTERM, EXPR_NEQ, EXPR_NONTERM, '\0'},
-    {EXPR_NONTERM, EXPR_LT, EXPR_NONTERM, '\0'},
-    {EXPR_NONTERM, EXPR_GT, EXPR_NONTERM, '\0'},
-    {EXPR_NONTERM, EXPR_LE, EXPR_NONTERM, '\0'},
+    {EXPR_NONTERM, EXPR_ADD, EXPR_NONTERM, '\0'}, {EXPR_NONTERM, EXPR_SUB, EXPR_NONTERM, '\0'}, {EXPR_NONTERM, EXPR_MUL, EXPR_NONTERM, '\0'},
+    {EXPR_NONTERM, EXPR_DIV, EXPR_NONTERM, '\0'}, {EXPR_NONTERM, EXPR_DOT, EXPR_NONTERM, '\0'}, {EXPR_ID, '\0'},
+    {EXPR_LBR, EXPR_NONTERM, EXPR_RBR, '\0'},     {EXPR_NONTERM, EXPR_EQ, EXPR_NONTERM, '\0'},  {EXPR_NONTERM, EXPR_NEQ, EXPR_NONTERM, '\0'},
+    {EXPR_NONTERM, EXPR_LT, EXPR_NONTERM, '\0'},  {EXPR_NONTERM, EXPR_GT, EXPR_NONTERM, '\0'},  {EXPR_NONTERM, EXPR_LE, EXPR_NONTERM, '\0'},
     {EXPR_NONTERM, EXPR_GE, EXPR_NONTERM, '\0'}};
 
-ptable_move_t ptable_get_next_move(ptable_symbol_t stack,
-                                   ptable_symbol_t input) {
-    if ((stack < P_TABLE_SIZE && stack >= 0 && input < P_TABLE_SIZE) ||
-        input >= 0) {
+ptable_move_t ptable_get_next_move(ptable_symbol_t stack, ptable_symbol_t input) {
+    if ((stack < P_TABLE_SIZE && stack >= 0 && input < P_TABLE_SIZE) || input >= 0) {
         switch (ptable[stack][input]) {
             case '[':
                 return EXPR_SHIFT;
@@ -102,15 +90,18 @@ int expr_shift(Char_stack_t *c_stack, char character) {
     return OK;
 }
 
-int expr_reduce(
-    Char_stack_t *c_stack /*, Token_stack_t *t_stack, Token_t *token*/) {
+int expr_reduce(Htab_t *table, Char_stack_t *c_stack, Token_stack_t *t_stack, Token_t *token) {
     DString_t d_string;
+    int gen_res;
     if (d_string_init(&d_string) == INTERNAL_ERR) {
         return INTERNAL_ERR;
     };
-    // char head_term = char_stack_get_closest_terminal(c_stack);
+    char term = char_stack_get_closest_terminal(c_stack);
 
-    // GENERATE INSTRUCTION HERE
+    if ((gen_res = expr_instr_gen(table, t_stack, token, term)) != OK) {
+        d_string_free_and_clear(&d_string);
+        return gen_res;
+    }
 
     // Reduction of expression
     char head_char = char_stack_pop(c_stack);
@@ -150,8 +141,7 @@ int is_valid_rule(DString_t *d_string) {
     return SYNTAX_ERR;
 }
 
-int expr_parse(Char_stack_t *c_stack, Token_stack_t *t_stack, Token_t *token,
-               int location) {
+int expr_parse(Htab_t *table, Char_stack_t *c_stack, Token_stack_t *t_stack, Token_t *token, int location) {
     bool is_logical = false;
     ptable_symbol_t input;
 
@@ -227,9 +217,7 @@ int expr_parse(Char_stack_t *c_stack, Token_stack_t *t_stack, Token_t *token,
             break;
         case T_SEM:
             if (location == EXPR_LOC_ASSIGN || location == EXPR_LOC_RET) {
-                if (char_stack_get_closest_terminal(c_stack) ==
-                        EXPR_STACK_BOTTOM &&
-                    char_stack_get_head(c_stack) == 'E') {
+                if (char_stack_get_closest_terminal(c_stack) == EXPR_STACK_BOTTOM && char_stack_get_head(c_stack) == 'E') {
                     return OK;
                 }
                 return EOEXPR;
@@ -245,12 +233,10 @@ int expr_parse(Char_stack_t *c_stack, Token_stack_t *t_stack, Token_t *token,
             break;
     }
     ptable_symbol_t stack = char_stack_get_closest_terminal(c_stack);
-    if (stack == EXPR_STACK_BOTTOM && input == EXPR_STACK_BOTTOM &&
-        c_stack->char_head == 'E') {
+    if (stack == EXPR_STACK_BOTTOM && input == EXPR_STACK_BOTTOM && c_stack->char_head == 'E') {
         return OK;
     }
-    if (stack == EXPR_STACK_BOTTOM && input == EXPR_RBR &&
-        c_stack->char_head == 'E') {
+    if (stack == EXPR_STACK_BOTTOM && input == EXPR_RBR && c_stack->char_head == 'E') {
         if (location == EXPR_LOC_COND) {
             return EOEXPR;
         } else {
@@ -264,10 +250,10 @@ int expr_parse(Char_stack_t *c_stack, Token_stack_t *t_stack, Token_t *token,
             return expr_shift(c_stack, input);
         case EXPR_REDUCE: {
             int ret;
-            if ((ret = expr_reduce(c_stack /*, t_stack, token*/)) != OK) {
+            if ((ret = expr_reduce(table, c_stack, t_stack, token)) != OK) {
                 return ret;
             }
-            return expr_parse(c_stack, t_stack, token, location);
+            return expr_parse(table, c_stack, t_stack, token, location);
         }
         case EXPR_SPECIAL_SHIFT:
             return expr_special_shift(c_stack, input) == INTERNAL_ERR;
@@ -315,7 +301,7 @@ int expr_main(Htab_t *table, Token_t *token, int location) {
                 return INTERNAL_ERR;
             }
         }
-        int status = expr_parse(&c_stack, &t_stack, token, location);
+        int status = expr_parse(table, &c_stack, &t_stack, token, location);
         if (status == EOEXPR) {
             load_tokens = false;
         } else {
@@ -328,9 +314,91 @@ int expr_main(Htab_t *table, Token_t *token, int location) {
     }
     int status = OK;
 
-    while ((status = expr_parse(&c_stack, &t_stack, eoexpr, location)) ==
-           EOEXPR)
+    while ((status = expr_parse(table, &c_stack, &t_stack, eoexpr, location)) == EOEXPR)
         ;
     free(eoexpr);
     return status;  // Generate result instruction here
+}
+
+int expr_instr_gen(Htab_t *table, Token_stack_t *t_stack, Token_t *token, char term) {
+    Token_t *tmp1 = token_stack_pop(t_stack);
+    Symbol_t *instr_var1 = malloc(sizeof(Symbol_t));
+    if (instr_var1 == NULL) {
+        return INTERNAL_ERR;
+    }
+    switch (term) {
+        case EXPR_ID:
+            // GENERATE INSTRUCTION
+            if (tmp1->type == T_INT || tmp1->type == T_FLOAT || tmp1->type == T_STRING) {
+                instr_var1->symbol_type = CONSTANT;
+                if (tmp1->type == T_INT) {
+                    instr_var1->const_type = INT;
+                } else if (tmp1->type == T_FLOAT) {
+                    instr_var1->const_type = FLOAT;
+                } else if (tmp1->type == T_STRING) {
+                    instr_var1->const_type = STRING;
+                }
+                strcpy(instr_var1->attribute, tmp1->attribute.string);
+            } else if (tmp1->type == T_ID) {
+                instr_var1 = &(htab_find(table, tmp1->attribute.string)->data);
+                if (instr_var1 == NULL) {
+                    return INTERNAL_ERR;
+                }
+            } else {
+                return INTERNAL_ERR;
+            }
+            generate_instruction(PUSHS, instr_var1, NULL, NULL, 0, stdout);
+        case EXPR_ADD:
+            // GENERATE INSTRUCTION
+            generate_instruction(ADDS, NULL, NULL, NULL, 0, stdout);
+            break;
+        case EXPR_SUB:
+            // GENERATE INSTRUCTION
+            generate_instruction(SUBS, NULL, NULL, NULL, 0, stdout);
+            break;
+        case EXPR_MUL:
+            // GENERATE INSTRUCTION
+            generate_instruction(MULS, NULL, NULL, NULL, 0, stdout);
+            break;
+        case EXPR_DIV:
+            // GENERATE INSTRUCTION
+            generate_instruction(DIVS, NULL, NULL, NULL, 0, stdout);
+            break;
+        case EXPR_DOT:
+            // GENERATE INSTRUCTION
+            break;
+        case EXPR_EQ:
+            // GENERATE INSTRUCTION
+            generate_instruction(EQS, NULL, NULL, NULL, 0, stdout);
+            break;
+        case EXPR_NEQ:
+            // GENERATE INSTRUCTION
+            generate_instruction(EQS, NULL, NULL, NULL, 0, stdout);
+            generate_instruction(NOTS, NULL, NULL, NULL, 0, stdout);
+            break;
+        case EXPR_LT:
+            // GENERATE INSTRUCTION
+            generate_instruction(LTS, NULL, NULL, NULL, 0, stdout);
+            break;
+        case EXPR_GT:
+            // GENERATE INSTRUCTION
+            generate_instruction(GTS, NULL, NULL, NULL, 0, stdout);
+            break;
+        case EXPR_LE:
+            // GENERATE INSTRUCTION
+            generate_instruction(GTS, NULL, NULL, NULL, 0, stdout);
+            generate_instruction(NOTS, NULL, NULL, NULL, 0, stdout);
+            break;
+        case EXPR_GE:
+            // GENERATE INSTRUCTION
+            generate_instruction(LTS, NULL, NULL, NULL, 0, stdout);
+            generate_instruction(NOTS, NULL, NULL, NULL, 0, stdout);
+            break;
+        case EXPR_RBR:
+            // GENERATE INSTRUCTION
+            break;
+        default:
+            return INTERNAL_ERR;
+    }
+    return OK;
 }

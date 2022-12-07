@@ -105,17 +105,14 @@ int program_rule(Token_t *token, scope_t *scope_state, Htab_t *global_table) {
             }
             return OK;  // TODO: maybe we want to throw error in some cases
         case K_FUNC:
-            if ((status = def_func_rule(token, scope_state, global_table)) !=
-                OK)
-                return status;
+            if ((status = def_func_rule(token, scope_state, global_table)) != OK) return status;
             break;
         case K_IF:
         case K_WHILE:
         case K_RET:
         case T_ID:
         case T_FUNC_ID:
-            if ((status = stat_rule(token, scope_state, global_table)) != OK)
-                return status;
+            if ((status = stat_rule(token, scope_state, global_table)) != OK) return status;
             break;
         default:
             return SYNTAX_ERR;
@@ -152,9 +149,7 @@ int def_func_rule(Token_t *token, scope_t *scope_state, Htab_t *global_table) {
     func_ptr->data.func->defined = true;
 
     // store key of function in global variable
-    if ((status =
-             d_string_replace_str(&function_id, token->attribute.string)) != OK)
-        return status;
+    if ((status = d_string_replace_str(&function_id, token->attribute.string)) != OK) return status;
 
     // set function name
     func_ptr->data.attribute = function_id.str;
@@ -184,8 +179,7 @@ int def_func_rule(Token_t *token, scope_t *scope_state, Htab_t *global_table) {
     if ((status = scan(token)) != OK) return status;
 
     // handle ... -> ... <TYPE>
-    if ((status = type_rule(token, global_table, false, true)) != OK)
-        return status;
+    if ((status = type_rule(token, global_table, false, true)) != OK) return status;
 
     // get new token
     if ((status = scan(token)) != OK) return status;
@@ -198,16 +192,13 @@ int def_func_rule(Token_t *token, scope_t *scope_state, Htab_t *global_table) {
     scope_state->in_global = false;
 
     // generate function header
-    if ((status = generate_instruction(DEF_FUNC, NULL, &(func_ptr->data), NULL,
-                                       0, stdout)) != OK)
-        return status;
+    if ((status = generate_instruction(DEF_FUNC, NULL, &(func_ptr->data), NULL, 0, stdout)) != OK) return status;
 
     // get new token
     if ((status = scan(token)) != OK) return status;
 
     // handle ... -> ... <STAT>
-    if ((status = stat_rule(token, scope_state, global_table)) != OK)
-        return status;
+    if ((status = stat_rule(token, scope_state, global_table)) != OK) return status;
 
     // update scope
     scope_state->in_func = false;
@@ -233,13 +224,10 @@ int arg_rule(Token_t *token, Htab_t *global_table) {
     // inc argc
     func_ptr->data.func->argc++;
     // realloc argv
-    func_ptr->data.func->argv =
-        realloc(func_ptr->data.func->argv,
-                func_ptr->data.func->argc * sizeof(Symbol_t));
+    func_ptr->data.func->argv = realloc(func_ptr->data.func->argv, func_ptr->data.func->argc * sizeof(Symbol_t));
 
     // handle ... -> <TYPE>
-    if ((status = type_rule(token, global_table, true, false)) != OK)
-        return status;
+    if ((status = type_rule(token, global_table, true, false)) != OK) return status;
 
     // get new token
     if ((status = scan(token)) != OK) return status;
@@ -275,8 +263,7 @@ int arg_list_rule(Token_t *current_token, Htab_t *global_table) {
     if ((status = scan(current_token)) != OK) return status;
 
     // handle ... -> ... <ARGLIST>
-    if ((status = arg_list_rule(current_token, global_table)) != OK)
-        return status;
+    if ((status = arg_list_rule(current_token, global_table)) != OK) return status;
 
     return status;
 }
@@ -304,12 +291,9 @@ int param_rule(Token_t *token, Htab_t *global_table, bool func_call) {
         func_ptr = htab_find(global_table, function_id.str);
         if (func_ptr == NULL) return INTERNAL_ERR;
     }
-    func_ptr->data.func->argv[func_ptr->data.func->argc - 1].symbol_type =
-        VARIABLE;
-    func_ptr->data.func->argv[func_ptr->data.func->argc - 1].attribute =
-        id_ptr->data.attribute;
-    func_ptr->data.func->argv[func_ptr->data.func->argc - 1].var->frame =
-        func_call ? LF : GF;
+    func_ptr->data.func->argv[func_ptr->data.func->argc - 1].symbol_type = VARIABLE;
+    func_ptr->data.func->argv[func_ptr->data.func->argc - 1].attribute = id_ptr->data.attribute;
+    func_ptr->data.func->argv[func_ptr->data.func->argc - 1].var->frame = func_call ? LF : GF;
 
     return status;
 }
@@ -327,37 +311,32 @@ int param_list_rule(Token_t *current_token, Htab_t *global_table) {
     if ((status = scan(current_token)) != OK) return status;
 
     // handle ... -> ... <PARAM>
-    if ((status = param_rule(current_token, global_table, false)) != OK)
-        return status;
+    if ((status = param_rule(current_token, global_table, false)) != OK) return status;
 
     // get new token
     if ((status = scan(current_token)) != OK) return status;
 
     // handle ... -> ... <PARAM_LIST>
-    if ((status = param_list_rule(current_token, global_table)) != OK)
-        return status;
+    if ((status = param_list_rule(current_token, global_table)) != OK) return status;
 
     return status;
 }
 
-int type_rule(Token_t *token, Htab_t *global_table, bool is_func_def,
-              bool is_func_type) {
+int type_rule(Token_t *token, Htab_t *global_table, bool is_func_def, bool is_func_type) {
     int status = OK;
 
     Htab_item_t *func_pointer = NULL;
     if (is_func_def == true) {
         // get function pointer
         func_pointer = htab_find(global_table, function_id.str);
-        func_pointer->data.func->argv[func_pointer->data.func->argc - 1].var =
-            malloc(sizeof(Var_t));
+        func_pointer->data.func->argv[func_pointer->data.func->argc - 1].var = malloc(sizeof(Var_t));
         if (func_pointer == NULL) return INTERNAL_ERR;
     }
 
     switch (token->type) {
         case K_STR:
             if (is_func_def == true) {
-                func_pointer->data.func->argv[func_pointer->data.func->argc - 1]
-                    .var->var_type = STRING;
+                func_pointer->data.func->argv[func_pointer->data.func->argc - 1].var->var_type = STRING;
             }
             if (is_func_type == true) {
                 func_pointer->data.func->return_type = STRING;
@@ -365,8 +344,7 @@ int type_rule(Token_t *token, Htab_t *global_table, bool is_func_def,
             return OK;
         case K_INT:
             if (is_func_def == true) {
-                func_pointer->data.func->argv[func_pointer->data.func->argc - 1]
-                    .var->var_type = INT;
+                func_pointer->data.func->argv[func_pointer->data.func->argc - 1].var->var_type = INT;
             }
             if (is_func_type == true) {
                 func_pointer->data.func->return_type = INT;
@@ -374,8 +352,7 @@ int type_rule(Token_t *token, Htab_t *global_table, bool is_func_def,
             return OK;
         case K_FLOAT:
             if (is_func_def == true) {
-                func_pointer->data.func->argv[func_pointer->data.func->argc - 1]
-                    .var->var_type = FLOAT;
+                func_pointer->data.func->argv[func_pointer->data.func->argc - 1].var->var_type = FLOAT;
             }
             if (is_func_type == true) {
                 func_pointer->data.func->return_type = FLOAT;
@@ -383,38 +360,31 @@ int type_rule(Token_t *token, Htab_t *global_table, bool is_func_def,
             return OK;
         case K_FLOAT_NULL:
             if (is_func_def == true) {
-                func_pointer->data.func->argv[func_pointer->data.func->argc - 1]
-                    .var->var_type = FLOAT;  // TODO FLOAT_NULL mby
+                func_pointer->data.func->argv[func_pointer->data.func->argc - 1].var->var_type = FLOAT;  // TODO FLOAT_NULL mby
             }
             if (is_func_type == true) {
-                func_pointer->data.func->return_type =
-                    FLOAT;  // TODO FLOAT_NULL mby
+                func_pointer->data.func->return_type = FLOAT;  // TODO FLOAT_NULL mby
             }
             return OK;
         case K_INT_NULL:
             if (is_func_def == true) {
-                func_pointer->data.func->argv[func_pointer->data.func->argc - 1]
-                    .var->var_type = INT;  // TODO INT_NULL mby
+                func_pointer->data.func->argv[func_pointer->data.func->argc - 1].var->var_type = INT;  // TODO INT_NULL mby
             }
             if (is_func_type == true) {
-                func_pointer->data.func->return_type =
-                    INT;  // TODO INT_NULL mby
+                func_pointer->data.func->return_type = INT;  // TODO INT_NULL mby
             }
             return OK;
         case K_STR_NULL:
             if (is_func_def == true) {
-                func_pointer->data.func->argv[func_pointer->data.func->argc - 1]
-                    .var->var_type = STRING;  // TODO STR_NULL mby
+                func_pointer->data.func->argv[func_pointer->data.func->argc - 1].var->var_type = STRING;  // TODO STR_NULL mby
             }
             if (is_func_type == true) {
-                func_pointer->data.func->return_type =
-                    STRING;  // TODO STR_NULL mby
+                func_pointer->data.func->return_type = STRING;  // TODO STR_NULL mby
             }
             return OK;
         case K_NULL:
             if (is_func_def == true) {
-                func_pointer->data.func->argv[func_pointer->data.func->argc - 1]
-                    .var->var_type = NIL;
+                func_pointer->data.func->argv[func_pointer->data.func->argc - 1].var->var_type = NIL;
             }
             if (is_func_type == true) {
                 //                func_pointer->data.func->return_type = NIL;
@@ -440,36 +410,27 @@ int const_rule(Token_t *token, Htab_t *global_table, bool func_call) {
     func_ptr->data.symbol_type = CONSTANT;
     switch (token->type) {
         case T_INT:
-            func_ptr->data.func->argv[func_ptr->data.func->argc - 1]
-                .const_type = INT;
-            func_ptr->data.func->argv[func_ptr->data.func->argc - 1].attribute =
-                token->attribute.string;
+            func_ptr->data.func->argv[func_ptr->data.func->argc - 1].const_type = INT;
+            func_ptr->data.func->argv[func_ptr->data.func->argc - 1].attribute = token->attribute.string;
             return OK;
         case T_FLOAT:
-            func_ptr->data.func->argv[func_ptr->data.func->argc - 1]
-                .const_type = FLOAT;
-            func_ptr->data.func->argv[func_ptr->data.func->argc - 1].attribute =
-                token->attribute.string;
+            func_ptr->data.func->argv[func_ptr->data.func->argc - 1].const_type = FLOAT;
+            func_ptr->data.func->argv[func_ptr->data.func->argc - 1].attribute = token->attribute.string;
             return OK;
         case T_STRING:
-            func_ptr->data.func->argv[func_ptr->data.func->argc - 1]
-                .const_type = STRING;
-            func_ptr->data.func->argv[func_ptr->data.func->argc - 1].attribute =
-                token->attribute.string;
+            func_ptr->data.func->argv[func_ptr->data.func->argc - 1].const_type = STRING;
+            func_ptr->data.func->argv[func_ptr->data.func->argc - 1].attribute = token->attribute.string;
             return OK;
         case K_NULL:
-            func_ptr->data.func->argv[func_ptr->data.func->argc - 1]
-                .const_type = NIL;
-            func_ptr->data.func->argv[func_ptr->data.func->argc - 1].attribute =
-                token->attribute.string;
+            func_ptr->data.func->argv[func_ptr->data.func->argc - 1].const_type = NIL;
+            func_ptr->data.func->argv[func_ptr->data.func->argc - 1].attribute = token->attribute.string;
             return OK;
         default:
             return SYNTAX_ERR;
     }
 }
 
-int stat_rule(Token_t *current_token, scope_t *scope_state,
-              Htab_t *global_table) {
+int stat_rule(Token_t *current_token, scope_t *scope_state, Htab_t *global_table) {
     int status = OK;
 
     // handle <STAT> -> K_IF
@@ -487,9 +448,7 @@ int stat_rule(Token_t *current_token, scope_t *scope_state,
         if ((status = scan(current_token)) != OK) return status;
 
         // handle ... -> ... <EXPR>
-        if ((status = expr_rule(current_token, global_table, EXPR_LOC_COND,
-                                scope_state)) != OK)
-            return status;
+        if ((status = expr_rule(current_token, global_table, EXPR_LOC_COND, scope_state)) != OK) return status;
 
         // get new token
         if ((status = scan(current_token)) != OK) return status;
@@ -501,9 +460,7 @@ int stat_rule(Token_t *current_token, scope_t *scope_state,
         if ((status = scan(current_token)) != OK) return status;
 
         // handle ... -> ... <STAT>
-        if ((status = stat_rule(current_token, scope_state, global_table)) !=
-            OK)
-            return status;
+        if ((status = stat_rule(current_token, scope_state, global_table)) != OK) return status;
 
         // get new token
         if ((status = scan(current_token)) != OK) return status;
@@ -521,9 +478,7 @@ int stat_rule(Token_t *current_token, scope_t *scope_state,
         if ((status = scan(current_token)) != OK) return status;
 
         // handle ... -> ... <STAT>
-        if ((status = stat_rule(current_token, scope_state, global_table)) !=
-            OK)
-            return status;
+        if ((status = stat_rule(current_token, scope_state, global_table)) != OK) return status;
 
         // update scope
         scope_state->count_if--;
@@ -545,9 +500,7 @@ int stat_rule(Token_t *current_token, scope_t *scope_state,
         if ((status = scan(current_token)) != OK) return status;
 
         // handle ... -> ... <EXPR>
-        if ((status = expr_rule(current_token, global_table, EXPR_LOC_COND,
-                                scope_state)) != OK)
-            return status;
+        if ((status = expr_rule(current_token, global_table, EXPR_LOC_COND, scope_state)) != OK) return status;
 
         // get new token
         if ((status = scan(current_token)) != OK) return status;
@@ -559,9 +512,7 @@ int stat_rule(Token_t *current_token, scope_t *scope_state,
         if ((status = scan(current_token)) != OK) return status;
 
         // handle ... -> ... <STAT>
-        if ((status = stat_rule(current_token, scope_state, global_table)) !=
-            OK)
-            return status;
+        if ((status = stat_rule(current_token, scope_state, global_table)) != OK) return status;
 
         // update scope
         scope_state->count_while--;
@@ -574,9 +525,7 @@ int stat_rule(Token_t *current_token, scope_t *scope_state,
         if ((status = scan(current_token)) != OK) return status;
 
         // handle ... -> ... <EXPR>
-        if ((status = expr_rule(current_token, global_table, EXPR_LOC_RET,
-                                scope_state)) != OK)
-            return status;
+        if ((status = expr_rule(current_token, global_table, EXPR_LOC_RET, scope_state)) != OK) return status;
 
         // get new token
         if ((status = scan(current_token)) != OK) return status;
@@ -588,9 +537,7 @@ int stat_rule(Token_t *current_token, scope_t *scope_state,
         if ((status = scan(current_token)) != OK) return status;
 
         // handle ... -> ... <STAT>
-        if ((status = stat_rule(current_token, scope_state, global_table)) !=
-            OK)
-            return status;
+        if ((status = stat_rule(current_token, scope_state, global_table)) != OK) return status;
 
         //        // handle ... -> ... T_RCBR
         //        if (current_token->type != T_RCBR) return SYNTAX_ERR;
@@ -620,23 +567,17 @@ int stat_rule(Token_t *current_token, scope_t *scope_state,
             if ((status = scan(current_token)) != OK) return status;
 
             // handle ... -> ... <ASSIGN_TYPE>
-            if ((status = assign_type_rule(current_token, scope_state,
-                                           global_table)) != OK)
-                return status;
+            if ((status = assign_type_rule(current_token, scope_state, global_table)) != OK) return status;
 
             // get new token
             if ((status = scan(current_token)) != OK) return status;
 
             // handle ... -> ... <STAT>
-            if ((status =
-                     stat_rule(current_token, scope_state, global_table)) != OK)
-                return status;
+            if ((status = stat_rule(current_token, scope_state, global_table)) != OK) return status;
         }
         // handle ... -> ...<TYPE>
         else {
-            if ((status = type_rule(current_token, global_table, false,
-                                    false)) != OK)
-                return status;
+            if ((status = type_rule(current_token, global_table, false, false)) != OK) return status;
 
             // get new token
             if ((status = scan(current_token)) != OK) return status;
@@ -648,8 +589,7 @@ int stat_rule(Token_t *current_token, scope_t *scope_state,
             if ((status = scan(current_token)) != OK) return status;
 
             // handle ... -> ... <STAT>
-            if ((status =
-                     stat_rule(current_token, scope_state, global_table)) != OK)
+            if ((status = stat_rule(current_token, scope_state, global_table)) != OK)
                 ;
         }
     }
@@ -658,9 +598,7 @@ int stat_rule(Token_t *current_token, scope_t *scope_state,
     if (current_token->type == T_FUNC_ID) {
         // save function id to func_call_id
         d_string_replace_str(&func_call_id, current_token->attribute.string);
-        if ((status = func_call_rule(current_token, scope_state,
-                                     global_table)) != OK)
-            return status;
+        if ((status = func_call_rule(current_token, scope_state, global_table)) != OK) return status;
 
         // get new token
         if ((status = scan(current_token)) != OK) return status;
@@ -672,17 +610,13 @@ int stat_rule(Token_t *current_token, scope_t *scope_state,
         Htab_item_t *func_ptr = htab_find(global_table, func_call_id.str);
 
         // generate instruction
-        if ((status = generate_instruction(CALL_FUNC, NULL, &func_ptr->data,
-                                           NULL, 0, stdout)) != OK)
-            return status;
+        if ((status = generate_instruction(CALL_FUNC, NULL, &func_ptr->data, NULL, 0, stdout)) != OK) return status;
 
         // get new token
         if ((status = scan(current_token)) != OK) return status;
 
         // handle ... -> ... <STAT>
-        if ((status = stat_rule(current_token, scope_state, global_table)) !=
-            OK)
-            return status;
+        if ((status = stat_rule(current_token, scope_state, global_table)) != OK) return status;
     }
 
     // handle ... -> T_RCBR
@@ -700,38 +634,29 @@ int stat_rule(Token_t *current_token, scope_t *scope_state,
     return status;
 }
 
-int assign_type_rule(Token_t *current_token, scope_t *scope_state,
-                     Htab_t *global_table) {
+int assign_type_rule(Token_t *current_token, scope_t *scope_state, Htab_t *global_table) {
     int status = OK;
 
     // handle <ASSIGN_TYPE> -> <FUNC_CALL>
     if (current_token->type == T_FUNC_ID) {
         d_string_replace_str(&function_id, current_token->attribute.string);
 
-        if ((status = func_call_rule(current_token, scope_state,
-                                     global_table)) != OK)
-            return status;
+        if ((status = func_call_rule(current_token, scope_state, global_table)) != OK) return status;
 
         // get function from global table
         Htab_item_t *function = htab_find(global_table, func_call_id.str);
         Htab_item_t *variable = htab_find(global_table, variable_id.str);
 
-        if ((status = generate_instruction(CALL_FUNC_ASSIGN, &variable->data,
-                                           &function->data, NULL, 0, stdout)) !=
-            OK)
-            return status;
+        if ((status = generate_instruction(CALL_FUNC_ASSIGN, &variable->data, &function->data, NULL, 0, stdout)) != OK) return status;
     }
 
     // handle ... -> <EXPR>
-    if ((status = expr_rule(current_token, global_table, EXPR_LOC_ASSIGN,
-                            scope_state)) != OK)
-        return status;
+    if ((status = expr_rule(current_token, global_table, EXPR_LOC_ASSIGN, scope_state)) != OK) return status;
 
     return status;
 }
 
-int func_call_rule(Token_t *current_token, scope_t *scope_state,
-                   Htab_t *global_table) {
+int func_call_rule(Token_t *current_token, scope_t *scope_state, Htab_t *global_table) {
     int status = OK;
 
     // handle <FUNC_CALL> -> T_FUNC_ID
@@ -752,21 +677,18 @@ int func_call_rule(Token_t *current_token, scope_t *scope_state,
     if ((status = scan(current_token)) != OK) return status;
 
     // handle ... -> ... <PARAM>
-    if ((status = param_rule(current_token, global_table, true)) != OK)
-        return status;
+    if ((status = param_rule(current_token, global_table, true)) != OK) return status;
 
     // get new token
     if ((status = scan(current_token)) != OK) return status;
 
     // handle ... -> ... <PARAM_LIST>
-    if ((status = param_list_rule(current_token, global_table)) != OK)
-        return status;
+    if ((status = param_list_rule(current_token, global_table)) != OK) return status;
 
     return status;
 }
 
-int expr_rule(Token_t *current_token, Htab_t *global_table, int location,
-              scope_t *scope_state) {
+int expr_rule(Token_t *current_token, Htab_t *global_table, int location, scope_t *scope_state) {
     if (scope_state->in_global) {
         return expr_main(global_table, current_token, location);
     } else {

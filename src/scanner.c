@@ -13,9 +13,7 @@
 #include "scanner.h"
 
 // Checks if character is a white character (not a newline)
-int is_white(int input) {
-    return (input == ' ' || input == '\t' || (input >= 11 && input <= 13));
-}
+int is_white(int input) { return (input == ' ' || input == '\t' || (input >= 11 && input <= 13)); }
 
 // Function for handling prolog
 int prolog_handler(void) {
@@ -129,12 +127,8 @@ int epilog_handler(void) {
 
 // Function for keyword handling
 int keyword_handler(DString_t *dString, Token_t *token) {
-    char *keywords[] = {"else", "float",   "function", "if",   "int",
-                        "null", "return",  "string",   "void", "while",
-                        "?int", "?string", "?float"};
-    int keyword_types[] = {K_ELSE,     K_FLOAT,    K_FUNC,      K_IF,   K_INT,
-                           K_NULL,     K_RET,      K_STR,       K_VOID, K_WHILE,
-                           K_INT_NULL, K_STR_NULL, K_FLOAT_NULL};
+    char *keywords[] = {"else", "float", "function", "if", "int", "null", "return", "string", "void", "while", "?int", "?string", "?float"};
+    int keyword_types[] = {K_ELSE, K_FLOAT, K_FUNC, K_IF, K_INT, K_NULL, K_RET, K_STR, K_VOID, K_WHILE, K_INT_NULL, K_STR_NULL, K_FLOAT_NULL};
     int keywords_array_size = sizeof(keywords) / sizeof(keywords[0]);
 
     for (int i = 0; i < keywords_array_size; i++) {
@@ -196,9 +190,7 @@ int string_handler(DString_t *dString, Token_t *token) {
                     for (int x = 0; x < 2; x++) {
                         curr = dString->str[++i];
                         // correct format handling
-                        if (((x == 1 && oct_hex[0] == '0') ? curr >= '1'
-                                                           : curr >= '0') &&
-                            curr <= '9') {
+                        if (((x == 1 && oct_hex[0] == '0') ? curr >= '1' : curr >= '0') && curr <= '9') {
                             oct_hex[x] = curr;
                             oct_hex[x + 1] = '\0';
                         } else if (curr >= 'a' && curr <= 'f') {
@@ -220,9 +212,7 @@ int string_handler(DString_t *dString, Token_t *token) {
                     }
                     // convert value to int
                     if (num_ok) {
-                        d_string_add_char(
-                            &dString_local,
-                            (char)strtol(oct_hex, &garbage_strtol, 16));
+                        d_string_add_char(&dString_local, (char)strtol(oct_hex, &garbage_strtol, 16));
                     }
                     for (int j = 0; j < 4; j++) {
                         oct_hex[j] = '\0';
@@ -237,10 +227,7 @@ int string_handler(DString_t *dString, Token_t *token) {
                     for (int x = 1; x < 3; x++) {
                         curr = dString->str[++i];
                         // correct format handling
-                        if (((x == 2 && oct_hex[0] == '0' && oct_hex[1] == '0')
-                                 ? curr >= '1'
-                                 : curr >= '0') &&
-                            curr <= '7') {
+                        if (((x == 2 && oct_hex[0] == '0' && oct_hex[1] == '0') ? curr >= '1' : curr >= '0') && curr <= '7') {
                             oct_hex[x] = curr;
                             oct_hex[x + 1] = '\0';
                         } else {
@@ -255,9 +242,7 @@ int string_handler(DString_t *dString, Token_t *token) {
                     }
                     // convert value to int
                     if (num_ok) {
-                        d_string_add_char(
-                            &dString_local,
-                            (char)strtol(oct_hex, &garbage_strtol, 8));
+                        d_string_add_char(&dString_local, (char)strtol(oct_hex, &garbage_strtol, 8));
                     }
                     for (int j = 0; j < 4; j++) {
                         oct_hex[j] = '\0';
@@ -338,8 +323,7 @@ int float_handler(DString_t *dString, Token_t *token) {
 T_State_t state(T_State_t act, int curr, DString_t *DString) {
     switch (act) {
         case S_START:
-            if ((curr >= 'a' && curr <= 'z') || (curr >= 'A' && curr <= 'Z') ||
-                (curr == '_')) {
+            if ((curr >= 'a' && curr <= 'z') || (curr >= 'A' && curr <= 'Z') || (curr == '_')) {
                 d_string_add_char(DString, curr);
                 return S_KEYWORD;
             }
@@ -438,8 +422,7 @@ T_State_t state(T_State_t act, int curr, DString_t *DString) {
 
         // keywords and epilog
         case S_KEYWORD:
-            if ((curr >= 'a' && curr <= 'z') || (curr >= 'A' && curr <= 'Z') ||
-                (curr == '_') || (curr >= '0' && curr <= '9')) {
+            if ((curr >= 'a' && curr <= 'z') || (curr >= 'A' && curr <= 'Z') || (curr == '_') || (curr >= '0' && curr <= '9')) {
                 d_string_add_char(DString, curr);
                 return S_KEYWORD;
             } else {
@@ -449,8 +432,7 @@ T_State_t state(T_State_t act, int curr, DString_t *DString) {
         case QUEST_MARK:
             if (curr == '>') {
                 return S_PROL_END;
-            } else if ((curr >= 'a' && curr <= 'z') ||
-                       (curr >= 'A' && curr <= 'Z') || (curr == '_')) {
+            } else if ((curr >= 'a' && curr <= 'z') || (curr >= 'A' && curr <= 'Z') || (curr == '_')) {
                 d_string_add_char(DString, curr);
                 return S_KEYWORD;
             } else {
@@ -475,8 +457,7 @@ T_State_t state(T_State_t act, int curr, DString_t *DString) {
 
         // identificators
         case S_ID:
-            if ((curr >= 'a' && curr <= 'z') || (curr >= 'A' && curr <= 'Z') ||
-                (curr == '_') || (curr >= '0' && curr <= '9')) {
+            if ((curr >= 'a' && curr <= 'z') || (curr >= 'A' && curr <= 'Z') || (curr == '_') || (curr >= '0' && curr <= '9')) {
                 d_string_add_char(DString, curr);
                 return S_ID;
             } else {
@@ -553,8 +534,7 @@ T_State_t state(T_State_t act, int curr, DString_t *DString) {
                 return S_POSS_BC_END;
             }
             return S_BC;
-        default
-            :  // should never happen, unknown state handling (raises LEX_ERR)
+        default:  // should never happen, unknown state handling (raises LEX_ERR)
             return S_ERR;
     }
 }

@@ -1,7 +1,7 @@
 #pragma once
 
-#ifndef _CODEGEN_H_
-#define _CODEGEN_H_
+#ifndef _CODE_GENERATOR_H_
+#define _CODE_GENERATOR_H_
 
 /**
  * @headerfile code_generator.h
@@ -63,10 +63,6 @@ typedef enum Operation {
     MUL,
     DIV,
     IDIV,
-    // LOGICAL
-    AND,
-    OR,
-    NOT,
     // BUILD-IN FUNCTIONS
     WRITE,
     READ,
@@ -80,11 +76,28 @@ typedef enum Operation {
     CALL_FUNC_ASSIGN,
     DEF_FUNC,
     RETURN,
+    CONCAT,
+
+    // STACK OPERATIONS
+    PUSHS,
+    IF,
+    WHILE,
+    ADDS,
+    SUBS,
+    MULS,
+    DIVS,
+    IDIVS,
+    LTS,
+    GTS,
+    EQS,
+    ANDS,
+    ORS,
+    NOTS,
+
 } Operation_t;
 
 // TODO
-void generate_if_start(Operation_t type, char *var1, char *var2, int label,
-                       FILE *file);
+void generate_if_start(Operation_t type, char *var1, char *var2, int label, FILE *file);
 void generate_else(int label, FILE *file);
 /**
  * @brief Generates code for while loop start
@@ -95,8 +108,7 @@ void generate_else(int label, FILE *file);
  * @param var2 Second variable of the condition
  * @param file File to write the code to
  */
-void generate_while_start(Operation_t type, char *var1, char *var2, int label,
-                          FILE *file);
+void generate_while_start(Operation_t type, char *var1, char *var2, int label, FILE *file);
 
 /**
  * @brief Generates code for while loop end
@@ -291,8 +303,7 @@ void generate_call(char *label, FILE *file);
  *
  * @param file File to write the code to
  */
-void generate_return(Symbol_t *func, Symbol_type_t type, char *attribute,
-                     FILE *file);
+void generate_return(Symbol_t *func, Symbol_type_t type, char *attribute, FILE *file);
 
 /**
  * @brief Generates code for pushs
@@ -522,8 +533,19 @@ int string_convert(Symbol_t *string, DString_t *converted_str);
  *
  * @todo not implemented yet
  */
-int generate_instruction(Operation_t operation, Symbol_t *dest_in,
-                         Symbol_t *var_in_1, Symbol_t *var_in_2, int label,
-                         FILE *file);
+int generate_instruction(Operation_t operation, Symbol_t *dest_in, Symbol_t *var_in_1, Symbol_t *var_in_2, int label, FILE *file);
 
-#endif
+void built_in_floatval(FILE *file);
+void built_in_intval(FILE *file);
+void built_in_strval(FILE *file);
+void built_in_substring(FILE *file);
+void built_in_reads(FILE *file);
+void built_in_readi(FILE *file);
+void built_in_readf(FILE *file);
+void built_in_write(FILE *file);
+void built_in_strlen(FILE *file);
+void built_in_ord(FILE *file);
+void built_in_chr(FILE *file);
+void print_built_in(FILE *file);
+
+#endif  // _CODE_GENERATOR_H_
