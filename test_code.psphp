@@ -1,4 +1,6 @@
 <?php
 declare(strict_types=1);
-function hello_world(int $x, int $z): null {
-                }
+if (1===1) {}
+else{
+}
+

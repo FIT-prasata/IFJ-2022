@@ -46,7 +46,7 @@ int parse(void) {
         free_token(token);
         return INTERNAL_ERR;
     }
-    scope_t scope_state = {false, false, false, false, true, 0, 0};
+    scope_t scope_state = {false, false, false, false, true, 0, 0, 0, 0};
     if ((status = d_string_init(&function_id)) != OK) {
         free_token(token);
         htab_free(global_table);
@@ -446,6 +446,9 @@ int stat_rule(Token_t *current_token, scope_t *scope_state, Htab_t *global_table
         // update scope
         scope_state->in_if = true;
         scope_state->count_if++;
+
+        int local_num_if = scope_state->num_if;
+        scope_state->num_if++;
         // get new token
         if ((status = scan(current_token)) != OK) return status;
 
@@ -457,6 +460,9 @@ int stat_rule(Token_t *current_token, scope_t *scope_state, Htab_t *global_table
 
         // handle ... -> ... <EXPR>
         if ((status = expr_rule(current_token, global_table, EXPR_LOC_COND, scope_state)) != OK) return status;
+
+        // generate if
+        if ((status = generate_instruction(IF, NULL, NULL, NULL, local_num_if, stdout)) != OK) return status;
 
         // get new token
         if ((status = scan(current_token)) != OK) return status;
@@ -476,6 +482,9 @@ int stat_rule(Token_t *current_token, scope_t *scope_state, Htab_t *global_table
         // handle ... -> ... K_ELSE
         if (current_token->type != K_ELSE) return SYNTAX_ERR;
 
+        // generate else
+        if ((status = generate_instruction(IF_ELSE, NULL, NULL, NULL, local_num_if, stdout)) != OK) return status;
+
         // get new token
         if ((status = scan(current_token)) != OK) return status;
 
@@ -488,9 +497,17 @@ int stat_rule(Token_t *current_token, scope_t *scope_state, Htab_t *global_table
         // handle ... -> ... <STAT>
         if ((status = stat_rule(current_token, scope_state, global_table)) != OK) return status;
 
+        // generate endif
+        if ((status = generate_instruction(IF_END, NULL, NULL, NULL, local_num_if, stdout)) != OK) return status;
+
         // update scope
         scope_state->count_if--;
         if (scope_state->count_if == 0) scope_state->in_if = false;
+
+        // get new token
+        if ((status = scan(current_token)) != OK) return status;
+
+        return stat_rule(current_token, scope_state, global_table);
     }
 
     // handle ... -> K_WHILE
@@ -498,6 +515,10 @@ int stat_rule(Token_t *current_token, scope_t *scope_state, Htab_t *global_table
         // update scope
         scope_state->in_while = true;
         scope_state->count_while++;
+
+        int local_num_while = scope_state->num_while;
+        scope_state->num_while++;
+
         // get new token
         if ((status = scan(current_token)) != OK) return status;
 
@@ -510,6 +531,9 @@ int stat_rule(Token_t *current_token, scope_t *scope_state, Htab_t *global_table
         // handle ... -> ... <EXPR>
         if ((status = expr_rule(current_token, global_table, EXPR_LOC_COND, scope_state)) != OK) return status;
 
+        // generate while
+        if ((status = generate_instruction(WHILE, NULL, NULL, NULL, local_num_while, stdout)) != OK) return status;
+
         // get new token
         if ((status = scan(current_token)) != OK) return status;
 
@@ -522,9 +546,18 @@ int stat_rule(Token_t *current_token, scope_t *scope_state, Htab_t *global_table
         // handle ... -> ... <STAT>
         if ((status = stat_rule(current_token, scope_state, global_table)) != OK) return status;
 
+        // generate endwhile
+        if ((status = generate_instruction(WHILE_END, NULL, NULL, NULL, local_num_while, stdout)) != OK) return status;
+
         // update scope
         scope_state->count_while--;
+        scope_state->num_while++;
         if (scope_state->count_while == 0) scope_state->in_while = false;
+
+        // get new token
+        if ((status = scan(current_token)) != OK) return status;
+
+        return stat_rule(current_token, scope_state, global_table);
     }
 
     // handle ... -> K_RET
@@ -632,7 +665,7 @@ int stat_rule(Token_t *current_token, scope_t *scope_state, Htab_t *global_table
         return status;
     }
 
-    if (!scope_state->in_global) {
+    if (!scope_state->in_global || scope_state->in_if || scope_state->in_while) {
         if (current_token->type == T_EOF || current_token->type == K_FUNC) {
             return SYNTAX_ERR;
         }

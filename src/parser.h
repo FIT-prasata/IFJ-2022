@@ -43,6 +43,8 @@ typedef struct {
     bool in_global;
     int count_if;
     int count_while;
+    int num_if;
+    int num_while;
 } scope_t;
 
 // Function prototypes
