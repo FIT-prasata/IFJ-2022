@@ -38,3 +38,18 @@ class ExprTestCases(unittest.TestCase):
         $x = $y;
         """
         self.assertEqual(execute_programme(stdin)[0], 5)
+
+    def test_relation_assignment(self):
+        stdin = """<?php
+        declare(strict_types=1);
+        $x = 1 < 2;
+        """
+        self.assertEqual(execute_programme(stdin)[0], 2)
+
+    def test_multiple_relations(self):
+        stdin = """<?php
+        declare(strict_types=1);
+        if(1 < 2 < 3) {}
+        else {}
+        """
+        self.assertEqual(execute_programme(stdin)[0], 2)

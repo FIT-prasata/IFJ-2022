@@ -28,6 +28,37 @@ Token_t *init_token(void) {
     return token;
 }
 
+int add_built_in(Htab_t *global_table) {
+    if (global_table == NULL) return INTERNAL_ERR;
+    Token_t *token = init_token();
+    if (token == NULL) return INTERNAL_ERR;
+    token->type = T_FUNC_ID;
+    token->attribute.string = "reads";
+    if (htab_insert_item(global_table, token) != OK) return INTERNAL_ERR;
+    token->attribute.string = "readi";
+    if (htab_insert_item(global_table, token) != OK) return INTERNAL_ERR;
+    token->attribute.string = "readf";
+    if (htab_insert_item(global_table, token) != OK) return INTERNAL_ERR;
+    token->attribute.string = "write";
+    if (htab_insert_item(global_table, token) != OK) return INTERNAL_ERR;
+    token->attribute.string = "floatval";
+    if (htab_insert_item(global_table, token) != OK) return INTERNAL_ERR;
+    token->attribute.string = "intval";
+    if (htab_insert_item(global_table, token) != OK) return INTERNAL_ERR;
+    token->attribute.string = "strval";
+    if (htab_insert_item(global_table, token) != OK) return INTERNAL_ERR;
+    token->attribute.string = "strlen";
+    if (htab_insert_item(global_table, token) != OK) return INTERNAL_ERR;
+    token->attribute.string = "substring";
+    if (htab_insert_item(global_table, token) != OK) return INTERNAL_ERR;
+    token->attribute.string = "ord";
+    if (htab_insert_item(global_table, token) != OK) return INTERNAL_ERR;
+    token->attribute.string = "chr";
+    if (htab_insert_item(global_table, token) != OK) return INTERNAL_ERR;
+    free(token);
+    return OK;
+}
+
 int free_token(Token_t *token) {
     int status = OK;
     if (token == NULL) return INTERNAL_ERR;
@@ -63,6 +94,29 @@ int parse(void) {
         htab_free(global_table);
         d_string_free_and_clear(&function_id);
         d_string_free_and_clear(&variable_id);
+        return status;
+    }
+
+    // generate prolog
+    if ((status = generate_instruction(PROLOG, NULL, NULL, NULL, 0, stdout)) != OK) {
+        free_token(token);
+        htab_free(global_table);
+        d_string_free_and_clear(&function_id);
+        d_string_free_and_clear(&variable_id);
+        d_string_free_and_clear(&func_call_id);
+        return status;
+    }
+
+    // generate build-in functions
+    print_built_in(stdout);
+
+    // add build-in functions to global table
+    if ((status = add_built_in(global_table)) != OK) {
+        free_token(token);
+        htab_free(global_table);
+        d_string_free_and_clear(&function_id);
+        d_string_free_and_clear(&variable_id);
+        d_string_free_and_clear(&func_call_id);
         return status;
     }
 
@@ -285,8 +339,10 @@ int param_rule(Token_t *token, Htab_t *global_table, bool func_call) {
     Htab_item_t *id_ptr;
     if (func_call == true) {
         id_ptr = htab_lookup_add(global_table, token);
+        id_ptr->data.var->frame = GF;
     } else {
         id_ptr = htab_lookup_add(local_table, token);
+        id_ptr->data.var->frame = LF;
     }
 
     if (id_ptr == NULL) return INTERNAL_ERR;
@@ -418,20 +474,20 @@ int const_rule(Token_t *token, Htab_t *global_table, bool func_call) {
     func_ptr->data.symbol_type = CONSTANT;
     switch (token->type) {
         case T_INT:
-            func_ptr->data.func->argv[func_ptr->data.func->argc - 1].const_type = INT;
-            func_ptr->data.func->argv[func_ptr->data.func->argc - 1].attribute = token->attribute.string;
+//            func_ptr->data.func->argv[func_ptr->data.func->argc - 1].const_type = INT;
+//            func_ptr->data.func->argv[func_ptr->data.func->argc - 1].attribute = token->attribute.string;
             return OK;
         case T_FLOAT:
-            func_ptr->data.func->argv[func_ptr->data.func->argc - 1].const_type = FLOAT;
-            func_ptr->data.func->argv[func_ptr->data.func->argc - 1].attribute = token->attribute.string;
+//            func_ptr->data.func->argv[func_ptr->data.func->argc - 1].const_type = FLOAT;
+//            func_ptr->data.func->argv[func_ptr->data.func->argc - 1].attribute = token->attribute.string;
             return OK;
         case T_STRING:
-            func_ptr->data.func->argv[func_ptr->data.func->argc - 1].const_type = STRING;
-            func_ptr->data.func->argv[func_ptr->data.func->argc - 1].attribute = token->attribute.string;
+//            func_ptr->data.func->argv[func_ptr->data.func->argc - 1].const_type = STRING;
+//            func_ptr->data.func->argv[func_ptr->data.func->argc - 1].attribute = token->attribute.string;
             return OK;
         case K_NULL:
-            func_ptr->data.func->argv[func_ptr->data.func->argc - 1].const_type = NIL;
-            func_ptr->data.func->argv[func_ptr->data.func->argc - 1].attribute = token->attribute.string;
+//            func_ptr->data.func->argv[func_ptr->data.func->argc - 1].const_type = NIL;
+//            func_ptr->data.func->argv[func_ptr->data.func->argc - 1].attribute = token->attribute.string;
             return OK;
         default:
             return SYNTAX_ERR;
@@ -583,14 +639,17 @@ int stat_rule(Token_t *current_token, scope_t *scope_state, Htab_t *global_table
         // save id name to variable_id
         d_string_replace_str(&variable_id, current_token->attribute.string);
         // get variable from global table
+        Htab_item_t *variable;
         if (scope_state->in_global == true) {
-            if (htab_lookup_add(global_table, current_token) == NULL) {
+            if ((variable = htab_lookup_add(global_table, current_token)) == NULL) {
                 return INTERNAL_ERR;
             }
+            variable->data.var->frame = GF;
         } else {
-            if (htab_lookup_add(local_table, current_token) == NULL) {
+            if ((variable = htab_lookup_add(local_table, current_token)) == NULL) {
                 return INTERNAL_ERR;
             }
+            variable->data.var->frame = LF;
         }
 
         // get new token
@@ -683,10 +742,21 @@ int assign_type_rule(Token_t *current_token, scope_t *scope_state, Htab_t *globa
         Htab_item_t *variable = htab_find(global_table, variable_id.str);
 
         if ((status = generate_instruction(CALL_FUNC_ASSIGN, &variable->data, &function->data, NULL, 0, stdout)) != OK) return status;
+        return status;
     }
 
     // handle ... -> <EXPR>
     if ((status = expr_rule(current_token, global_table, EXPR_LOC_ASSIGN, scope_state)) != OK) return status;
+
+    // generate assign
+    Htab_item_t *variable;
+    if (scope_state->in_global == true) {
+        variable = htab_find(global_table, variable_id.str);
+    } else {
+        variable = htab_find(local_table, variable_id.str);
+    }
+    if (variable == NULL) return SYNTAX_ERR;
+    if ((status = generate_instruction(POPS, NULL, &variable->data, NULL, 0, stdout)) != OK) return status;
 
     return status;
 }

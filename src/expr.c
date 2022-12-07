@@ -98,10 +98,10 @@ int expr_reduce(Htab_t *table, Char_stack_t *c_stack, Token_stack_t *t_stack, To
     };
     char term = char_stack_get_closest_terminal(c_stack);
 
-    // if ((gen_res = expr_instr_gen(table, t_stack, token, term)) != OK) {
-    //     d_string_free_and_clear(&d_string);
-    //     return gen_res;
-    // }
+    if ((gen_res = expr_instr_gen(table, t_stack, token, term)) != OK) {
+        d_string_free_and_clear(&d_string);
+        return gen_res;
+    }
 
     // Reduction of expression
     char head_char = char_stack_pop(c_stack);
@@ -339,6 +339,7 @@ int expr_instr_gen(Htab_t *table, Token_stack_t *t_stack, Token_t *token, char t
                 } else if (tmp1->type == T_STRING) {
                     instr_var1->const_type = STRING;
                 }
+                instr_var1->attribute = malloc(sizeof(char) * strlen(tmp1->attribute.string) + 1);
                 strcpy(instr_var1->attribute, tmp1->attribute.string);
             } else if (tmp1->type == T_ID) {
                 instr_var1 = &(htab_find(table, tmp1->attribute.string)->data);
@@ -348,7 +349,7 @@ int expr_instr_gen(Htab_t *table, Token_stack_t *t_stack, Token_t *token, char t
             } else {
                 return INTERNAL_ERR;
             }
-            generate_instruction(PUSHS, instr_var1, NULL, NULL, 0, stdout);
+            generate_instruction(PUSHS, NULL, instr_var1, NULL, 0, stdout);
             break;
         case EXPR_ADD:
             // GENERATE INSTRUCTION
@@ -368,6 +369,7 @@ int expr_instr_gen(Htab_t *table, Token_stack_t *t_stack, Token_t *token, char t
             break;
         case EXPR_DOT:
             // GENERATE INSTRUCTION
+            generate_instruction(CONCAT, NULL, NULL, NULL, 0, stdout);
             break;
         case EXPR_EQ:
             // GENERATE INSTRUCTION

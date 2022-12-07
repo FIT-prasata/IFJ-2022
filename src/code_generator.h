@@ -80,6 +80,7 @@ typedef enum Operation {
 
     // STACK OPERATIONS
     PUSHS,
+    POPS,
     IF,
     WHILE,
     ADDS,
@@ -390,7 +391,7 @@ void generate_write(char *var, FILE *file);
  * @param destination Destination variable
  * @param file File to write the code to
  */
-void generate_concat(char *var1, char *var2, char *destination, FILE *file);
+void generate_concat(FILE *file);
 
 /**
  * @brief Generates code for strlen

@@ -51,6 +51,8 @@ typedef struct {
 Token_t *init_token(void);
 int free_token(Token_t *token);
 
+int add_built_in(Htab_t *global_table);
+
 /**
  * @brief main function for parsing
  * @return void

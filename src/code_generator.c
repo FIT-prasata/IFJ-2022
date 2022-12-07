@@ -124,7 +124,15 @@ void generate_move(char *source, char *destination, FILE *file) { fprintf(file, 
 
 void generate_defvar(char *var, FILE *file) { fprintf(file, "DEFVAR %s\n", var); }
 
-void generate_concat(char *var1, char *var2, char *destination, FILE *file) { fprintf(file, "CONCAT %s %s %s\n", destination, var1, var2); }
+void generate_concat(FILE *file) {
+    fprintf(file, "DEFVAR GF@%%tmp_concat%d\n", tmp_var_count++);
+    fprintf(file, "DEFVAR GF@%%tmp_concat%d\n", tmp_var_count++);
+    fprintf(file, "DEFVAR GF@%%tmp_concat%d\n", tmp_var_count++);
+    fprintf(file, "POPS GF@%%tmp_concat%d\n", tmp_var_count - 2);
+    fprintf(file, "POPS GF@%%tmp_concat%d\n", tmp_var_count - 3);
+    fprintf(file, "CONCAT GF@%%tmp_concat%d %GF@%%tmp_concat%d %GF@%%tmp_concat%d\n", tmp_var_count - 1, tmp_var_count - 3, tmp_var_count - 2);
+    fprintf(file, "PUSHS GF@%%tmp_concat%d\n", tmp_var_count - 1);
+}
 
 void generate_def_func(Symbol_t *func, FILE *file) {
     fprintf(file, "JUMP .%%end_%s\n", func->attribute);
@@ -359,7 +367,7 @@ int generate_instruction(Operation_t operation, Symbol_t *dest_in, Symbol_t *var
             generate_def_func(var_in_1, file);
             break;
         case CONCAT:
-            generate_concat(var1.str, var2.str, dest.str, file);
+            generate_concat(file);
             break;
         case RETURN:
             if (var_in_1 != NULL) {
@@ -419,6 +427,9 @@ int generate_instruction(Operation_t operation, Symbol_t *dest_in, Symbol_t *var
             break;
         case NOTS:
             fprintf(file, "NOTS\n");
+            break;
+        case POPS:
+            fprintf(file, "POPS %s\n", var1.str);
             break;
     }
     return OK;
