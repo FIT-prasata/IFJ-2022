@@ -101,30 +101,6 @@ int prolog_handler(void) {
     }
 }
 
-// Function for handling epilog
-int epilog_handler(void) {
-    int curr = getchar();
-    int curr2;
-    if (curr == EOF) {
-        ungetc(curr, stdin);
-        return OK;
-    } else if (curr == '\n') {
-        curr2 = getchar();
-        if (curr2 == EOF) {
-            ungetc(curr2, stdin);
-            ungetc(curr, stdin);
-            return OK;
-        } else {
-            ungetc(curr2, stdin);
-            ungetc(curr, stdin);
-            return SYNTAX_ERR;
-        }
-    } else {
-        ungetc(curr, stdin);
-        return SYNTAX_ERR;
-    }
-}
-
 // Function for keyword handling
 int keyword_handler(DString_t *dString, Token_t *token) {
     char *keywords[] = {"else", "float", "function", "if", "int", "null", "return", "string", "void", "while", "?int", "?string", "?float"};
@@ -704,9 +680,14 @@ int scan(Token_t *token) {
 
             // longer tokens but of known length
             case S_PROL_END:
-                token->type = T_END_PROLOG;
                 // epilog should be last thing in file
-                return_type = epilog_handler();
+                curr = getchar();
+                if (curr == EOF) {
+                    token->type = T_EOF;
+                    return_type = OK;
+                    break;
+                }
+                return_type = LEX_ERR;
                 break;
             case S_LT:
                 curr = getchar();
