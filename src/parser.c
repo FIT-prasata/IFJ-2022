@@ -509,8 +509,6 @@ int type_rule(Token_t *token, Htab_t *global_table, bool is_func_def, bool is_fu
 }
 
 int const_rule(Token_t *token, Htab_t *global_table, bool func_call) {
-    int status = OK;
-
     // get function pointer
     Htab_item_t *func_ptr;
     if (func_call) {
@@ -732,8 +730,7 @@ int stat_rule(Token_t *current_token, scope_t *scope_state, Htab_t *global_table
             if ((status = scan(current_token)) != OK) return status;
 
             // handle ... -> ... <STAT>
-            if ((status = stat_rule(current_token, scope_state, global_table)) != OK)
-                ;
+            if ((status = stat_rule(current_token, scope_state, global_table)) != OK)return status;
         }
     }
 
@@ -741,7 +738,7 @@ int stat_rule(Token_t *current_token, scope_t *scope_state, Htab_t *global_table
     if (current_token->type == T_FUNC_ID) {
         // save function id to func_call_id
         d_string_replace_str(&func_call_id, current_token->attribute.string);
-        if ((status = func_call_rule(current_token, scope_state, global_table)) != OK) return status;
+        if ((status = func_call_rule(current_token, global_table)) != OK) return status;
 
         // get new token
         if ((status = scan(current_token)) != OK) return status;
@@ -784,7 +781,7 @@ int assign_type_rule(Token_t *current_token, scope_t *scope_state, Htab_t *globa
     if (current_token->type == T_FUNC_ID) {
         d_string_replace_str(&function_id, current_token->attribute.string);
 
-        if ((status = func_call_rule(current_token, scope_state, global_table)) != OK) return status;
+        if ((status = func_call_rule(current_token, global_table)) != OK) return status;
 
         // get function from global table
         Htab_item_t *function = htab_find(global_table, func_call_id.str);
@@ -819,7 +816,7 @@ int assign_type_rule(Token_t *current_token, scope_t *scope_state, Htab_t *globa
     return status;
 }
 
-int func_call_rule(Token_t *current_token, scope_t *scope_state, Htab_t *global_table) {
+int func_call_rule(Token_t *current_token, Htab_t *global_table) {
     int status = OK;
 
     // handle <FUNC_CALL> -> T_FUNC_ID

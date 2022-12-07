@@ -88,7 +88,7 @@ char char_stack_get_head(Char_stack_t *c_stack) {
 
 int char_stack_push(Char_stack_t *c_stack, char character) {
     Char_stack_t *tmp = (Char_stack_t *)malloc(sizeof(Char_stack_t));
-    if (tmp == NULL || c_stack == NULL || character == NULL) return INTERNAL_ERR;
+    if (tmp == NULL || c_stack == NULL) return INTERNAL_ERR;
     tmp->char_head = c_stack->char_head;
     tmp->next_char = c_stack->next_char;
     c_stack->char_head = character;

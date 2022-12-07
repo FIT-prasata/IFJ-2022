@@ -90,7 +90,7 @@ int expr_shift(Char_stack_t *c_stack, char character) {
     return OK;
 }
 
-int expr_reduce(Htab_t *table, Char_stack_t *c_stack, Token_stack_t *t_stack, Token_t *token) {
+int expr_reduce(Htab_t *table, Char_stack_t *c_stack, Token_stack_t *t_stack) {
     DString_t d_string;
     int gen_res;
     if (d_string_init(&d_string) == INTERNAL_ERR) {
@@ -98,7 +98,7 @@ int expr_reduce(Htab_t *table, Char_stack_t *c_stack, Token_stack_t *t_stack, To
     };
     char term = char_stack_get_closest_terminal(c_stack);
 
-    if ((gen_res = expr_instr_gen(table, t_stack, token, term)) != OK) {
+    if ((gen_res = expr_instr_gen(table, t_stack, term)) != OK) {
         d_string_free_and_clear(&d_string);
         return gen_res;
     }
@@ -142,7 +142,6 @@ int is_valid_rule(DString_t *d_string) {
 }
 
 int expr_parse(Htab_t *table, Char_stack_t *c_stack, Token_stack_t *t_stack, Token_t *token, int location) {
-    bool is_logical = false;
     ptable_symbol_t input;
 
     // Handle logical operators inside assignment
@@ -184,27 +183,21 @@ int expr_parse(Htab_t *table, Char_stack_t *c_stack, Token_stack_t *t_stack, Tok
             break;
         case T_EQ:
             input = EXPR_EQ;
-            is_logical = true;
             break;
         case T_NEQ:
             input = EXPR_NEQ;
-            is_logical = true;
             break;
         case T_LT:
             input = EXPR_LT;
-            is_logical = true;
             break;
         case T_GT:
             input = EXPR_GT;
-            is_logical = true;
             break;
         case T_LEQ:
             input = EXPR_LE;
-            is_logical = true;
             break;
         case T_GEQ:
             input = EXPR_GE;
-            is_logical = true;
             break;
         case T_ID:
             input = EXPR_ID;
@@ -250,7 +243,7 @@ int expr_parse(Htab_t *table, Char_stack_t *c_stack, Token_stack_t *t_stack, Tok
             return expr_shift(c_stack, input);
         case EXPR_REDUCE: {
             int ret;
-            if ((ret = expr_reduce(table, c_stack, t_stack, token)) != OK) {
+            if ((ret = expr_reduce(table, c_stack, t_stack)) != OK) {
                 return ret;
             }
             return expr_parse(table, c_stack, t_stack, token, location);
@@ -320,7 +313,7 @@ int expr_main(Htab_t *table, Token_t *token, int location) {
     return status;  // Generate result instruction here
 }
 
-int expr_instr_gen(Htab_t *table, Token_stack_t *t_stack, Token_t *token, char term) {
+int expr_instr_gen(Htab_t *table, Token_stack_t *t_stack, char term) {
     Token_t *tmp1 = malloc(sizeof(Token_t));
     token_stack_pop(t_stack, tmp1);
     Symbol_t *instr_var1 = malloc(sizeof(Symbol_t));

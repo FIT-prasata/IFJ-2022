@@ -184,7 +184,7 @@ int assign_type_rule(Token_t *current_token, scope_t *scope_state, Htab_t *globa
  * @param global_table
  * @return
  */
-int func_call_rule(Token_t *current_token, scope_t *scope_state, Htab_t *global_table);
+int func_call_rule(Token_t *current_token, Htab_t *global_table);
 
 /**
  * @brief EXPR -> precedent analysis -> bottom up parser
