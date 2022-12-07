@@ -258,3 +258,30 @@ class ParserTestCases(unittest.TestCase):
         }
         """
         self.assertEqual(execute_programme(stdin)[0], 0)
+
+    def test_func_def_with_return_and_params(self):
+        stdin = """<?php
+            declare(strict_types=1);
+            function hello_world(int $x, int $z): int {
+                return $x + $z + 2 * 10;
+            }
+        """
+        self.assertEqual(execute_programme(stdin)[0], 0)
+
+    def test_func_def_with_return_and_params_invalid(self):
+        stdin = """<?php
+            declare(strict_types=1);
+            function hello_world(int $x,): int {
+                return $x + 2 * 10;
+            }
+        """
+        self.assertEqual(execute_programme(stdin)[0], 2)
+
+    def test_func_def_with_return_and_params_undef_param(self):
+        stdin = """<?php
+            declare(strict_types=1);
+            function hello_world(int $x): int {
+                return $x + $y + 2 * 10;
+            }
+        """
+        self.assertEqual(execute_programme(stdin)[0], 5)

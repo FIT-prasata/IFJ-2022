@@ -1,6 +1,5 @@
 <?php
 declare(strict_types=1);
-if (1===1) {}
-else{
+function hello_world(int $x, int $z): int {
+    return $x + $z + 2 * 10;
 }
-

@@ -149,8 +149,7 @@ int const_rule(Token_t *current_token, Htab_t *global_table, bool func_call);
  * @brief   RULES
  *          <STAT> -> K_IF T_LBR <EXPR> T_LCBR <STAT> K_ELSE LCBR <STAT>
  *          <STAT> -> K_WHILE T_LBR <EXPR> T_LCBR <STAT>
- *          <STAT> -> K_RET <EXPR> T_SEM <STAT>
- *          TODO isn't here '{' missing?
+ *          <STAT> -> K_RET <EXPR> <STAT>
  *
  *          <STAT> -> T_ID T_ASSIGN <ASSIGN_TYPE> <STAT>
  *          <STAT> -> T_ID <TYPE> T_SEM <STAT>
