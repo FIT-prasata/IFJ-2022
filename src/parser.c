@@ -279,7 +279,13 @@ int param_rule(Token_t *token, Htab_t *global_table, bool func_call) {
     if (token->type != T_ID) return SYNTAX_ERR;
 
     // get/set id
-    Htab_item_t *id_ptr = htab_lookup_add(global_table, token);
+    Htab_item_t *id_ptr;
+    if (func_call == true) {
+        id_ptr = htab_lookup_add(global_table, token);
+    } else {
+        id_ptr = htab_lookup_add(local_table, token);
+    }
+
     if (id_ptr == NULL) return INTERNAL_ERR;
     // get function pointer
     Htab_item_t *func_ptr;
@@ -325,14 +331,13 @@ int param_list_rule(Token_t *current_token, Htab_t *global_table) {
 int type_rule(Token_t *token, Htab_t *global_table, bool is_func_def, bool is_func_type) {
     int status = OK;
 
-    Htab_item_t *func_pointer = NULL;
+    Htab_item_t *func_pointer = htab_find(global_table, function_id.str);
+
     if (is_func_def == true) {
         // get function pointer
-        func_pointer = htab_find(global_table, function_id.str);
         func_pointer->data.func->argv[func_pointer->data.func->argc - 1].var = malloc(sizeof(Var_t));
         if (func_pointer == NULL) return INTERNAL_ERR;
     }
-
     switch (token->type) {
         case K_STR:
             if (is_func_def == true) {

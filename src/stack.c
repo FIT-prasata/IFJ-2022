@@ -58,11 +58,11 @@ T_type_t token_stack_pop(Token_stack_t *t_stack, Token_t *token) {
 
 void token_stack_clear(Token_stack_t *t_stack) {
     Token_t *tmp = (Token_t *)malloc(sizeof(Token_t));
-    while (token_stack_pop(t_stack, tmp) != TOKEN_EMPTY_STACK){
+    while (token_stack_pop(t_stack, tmp) != TOKEN_EMPTY_STACK) {
         free(tmp);
         tmp = (Token_t *)malloc(sizeof(Token_t));
     }
-        free(tmp);
+    free(tmp);
 }
 
 // CHARACTER STACK

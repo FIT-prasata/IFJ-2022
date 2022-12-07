@@ -194,7 +194,7 @@ int htab_clear(Htab_t *table) {
         }
     }
     table->size = 0;
-    return OK;
+    return OK;  
 }
 
 // Hashtable destructor - deletes all items and frees allocated memory
