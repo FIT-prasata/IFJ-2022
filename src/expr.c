@@ -328,84 +328,84 @@ int expr_main(Htab_t *table, Token_t *token, int location) {
 }
 
 int expr_instr_gen(Htab_t *table, Token_stack_t *t_stack, Token_t *token, char term) {
-  switch (term) {
-    case EXPR_ID:
-      // GENERATE INSTRUCTION
-      Token_t *tmp1 = token_stack_pop(t_stack);
-      Symbol_t *instr_var1 = malloc(sizeof(Symbol_t));
-        if(instr_var1 == NULL) {
-          return INTERNAL_ERR;
-        }
-      if (tmp1->type == T_INT || tmp1->type == T_FLOAT || tmp1->type == T_STRING) {
-        instr_var1->symbol_type = CONSTANT;
-        if (tmp1->type == T_INT) {
-          instr_var1->const_type = INT;
-        } else if (tmp1->type == T_FLOAT) {
-          instr_var1->const_type = FLOAT;
-        } else if (tmp1->type == T_STRING) {
-          instr_var1->const_type = STRING;
-        }
-        strcpy(instr_var1->attribute, tmp1->attribute.string);
-      } else if (tmp1->type == T_ID) {
-        instr_var1 = &(htab_find(table, tmp1->attribute.string)->data);
-        if (instr_var1 == NULL) {
-          return INTERNAL_ERR;
-        }
-      } else {
+    Token_t *tmp1 = token_stack_pop(t_stack);
+    Symbol_t *instr_var1 = malloc(sizeof(Symbol_t));
+    if(instr_var1 == NULL) {
         return INTERNAL_ERR;
-      }      
-      generate_instruction(PUSHS, instr_var1, NULL, NULL, 0, stdout);
-    case EXPR_ADD:
-      // GENERATE INSTRUCTION
-      generate_instruction(ADDS, NULL, NULL, NULL, 0, stdout);
-      break;
-    case EXPR_SUB:
-      // GENERATE INSTRUCTION
-      generate_instruction(SUBS, NULL, NULL, NULL, 0, stdout);
-      break;
-    case EXPR_MUL:
-      // GENERATE INSTRUCTION
-      generate_instruction(MULS, NULL, NULL, NULL, 0, stdout);
-      break;
-    case EXPR_DIV:
-      // GENERATE INSTRUCTION
-      generate_instruction(DIVS, NULL, NULL, NULL, 0, stdout);
-      break;
-    case EXPR_DOT:
-      // GENERATE INSTRUCTION
-      break;
-    case EXPR_EQ:
-      // GENERATE INSTRUCTION
-      generate_instruction(EQS, NULL, NULL, NULL, 0, stdout);
-      break;
-    case EXPR_NEQ:
-      // GENERATE INSTRUCTION
-      generate_instruction(EQS, NULL, NULL, NULL, 0, stdout);
-      generate_instruction(NOTS, NULL, NULL, NULL, 0, stdout);
-      break;
-    case EXPR_LT:
-      // GENERATE INSTRUCTION
-      generate_instruction(LTS, NULL, NULL, NULL, 0, stdout);
-      break;
-    case EXPR_GT:
-      // GENERATE INSTRUCTION
-      generate_instruction(GTS, NULL, NULL, NULL, 0, stdout);
-      break;
-    case EXPR_LE:
-      // GENERATE INSTRUCTION
-      generate_instruction(GTS, NULL, NULL, NULL, 0, stdout);
-      generate_instruction(NOTS, NULL, NULL, NULL, 0, stdout);
-      break;
-    case EXPR_GE:
-      // GENERATE INSTRUCTION
-      generate_instruction(LTS, NULL, NULL, NULL, 0, stdout);
-      generate_instruction(NOTS, NULL, NULL, NULL, 0, stdout);
-      break;
-    case EXPR_RBR:
-      // GENERATE INSTRUCTION 
-      break;
-    default:
-      return INTERNAL_ERR;
-  }
-  return OK;
+    }
+    switch (term) {
+        case EXPR_ID:
+            // GENERATE INSTRUCTION
+            if (tmp1->type == T_INT || tmp1->type == T_FLOAT || tmp1->type == T_STRING) {
+                instr_var1->symbol_type = CONSTANT;
+                if (tmp1->type == T_INT) {
+                    instr_var1->const_type = INT;
+                } else if (tmp1->type == T_FLOAT) {
+                    instr_var1->const_type = FLOAT;
+                } else if (tmp1->type == T_STRING) {
+                    instr_var1->const_type = STRING;
+                }
+                strcpy(instr_var1->attribute, tmp1->attribute.string);
+            } else if (tmp1->type == T_ID) {
+                instr_var1 = &(htab_find(table, tmp1->attribute.string)->data);
+                if (instr_var1 == NULL) {
+                    return INTERNAL_ERR;
+                }
+            } else {
+                return INTERNAL_ERR;
+            }
+            generate_instruction(PUSHS, instr_var1, NULL, NULL, 0, stdout);
+        case EXPR_ADD:
+            // GENERATE INSTRUCTION
+            generate_instruction(ADDS, NULL, NULL, NULL, 0, stdout);
+            break;
+        case EXPR_SUB:
+            // GENERATE INSTRUCTION
+            generate_instruction(SUBS, NULL, NULL, NULL, 0, stdout);
+            break;
+        case EXPR_MUL:
+            // GENERATE INSTRUCTION
+            generate_instruction(MULS, NULL, NULL, NULL, 0, stdout);
+            break;
+        case EXPR_DIV:
+            // GENERATE INSTRUCTION
+            generate_instruction(DIVS, NULL, NULL, NULL, 0, stdout);
+            break;
+        case EXPR_DOT:
+            // GENERATE INSTRUCTION
+            break;
+        case EXPR_EQ:
+            // GENERATE INSTRUCTION
+            generate_instruction(EQS, NULL, NULL, NULL, 0, stdout);
+            break;
+        case EXPR_NEQ:
+            // GENERATE INSTRUCTION
+            generate_instruction(EQS, NULL, NULL, NULL, 0, stdout);
+            generate_instruction(NOTS, NULL, NULL, NULL, 0, stdout);
+            break;
+        case EXPR_LT:
+            // GENERATE INSTRUCTION
+            generate_instruction(LTS, NULL, NULL, NULL, 0, stdout);
+            break;
+        case EXPR_GT:
+            // GENERATE INSTRUCTION
+            generate_instruction(GTS, NULL, NULL, NULL, 0, stdout);
+            break;
+        case EXPR_LE:
+            // GENERATE INSTRUCTION
+            generate_instruction(GTS, NULL, NULL, NULL, 0, stdout);
+            generate_instruction(NOTS, NULL, NULL, NULL, 0, stdout);
+            break;
+        case EXPR_GE:
+            // GENERATE INSTRUCTION
+            generate_instruction(LTS, NULL, NULL, NULL, 0, stdout);
+            generate_instruction(NOTS, NULL, NULL, NULL, 0, stdout);
+            break;
+        case EXPR_RBR:
+            // GENERATE INSTRUCTION
+            break;
+        default:
+            return INTERNAL_ERR;
+    }
+    return OK;
 }
