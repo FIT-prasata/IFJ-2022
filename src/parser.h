@@ -23,11 +23,11 @@
 extern int line_num;
 
 // LOCAL INCLUDES
+#include "code_generator.h"
 #include "error.h"
+#include "expr.h"
 #include "scanner.h"
 #include "symtable.h"
-#include "code_generator.h"
-#include "expr.h"
 
 // Location of expression
 #define EXPR_LOC_RET 100
@@ -133,7 +133,8 @@ int param_list_rule(Token_t *current_token, Htab_t *global_table);
  * @param global_table
  * @return
  */
-int type_rule(Token_t *current_token, Htab_t *global_table, bool is_func_def, bool is_func_type);
+int type_rule(Token_t *current_token, Htab_t *global_table, bool is_func_def,
+              bool is_func_type);
 
 /**
  * @brief   RULES
@@ -173,7 +174,8 @@ int stat_rule(Token_t *current_token, scope_t *scope_state,
  * @param global_table
  * @return
  */
-int assign_type_rule(Token_t *current_token, scope_t *scope_state, Htab_t *global_table);
+int assign_type_rule(Token_t *current_token, scope_t *scope_state,
+                     Htab_t *global_table);
 
 /**
  * @brief   RULES
@@ -183,7 +185,8 @@ int assign_type_rule(Token_t *current_token, scope_t *scope_state, Htab_t *globa
  * @param global_table
  * @return
  */
-int func_call_rule(Token_t *current_token, scope_t *scope_state, Htab_t *global_table);
+int func_call_rule(Token_t *current_token, scope_t *scope_state,
+                   Htab_t *global_table);
 
 /**
  * @brief EXPR -> precedent analysis -> bottom up parser

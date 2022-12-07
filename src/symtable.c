@@ -83,13 +83,13 @@ int htab_insert_item(Htab_t *table, Token_t *token) {
         item->data.func = NULL;
         item->data.const_type = NIL;
     } else if (token->type == T_FUNC_ID) {
-
         item->data.symbol_type = FUNCTION;
         item->data.func = malloc(sizeof(Func_t));
         if (item->data.func == NULL) {
             free(item->data.attribute);
             free(item);
             return INTERNAL_ERR;
+            // TODO extra frees from parser
         }
         item->data.func->argc = 0;
         item->data.func->argv = NULL;
@@ -165,7 +165,13 @@ int htab_erase(Htab_t *table, Htab_key_t key) {
     } else {
         pervious->next = item->next;
     }
-    free(item->data.attribute);
+    if (item->data.symbol_type == VARIABLE) {
+        free(item->data.var);
+    } else {
+        free(item->data.func->argv);
+        free(item->data.func);
+    }
+    //    free(item->data.attribute);
     free(item);
     table->size--;
     return OK;

@@ -17,10 +17,10 @@ int tmp_var_count = 1;
 // LOCAL INCLUDES - tohletoto legacy code nechat v tomto poradi plsky
 #include "code_generator.h"
 #include "dynamic_string.h"
-#include "stack.h"
 #include "expr.h"
-#include "scanner.h"
 #include "parser.h"
+#include "scanner.h"
+#include "stack.h"
 #include "symtable.h"
 
 int main(void) {

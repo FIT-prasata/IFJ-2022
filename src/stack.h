@@ -21,14 +21,13 @@
 // LOCAL INCLUDES
 #include "error.h"    // for status codes
 #include "scanner.h"  // for accessing token struct later on
-#include "error.h"    // for status codes
 
 // line counting
 extern int line_num;
 
 // DEFINES
 #define NO_TYPE INT_MAX
-#define TOKEN_EMPTY_STACK INT_MAX-1
+#define TOKEN_EMPTY_STACK INT_MAX - 1
 #define CHAR_STACK_BOTTOM '$'
 #define CHAR_STACK_POP_ERR '\0'
 #define CHAR_STACK_NO_MATCH -1
@@ -46,31 +45,29 @@ typedef struct Token_stack {
     Token_stack_t *next_token;  // Pointer to next token
 } Token_stack_t;
 
-
-// Precedence table navigation 
+// Precedence table navigation
 typedef enum {
-    EXPR_STACK_BOTTOM, // Stack bottom '$'
-    EXPR_ID,           // Identifier 'i'
-    EXPR_ADD,          // Addition '+'
-    EXPR_SUB,          // Subtraction '-'
-    EXPR_MUL,          // Multiplication '*'
-    EXPR_DIV,          // Division '/'
-    EXPR_DOT,          // Dot '.'
-    EXPR_EQ,           // Equality '==='
-    EXPR_NEQ,          // Inequality '!=='
-    EXPR_LT,           // Less than '<'
-    EXPR_GT,           // Greater than '>'
-    EXPR_LE,           // Less than or equal '<='
-    EXPR_GE,           // Greater than or equal '>='
-    EXPR_LBR,          // Left bracket '('
-    EXPR_RBR           // Right bracket ')'
+    EXPR_STACK_BOTTOM,  // Stack bottom '$'
+    EXPR_ID,            // Identifier 'i'
+    EXPR_ADD,           // Addition '+'
+    EXPR_SUB,           // Subtraction '-'
+    EXPR_MUL,           // Multiplication '*'
+    EXPR_DIV,           // Division '/'
+    EXPR_DOT,           // Dot '.'
+    EXPR_EQ,            // Equality '==='
+    EXPR_NEQ,           // Inequality '!=='
+    EXPR_LT,            // Less than '<'
+    EXPR_GT,            // Greater than '>'
+    EXPR_LE,            // Less than or equal '<='
+    EXPR_GE,            // Greater than or equal '>='
+    EXPR_LBR,           // Left bracket '('
+    EXPR_RBR            // Right bracket ')'
 } ptable_symbol_t;
-
 
 // Initializes token stack
 int token_stack_init(Token_stack_t *t_stack);
 
-// Returns token that is currently on top of the token stack 
+// Returns token that is currently on top of the token stack
 T_type_t token_stack_get_head(Token_stack_t *t_stack);
 
 // Pushes token into the stack
@@ -109,7 +106,8 @@ void char_stack_clear(Char_stack_t *c_stack);
 // Get the closest terminal on top of the character stack
 ptable_symbol_t char_stack_get_closest_terminal(Char_stack_t *c_stack);
 
-// Pushes '[' character into the character stack to the right of the closest terminal
+// Pushes '[' character into the character stack to the right of the closest
+// terminal
 int char_stack_push_shift(Char_stack_t *c_stack);
 
-#endif // _STACK_H_
+#endif  // _STACK_H_

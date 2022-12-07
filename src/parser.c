@@ -143,6 +143,7 @@ int def_func_rule(Token_t *token, scope_t *scope_state, Htab_t *global_table) {
 
     // check if function wasn't already defined
     if (func_ptr->data.func->defined != false) return UNDEF_FUNC_ERR;
+    func_ptr->data.func->defined = true;
 
     // store key of function in global variable
     if ((status =
@@ -217,8 +218,13 @@ int arg_rule(Token_t *token, Htab_t *global_table) {
     Htab_item_t *func_ptr = htab_find(global_table, function_id.str);
     if (func_ptr == NULL) return INTERNAL_ERR;
 
+    func_ptr->data.symbol_type = FUNCTION;
     // inc argc
     func_ptr->data.func->argc++;
+    // realloc argv
+    func_ptr->data.func->argv =
+        realloc(func_ptr->data.func->argv,
+                func_ptr->data.func->argc * sizeof(Symbol_t));
 
     // handle ... -> <TYPE>
     if ((status = type_rule(token, global_table, true, false)) != OK)
@@ -267,7 +273,7 @@ int arg_list_rule(Token_t *current_token, Htab_t *global_table) {
 int param_rule(Token_t *token, Htab_t *global_table, bool func_call) {
     int status = OK;
     // handle <PARAM> -> <CONST>
-    if (const_rule(token, global_table, false) == OK) {
+    if (const_rule(token, global_table, func_call) == OK) {
         return OK;
     }
 
@@ -287,10 +293,12 @@ int param_rule(Token_t *token, Htab_t *global_table, bool func_call) {
         func_ptr = htab_find(global_table, function_id.str);
         if (func_ptr == NULL) return INTERNAL_ERR;
     }
-
+    func_ptr->data.func->argv[func_ptr->data.func->argc - 1].symbol_type =
+        VARIABLE;
     func_ptr->data.func->argv[func_ptr->data.func->argc - 1].attribute =
         id_ptr->data.attribute;
-    func_ptr->data.func->argv[func_ptr->data.func->argc - 1].var->frame = LF;
+    func_ptr->data.func->argv[func_ptr->data.func->argc - 1].var->frame =
+        func_call ? LF : GF;
 
     return status;
 }
@@ -328,8 +336,10 @@ int type_rule(Token_t *token, Htab_t *global_table, bool is_func_def,
     Htab_item_t *func_pointer = NULL;
     if (is_func_def == true) {
         // get function pointer
-        Htab_item_t *func_ptr = htab_find(global_table, function_id.str);
-        if (func_ptr == NULL) return INTERNAL_ERR;
+        func_pointer = htab_find(global_table, function_id.str);
+        func_pointer->data.func->argv[func_pointer->data.func->argc - 1].var =
+            malloc(sizeof(Var_t));
+        if (func_pointer == NULL) return INTERNAL_ERR;
     }
 
     switch (token->type) {
@@ -396,7 +406,7 @@ int type_rule(Token_t *token, Htab_t *global_table, bool is_func_def,
                     .var->var_type = NIL;
             }
             if (is_func_type == true) {
-                func_pointer->data.func->return_type = NIL;
+                //                func_pointer->data.func->return_type = NIL;
             }
             return OK;
         default:
@@ -416,7 +426,7 @@ int const_rule(Token_t *token, Htab_t *global_table, bool func_call) {
         func_ptr = htab_find(global_table, function_id.str);
         if (func_ptr == NULL) return INTERNAL_ERR;
     }
-
+    func_ptr->data.symbol_type = CONSTANT;
     switch (token->type) {
         case T_INT:
             func_ptr->data.func->argv[func_ptr->data.func->argc - 1]
@@ -642,13 +652,7 @@ int stat_rule(Token_t *current_token, scope_t *scope_state,
 
     // handle ... -> T_RCBR
     if (current_token->type == T_RCBR) {
-        // get new token
-        if ((status = scan(current_token)) != OK) return status;
-
-        // handle ... -> ... <STAT>
-        if ((status = stat_rule(current_token, scope_state, global_table)) !=
-            OK)
-            return status;
+        return status;
     }
 
     // end + ε

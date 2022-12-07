@@ -23,7 +23,7 @@ int token_stack_init(Token_stack_t *t_stack) {
     return OK;
 }
 
-T_type_t token_stack_get_head(Token_stack_t *t_stack) { 
+T_type_t token_stack_get_head(Token_stack_t *t_stack) {
     if (t_stack == NULL) {
         return INTERNAL_ERR;
     }
@@ -32,7 +32,9 @@ T_type_t token_stack_get_head(Token_stack_t *t_stack) {
 
 int token_stack_push(Token_stack_t *t_stack, Token_t *token) {
     Token_stack_t *tmp = (Token_stack_t *)malloc(sizeof(Token_stack_t));
-    if (tmp == NULL || token == NULL || token->type == NO_TYPE || t_stack == NULL) return INTERNAL_ERR;
+    if (tmp == NULL || token == NULL || token->type == NO_TYPE ||
+        t_stack == NULL)
+        return INTERNAL_ERR;
     tmp->token_head = t_stack->token_head;
     tmp->next_token = t_stack->next_token;
     t_stack->token_head = *token;
@@ -56,12 +58,16 @@ T_type_t token_stack_pop(Token_stack_t *t_stack) {
 }
 
 void token_stack_clear(Token_stack_t *t_stack) {
-    while (token_stack_pop(t_stack) != TOKEN_EMPTY_STACK);
+    while (token_stack_pop(t_stack) != TOKEN_EMPTY_STACK)
+        ;
 }
 
 // CHARACTER STACK
 
-char all_terminals[TERMINALS_NUM] = { EXPR_STACK_BOTTOM, EXPR_ID, EXPR_ADD, EXPR_SUB, EXPR_MUL, EXPR_DIV, EXPR_DOT, EXPR_EQ, EXPR_NEQ, EXPR_LT, EXPR_GT, EXPR_LE, EXPR_GE, EXPR_LBR, EXPR_RBR };
+char all_terminals[TERMINALS_NUM] = {
+    EXPR_STACK_BOTTOM, EXPR_ID,  EXPR_ADD, EXPR_SUB, EXPR_MUL,
+    EXPR_DIV,          EXPR_DOT, EXPR_EQ,  EXPR_NEQ, EXPR_LT,
+    EXPR_GT,           EXPR_LE,  EXPR_GE,  EXPR_LBR, EXPR_RBR};
 
 int char_stack_init(Char_stack_t *c_stack) {
     if (c_stack == NULL) {
@@ -80,8 +86,9 @@ char char_stack_get_head(Char_stack_t *c_stack) {
 }
 
 int char_stack_push(Char_stack_t *c_stack, char character) {
-    Char_stack_t *tmp = (Char_stack_t *) malloc(sizeof(Char_stack_t));
-    if (tmp == NULL || c_stack == NULL || character == NULL) return INTERNAL_ERR;
+    Char_stack_t *tmp = (Char_stack_t *)malloc(sizeof(Char_stack_t));
+    if (tmp == NULL || c_stack == NULL || character == NULL)
+        return INTERNAL_ERR;
     tmp->char_head = c_stack->char_head;
     tmp->next_char = c_stack->next_char;
     c_stack->char_head = character;
@@ -105,7 +112,8 @@ char char_stack_pop(Char_stack_t *c_stack) {
 }
 
 void char_stack_clear(Char_stack_t *c_stack) {
-    while (char_stack_pop(c_stack) != EXPR_STACK_BOTTOM);
+    while (char_stack_pop(c_stack) != EXPR_STACK_BOTTOM)
+        ;
 }
 
 ptable_symbol_t char_stack_get_closest_terminal(Char_stack_t *c_stack) {
@@ -138,8 +146,7 @@ int char_stack_push_shift(Char_stack_t *c_stack) {
                     prev->next_char = tmp;
                     tmp->char_head = '[';
                     tmp->next_char = c_stack;
-                }
-                else {
+                } else {
                     char_stack_push(c_stack, '[');
                 }
                 return OK;

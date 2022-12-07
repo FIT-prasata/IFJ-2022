@@ -295,13 +295,16 @@ void generate_func_call(Symbol_t *func, FILE *file) {
     for (int i = func->func->argc; i > 0; i--) {
         switch (func->func->argv[i - 1].var->frame) {
             case GF:
-                fprintf(file, "PUSHS GF@%s\n", func->func->argv[i - 1].attribute);
+                fprintf(file, "PUSHS GF@%s\n",
+                        func->func->argv[i - 1].attribute);
                 break;
             case LF:
-                fprintf(file, "PUSHS LF@%s\n", func->func->argv[i - 1].attribute);
+                fprintf(file, "PUSHS LF@%s\n",
+                        func->func->argv[i - 1].attribute);
                 break;
             case TF:
-                fprintf(file, "PUSHS TF@%s\n", func->func->argv[i - 1].attribute);
+                fprintf(file, "PUSHS TF@%s\n",
+                        func->func->argv[i - 1].attribute);
                 break;
             default:
                 break;
@@ -314,13 +317,16 @@ void generate_func_call_assign(char *destination, Symbol_t *func, FILE *file) {
     for (int i = func->func->argc; i > 0; i--) {
         switch (func->func->argv[i - 1].var->frame) {
             case GF:
-                fprintf(file, "PUSHS GF@%s\n", func->func->argv[i - 1].attribute);
+                fprintf(file, "PUSHS GF@%s\n",
+                        func->func->argv[i - 1].attribute);
                 break;
             case LF:
-                fprintf(file, "PUSHS LF@%s\n", func->func->argv[i - 1].attribute);
+                fprintf(file, "PUSHS LF@%s\n",
+                        func->func->argv[i - 1].attribute);
                 break;
             case TF:
-                fprintf(file, "PUSHS TF@%s\n", func->func->argv[i - 1].attribute);
+                fprintf(file, "PUSHS TF@%s\n",
+                        func->func->argv[i - 1].attribute);
                 break;
             default:
                 break;
@@ -438,10 +444,10 @@ int generate_instruction(Operation_t operation, Symbol_t *dest_in,
         case IN_STRLEN:  // built-in strlen function
             generate_strlen(var1.str, dest.str, file);  // snad OK
             break;
-        case IN_ORD: // TODO: check if this is OK
+        case IN_ORD:  // TODO: check if this is OK
             generate_stri2int(var1.str, "int@0", dest.str, file);
             break;
-        case IN_CHR: // TODO: check if this is OK
+        case IN_CHR:  // TODO: check if this is OK
             generate_int2char(var1.str, dest.str, file);
             break;
         case DEF_FUNC:

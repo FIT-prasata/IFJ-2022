@@ -23,7 +23,6 @@
 //#include "stack.h"
 #include <stdint.h>
 
-
 // line counting
 extern int line_num;
 
