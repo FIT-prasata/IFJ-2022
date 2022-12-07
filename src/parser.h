@@ -196,6 +196,6 @@ int func_call_rule(Token_t *current_token, scope_t *scope_state,
  * @param global_table
  * @return
  */
-int expr_rule(Token_t *current_token, Htab_t *global_table, int location);
+int expr_rule(Token_t *current_token, Htab_t *global_table, int location, scope_t *scope_state);
 
 #endif  // _PARSER_H_

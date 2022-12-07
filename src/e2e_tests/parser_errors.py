@@ -79,6 +79,5 @@ class ParserTestCases(unittest.TestCase):
         declare(strict_types=1);
         function hello_world(int $x): null 
         }
-        
         """
         self.assertEqual(execute_programme(stdin)[0], 2)

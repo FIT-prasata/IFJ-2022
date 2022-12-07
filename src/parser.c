@@ -16,6 +16,8 @@ DString_t function_id;
 DString_t variable_id;
 DString_t func_call_id;
 
+Htab_t *local_table;
+
 int param_number;
 
 Token_t *init_token(void) {
@@ -125,6 +127,10 @@ int program_rule(Token_t *token, scope_t *scope_state, Htab_t *global_table) {
 }
 
 int def_func_rule(Token_t *token, scope_t *scope_state, Htab_t *global_table) {
+    // initialize local table
+    local_table = htab_init(50);
+    if (local_table == NULL) return INTERNAL_ERR;
+
     int status = OK;
     // no states to set yet
 
@@ -206,6 +212,9 @@ int def_func_rule(Token_t *token, scope_t *scope_state, Htab_t *global_table) {
     // update scope
     scope_state->in_func = false;
     scope_state->in_global = true;
+
+    // free local table
+    htab_free(local_table);
 
     return OK;
 }
@@ -478,8 +487,8 @@ int stat_rule(Token_t *current_token, scope_t *scope_state,
         if ((status = scan(current_token)) != OK) return status;
 
         // handle ... -> ... <EXPR>
-        if ((status = expr_rule(current_token, global_table, EXPR_LOC_COND)) !=
-            OK)
+        if ((status = expr_rule(current_token, global_table, EXPR_LOC_COND,
+                                scope_state)) != OK)
             return status;
 
         // get new token
@@ -536,8 +545,8 @@ int stat_rule(Token_t *current_token, scope_t *scope_state,
         if ((status = scan(current_token)) != OK) return status;
 
         // handle ... -> ... <EXPR>
-        if ((status = expr_rule(current_token, global_table, EXPR_LOC_COND)) !=
-            OK)
+        if ((status = expr_rule(current_token, global_table, EXPR_LOC_COND,
+                                scope_state)) != OK)
             return status;
 
         // get new token
@@ -565,8 +574,8 @@ int stat_rule(Token_t *current_token, scope_t *scope_state,
         if ((status = scan(current_token)) != OK) return status;
 
         // handle ... -> ... <EXPR>
-        if ((status = expr_rule(current_token, global_table, EXPR_LOC_RET)) !=
-            OK)
+        if ((status = expr_rule(current_token, global_table, EXPR_LOC_RET,
+                                scope_state)) != OK)
             return status;
 
         // get new token
@@ -591,6 +600,16 @@ int stat_rule(Token_t *current_token, scope_t *scope_state,
     if (current_token->type == T_ID) {
         // save id name to variable_id
         d_string_replace_str(&variable_id, current_token->attribute.string);
+        // get variable from global table
+        if (scope_state->in_global == true) {
+            if (htab_lookup_add(global_table, current_token) == NULL) {
+                return INTERNAL_ERR;
+            }
+        } else {
+            if (htab_lookup_add(local_table, current_token) == NULL) {
+                return INTERNAL_ERR;
+            }
+        }
 
         // get new token
         if ((status = scan(current_token)) != OK) return status;
@@ -693,11 +712,9 @@ int assign_type_rule(Token_t *current_token, scope_t *scope_state,
                                      global_table)) != OK)
             return status;
 
-        // get variable from global table
-        Htab_item_t *variable = htab_find(global_table, variable_id.str);
-
         // get function from global table
         Htab_item_t *function = htab_find(global_table, func_call_id.str);
+        Htab_item_t *variable = htab_find(global_table, variable_id.str);
 
         if ((status = generate_instruction(CALL_FUNC_ASSIGN, &variable->data,
                                            &function->data, NULL, 0, stdout)) !=
@@ -706,8 +723,8 @@ int assign_type_rule(Token_t *current_token, scope_t *scope_state,
     }
 
     // handle ... -> <EXPR>
-    if ((status = expr_rule(current_token, global_table, EXPR_LOC_ASSIGN)) !=
-        OK)
+    if ((status = expr_rule(current_token, global_table, EXPR_LOC_ASSIGN,
+                            scope_state)) != OK)
         return status;
 
     return status;
@@ -748,8 +765,11 @@ int func_call_rule(Token_t *current_token, scope_t *scope_state,
     return status;
 }
 
-int expr_rule(Token_t *current_token, Htab_t *global_table, int location) {
-    int status = OK;
-    expr_main(global_table, current_token, location);
-    return status;
+int expr_rule(Token_t *current_token, Htab_t *global_table, int location,
+              scope_t *scope_state) {
+    if (scope_state->in_global) {
+        return expr_main(global_table, current_token, location);
+    } else {
+        return expr_main(local_table, current_token, location);
+    }
 }
