@@ -729,6 +729,6 @@ int func_call_rule(Token_t *current_token, scope_t *scope_state,
 
 int expr_rule(Token_t *current_token, Htab_t *global_table, int location) {
     int status = OK;
-    expr_main(current_token, global_table, location);
+    expr_main(global_table, current_token, location);
     return status;
 }

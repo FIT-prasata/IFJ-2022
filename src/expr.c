@@ -114,16 +114,16 @@ int expr_reduce(
 
     // Reduction of expression
     char head_char = char_stack_pop(c_stack);
-    while (head_char != CHAR_STACK_POP_ERR && head_char != '[') {
+    while (head_char != EXPR_STACK_BOTTOM && head_char != '[') {
         if (d_string_insert_before(&d_string, head_char) == INTERNAL_ERR) {
             d_string_free_and_clear(&d_string);
             return INTERNAL_ERR;
         }
         head_char = char_stack_pop(c_stack);
     }
-    if (is_valid_rule(&d_string) == INTERNAL_ERR) {
+    if (is_valid_rule(&d_string) == SYNTAX_ERR) {
         d_string_free_and_clear(&d_string);
-        return INTERNAL_ERR;
+        return SYNTAX_ERR;
     }
     d_string_free_and_clear(&d_string);
 
@@ -147,7 +147,7 @@ int is_valid_rule(DString_t *d_string) {
             return OK;
         }
     }
-    return INTERNAL_ERR;
+    return SYNTAX_ERR;
 }
 
 int expr_parse(Char_stack_t *c_stack, Token_stack_t *t_stack, Token_t *token,
@@ -240,13 +240,23 @@ int expr_parse(Char_stack_t *c_stack, Token_stack_t *t_stack, Token_t *token,
             break;
     }
     ptable_symbol_t stack = char_stack_get_closest_terminal(c_stack);
+    if (stack == EXPR_STACK_BOTTOM && input == EXPR_STACK_BOTTOM &&
+        c_stack->char_head == 'E' &&
+        char_stack_get_closest_terminal(c_stack) == EXPR_STACK_BOTTOM) {
+        return OK;
+    }
     ptable_move_t next_move = ptable_get_next_move(stack, input);
 
     switch (next_move) {
         case EXPR_SHIFT:
             return expr_shift(c_stack, input);
-        case EXPR_REDUCE:
-            return expr_reduce(c_stack /*, t_stack, token*/) == INTERNAL_ERR;
+        case EXPR_REDUCE: {
+            int ret;
+            if ((ret = expr_reduce(c_stack /*, t_stack, token*/)) != OK) {
+                return ret;
+            }
+            return expr_parse(c_stack, t_stack, token, location);
+        }
         case EXPR_SPECIAL_SHIFT:
             return expr_special_shift(c_stack, input) == INTERNAL_ERR;
         case EXPR_ERROR:
@@ -272,6 +282,9 @@ int expr_main(Htab_t *table, Token_t *token, int location) {
     if (table == NULL) {
         return INTERNAL_ERR;
     }
+    if (token->type == T_RBR && location == EXPR_LOC_COND) {
+        return SYNTAX_ERR;
+    }
     while (load_tokens == true) {
         if (token->type == T_ID) {
             Htab_item_t *item;
@@ -282,7 +295,6 @@ int expr_main(Htab_t *table, Token_t *token, int location) {
                 return INTERNAL_ERR;
             }
         }
-
         int status = expr_parse(&c_stack, &t_stack, token, location);
         if (status == EOEXPR) {
             load_tokens = false;
@@ -293,6 +305,6 @@ int expr_main(Htab_t *table, Token_t *token, int location) {
             // Get new token
             if ((status = scan(token)) != OK) return status;
         }
-        return INTERNAL_ERR;  // Generate result instruction here
     }
+    return INTERNAL_ERR;  // Generate result instruction here
 }
