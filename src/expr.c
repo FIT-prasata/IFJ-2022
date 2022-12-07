@@ -155,97 +155,105 @@ int expr_parse(Char_stack_t *c_stack, Token_stack_t *t_stack, Token_t *token,
     bool is_logical = false;
     ptable_symbol_t input;
 
-    // Handle logical operators inside assignment
-    switch (token->type) {
-        case T_EQ:
-        case T_NEQ:
-        case T_LT:
-        case T_GT:
-        case T_LEQ:
-        case T_GEQ:
-            if (location == EXPR_LOC_ASSIGN) {
-                return SYNTAX_ERR;
-            }
-            break;
-        default:
-            break;
+  // Handle logical operators inside assignment
+  switch (token->type) {
+    case T_EQ:
+    case T_NEQ:
+    case T_LT:
+    case T_GT:
+    case T_LEQ:
+    case T_GEQ:
+      if (location == EXPR_LOC_ASSIGN) {
+        return SYNTAX_ERR;
+      }
+      break;
+    default:
+      break;
+  }
+  switch (token->type) {
+    case T_ADD:
+      input = EXPR_ADD;
+      break;
+    case T_SUB:
+      input = EXPR_SUB;
+      break;
+    case T_MUL:
+      input = EXPR_MUL;
+      break;
+    case T_DIV:
+      input = EXPR_DIV;
+      break;
+    case T_CONCAT:
+      input = EXPR_DOT;
+      break;
+    case T_LBR:
+      input = EXPR_LBR;
+      break;
+    case T_RBR:
+      input = EXPR_RBR;
+      break;
+    case T_EQ:
+      input = EXPR_EQ;
+      is_logical = true;
+      break;
+    case T_NEQ:
+      input = EXPR_NEQ;
+      is_logical = true;
+      break;
+    case T_LT:
+      input = EXPR_LT;
+      is_logical = true;
+      break;
+    case T_GT:
+      input = EXPR_GT;
+      is_logical = true;
+      break;
+    case T_LEQ:
+      input = EXPR_LE;
+      is_logical = true;
+      break;
+    case T_GEQ:
+      input = EXPR_GE;
+      is_logical = true;
+      break;
+    case T_ID:
+      input = EXPR_ID;
+      break;
+    case T_INT:
+    case T_FLOAT:
+    case T_STRING:
+      input = EXPR_ID;
+      token_stack_push(t_stack, token);
+      break;
+    case T_SEM:
+      if (location == EXPR_LOC_ASSIGN || location == EXPR_LOC_RET) {
+        return EOEXPR;
+      }
+      else {
+        return SYNTAX_ERR;
+      }
+    default:
+      if (token->type == EOEXPR) {
+        input = EXPR_STACK_BOTTOM;
+      }
+      else {
+        return EOEXPR;
+      }
+      break;
+  }
+  ptable_symbol_t stack = char_stack_get_closest_terminal(c_stack);
+  if (stack == EXPR_STACK_BOTTOM && input == EXPR_STACK_BOTTOM && c_stack->char_head == 'E' && char_stack_get_closest_terminal(c_stack) == EXPR_STACK_BOTTOM) {
+    return OK;
+  }
+  if (stack == EXPR_STACK_BOTTOM && input == EXPR_RBR && c_stack->char_head == 'E' && char_stack_get_closest_terminal(c_stack) == EXPR_STACK_BOTTOM) {
+    if (location == EXPR_LOC_COND) {
+      return EOEXPR;
     }
-    switch (token->type) {
-        case T_ADD:
-            input = EXPR_ADD;
-            break;
-        case T_SUB:
-            input = EXPR_SUB;
-            break;
-        case T_MUL:
-            input = EXPR_MUL;
-            break;
-        case T_DIV:
-            input = EXPR_DIV;
-            break;
-        case T_CONCAT:
-            input = EXPR_DOT;
-            break;
-        case T_LBR:
-            input = EXPR_LBR;
-            break;
-        case T_RBR:
-            input = EXPR_RBR;
-            break;
-        case T_EQ:
-            input = EXPR_EQ;
-            is_logical = true;
-            break;
-        case T_NEQ:
-            input = EXPR_NEQ;
-            is_logical = true;
-            break;
-        case T_LT:
-            input = EXPR_LT;
-            is_logical = true;
-            break;
-        case T_GT:
-            input = EXPR_GT;
-            is_logical = true;
-            break;
-        case T_LEQ:
-            input = EXPR_LE;
-            is_logical = true;
-            break;
-        case T_GEQ:
-            input = EXPR_GE;
-            is_logical = true;
-            break;
-        case T_ID:
-            input = EXPR_ID;
-            break;
-        case T_INT:
-        case T_FLOAT:
-        case T_STRING:
-            input = EXPR_ID;
-            token_stack_push(t_stack, token);
-            break;
-        case T_SEM:
-            if (location == EXPR_LOC_ASSIGN || location == EXPR_LOC_RET) {
-                return EOEXPR;
-            } else {
-                return SYNTAX_ERR;
-            }
-        default:
-            if (token->type == EOEXPR) {
-                input = EXPR_STACK_BOTTOM;
-            } else {
-                return EOEXPR;
-            }
-            break;
+    else {
+      return SYNTAX_ERR;
     }
-    ptable_symbol_t stack = char_stack_get_closest_terminal(c_stack);
-    if (stack == EXPR_STACK_BOTTOM && input == EXPR_STACK_BOTTOM &&
-        c_stack->char_head == 'E' &&
-        char_stack_get_closest_terminal(c_stack) == EXPR_STACK_BOTTOM) {
-        return OK;
-    }
-    ptable_move_t next_move = ptable_get_next_move(stack, input);
+  }
+  ptable_move_t next_move = ptable_get_next_move(stack, input);
 
     switch (next_move) {
         case EXPR_SHIFT:

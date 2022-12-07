@@ -941,6 +941,127 @@ ASSERT_TRUE(char_stack_pop(&test_char_stack) == 'E')
 ASSERT_TRUE(char_stack_pop(&test_char_stack) == EXPR_STACK_BOTTOM)
 ENDTEST
 
+TEST(T_expr_parse_cond)
+Char_stack_t test_char_stack;
+char_stack_init(&test_char_stack);
+Token_stack_t test_token_stack;
+token_stack_init(&test_token_stack);
+Token_t test_token;
+test_token.type = T_LBR;
+Token_t test_token2;
+test_token2.type = T_ID;
+Token_t test_token3;
+test_token3.type = T_RBR;
+Token_t test_token4;
+test_token4.type = T_RBR;
+Token_t test_token5;
+test_token5.type = EOEXPR;
+int location = EXPR_LOC_COND;
+ASSERT_TRUE(expr_parse(&test_char_stack, &test_token_stack, &test_token, location) == OK)
+ASSERT_TRUE(char_stack_get_head(&test_char_stack) == EXPR_LBR)
+ASSERT_TRUE(expr_parse(&test_char_stack, &test_token_stack, &test_token2, location) == OK)
+ASSERT_TRUE(char_stack_get_head(&test_char_stack) == EXPR_ID)
+ASSERT_TRUE(expr_parse(&test_char_stack, &test_token_stack, &test_token3, location) == OK)
+ASSERT_TRUE(char_stack_get_head(&test_char_stack) == EXPR_RBR)
+ASSERT_TRUE(expr_parse(&test_char_stack, &test_token_stack, &test_token4, location) == EOEXPR)
+ASSERT_TRUE(expr_parse(&test_char_stack, &test_token_stack, &test_token5, location) == OK)
+ASSERT_TRUE(char_stack_pop(&test_char_stack) == 'E')
+ASSERT_TRUE(char_stack_pop(&test_char_stack) == EXPR_STACK_BOTTOM)
+ENDTEST
+
+TEST(T_expr_parse_complex_cond)
+Char_stack_t test_char_stack;
+char_stack_init(&test_char_stack);
+Token_stack_t test_token_stack;
+token_stack_init(&test_token_stack);
+Token_t test_token;
+test_token.type = T_LBR;
+Token_t test_token2;
+test_token2.type = T_ID;
+Token_t test_token3;
+test_token3.type = T_GT;
+Token_t test_token4;
+test_token4.type = T_ID;
+Token_t test_token5;
+test_token5.type = T_RBR;
+Token_t test_token6;
+test_token6.type = T_EQ;
+Token_t test_token7;
+test_token7.type = T_LBR;
+Token_t test_token8;
+test_token8.type = T_ID;
+Token_t test_token9;
+test_token9.type = T_LT;
+Token_t test_token10;
+test_token10.type = T_ID;
+Token_t test_token11;
+test_token11.type = T_RBR;
+Token_t test_token12;
+test_token12.type = T_RBR;
+Token_t test_token13;
+test_token13.type = EOEXPR;
+int location = EXPR_LOC_COND;
+ASSERT_TRUE(expr_parse(&test_char_stack, &test_token_stack, &test_token, location) == OK)
+ASSERT_TRUE(char_stack_get_head(&test_char_stack) == EXPR_LBR)
+ASSERT_TRUE(expr_parse(&test_char_stack, &test_token_stack, &test_token2, location) == OK)
+ASSERT_TRUE(char_stack_get_head(&test_char_stack) == EXPR_ID)
+ASSERT_TRUE(expr_parse(&test_char_stack, &test_token_stack, &test_token3, location) == OK)
+ASSERT_TRUE(char_stack_get_head(&test_char_stack) == EXPR_GT)
+ASSERT_TRUE(expr_parse(&test_char_stack, &test_token_stack, &test_token4, location) == OK)
+ASSERT_TRUE(char_stack_get_head(&test_char_stack) == EXPR_ID)
+ASSERT_TRUE(expr_parse(&test_char_stack, &test_token_stack, &test_token5, location) == OK)
+ASSERT_TRUE(char_stack_get_head(&test_char_stack) == EXPR_RBR)
+ASSERT_TRUE(expr_parse(&test_char_stack, &test_token_stack, &test_token6, location) == OK)
+ASSERT_TRUE(char_stack_get_head(&test_char_stack) == EXPR_EQ)
+ASSERT_TRUE(expr_parse(&test_char_stack, &test_token_stack, &test_token7, location) == OK)
+ASSERT_TRUE(char_stack_get_head(&test_char_stack) == EXPR_LBR)
+ASSERT_TRUE(expr_parse(&test_char_stack, &test_token_stack, &test_token8, location) == OK)
+ASSERT_TRUE(char_stack_get_head(&test_char_stack) == EXPR_ID)
+ASSERT_TRUE(expr_parse(&test_char_stack, &test_token_stack, &test_token9, location) == OK)
+ASSERT_TRUE(char_stack_get_head(&test_char_stack) == EXPR_LT)
+ASSERT_TRUE(expr_parse(&test_char_stack, &test_token_stack, &test_token10, location) == OK)
+ASSERT_TRUE(char_stack_get_head(&test_char_stack) == EXPR_ID)
+ASSERT_TRUE(expr_parse(&test_char_stack, &test_token_stack, &test_token11, location) == OK)
+ASSERT_TRUE(char_stack_get_head(&test_char_stack) == EXPR_RBR)
+ASSERT_TRUE(expr_parse(&test_char_stack, &test_token_stack, &test_token12, location) == EOEXPR)
+ASSERT_TRUE(expr_parse(&test_char_stack, &test_token_stack, &test_token13, location) == OK)
+ASSERT_TRUE(char_stack_pop(&test_char_stack) == 'E')
+ASSERT_TRUE(char_stack_pop(&test_char_stack) == EXPR_STACK_BOTTOM)
+ENDTEST
+
+TEST(T_expr_parse_cond_end_in_ret)
+Char_stack_t test_char_stack;
+char_stack_init(&test_char_stack);
+Token_stack_t test_token_stack;
+token_stack_init(&test_token_stack);
+Token_t test_token;
+test_token.type = T_LBR;
+Token_t test_token2;
+test_token2.type = T_ID;
+Token_t test_token3;
+test_token3.type = T_GT;
+Token_t test_token4;
+test_token4.type = T_ID;
+Token_t test_token5;
+test_token5.type = T_RBR;
+Token_t test_token6;
+test_token6.type = T_RBR;
+Token_t test_token7;
+test_token7.type = EOEXPR;
+int location = EXPR_LOC_RET;
+ASSERT_TRUE(expr_parse(&test_char_stack, &test_token_stack, &test_token, location) == OK)
+ASSERT_TRUE(char_stack_get_head(&test_char_stack) == EXPR_LBR)
+ASSERT_TRUE(expr_parse(&test_char_stack, &test_token_stack, &test_token2, location) == OK)
+ASSERT_TRUE(char_stack_get_head(&test_char_stack) == EXPR_ID)
+ASSERT_TRUE(expr_parse(&test_char_stack, &test_token_stack, &test_token3, location) == OK)
+ASSERT_TRUE(char_stack_get_head(&test_char_stack) == EXPR_GT)
+ASSERT_TRUE(expr_parse(&test_char_stack, &test_token_stack, &test_token4, location) == OK)
+ASSERT_TRUE(char_stack_get_head(&test_char_stack) == EXPR_ID)
+ASSERT_TRUE(expr_parse(&test_char_stack, &test_token_stack, &test_token5, location) == OK)
+ASSERT_TRUE(char_stack_get_head(&test_char_stack) == EXPR_RBR)
+ASSERT_TRUE(expr_parse(&test_char_stack, &test_token_stack, &test_token6, location) == SYNTAX_ERR)
+ENDTEST
+
 int run_expr_tests() {
     int errors = 0;
     printf("Running expression parser tests...\n");
@@ -963,5 +1084,8 @@ int run_expr_tests() {
     errors += T_expr_parse_complex_arithmetic();
     errors += T_expr_parse_invalid();
     errors += T_expr_parse_basic_cond();
+    errors += T_expr_parse_cond();
+    errors += T_expr_parse_complex_cond();
+    errors += T_expr_parse_cond_end_in_ret();
     return errors;
 }
