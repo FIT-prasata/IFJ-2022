@@ -175,13 +175,6 @@ int is_white(int input);
 int prolog_handler(void);
 
 /**
- * @brief Function for handling epilog
- *
- * @return 0 if epilog is correct, 1 otherwise
- */
-int epilog_handler(void);
-
-/**
  * @brief Function for keyword handling
  *
  * @param dString - pointer to dynamic strung

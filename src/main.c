@@ -27,7 +27,7 @@ int main(void) {
     int status = OK;
 
     if ((status = parse()) != OK) {
-        error_display(status, 0);
+        error_display(status, line_num);
     }
 
     return 0;
