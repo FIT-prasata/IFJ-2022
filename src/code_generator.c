@@ -18,6 +18,7 @@ void generate_while_start(Operation_t type, char *var1, char *var2, int label,
     switch (type) {
         case WHILE_EQ:
             fprintf(file, "LABEL .while_start_%d\n", label);
+
             fprintf(file, "JUMPIFEQ .while_body_%d %s %s\n", label, var1, var2);
             break;
         case WHILE_NEQ:
@@ -432,6 +433,58 @@ int generate_instruction(Operation_t operation, Symbol_t *dest_in,
             break;
         default:
             return INTERNAL_ERR;
+
+
+            case PUSHS:
+                fprintf(file, "PUSHS %s\n", var1.str);
+                break;
+            case IF:
+                fprintf(file, "PUSHS bool@true\n");
+                fprintf(file, "JUMPIFEQS .if_start_%d\n", label);
+                fprintf(file, "JUMP .if_else_%d\n", label);
+                fprintf(file, "LABEL .if_start_%d\n", label);
+                break;
+            case WHILE:
+                fprintf(file, "LABEL .while_start_%d\n", label);
+                fprintf(file, "PUSHS bool@true\n");
+                fprintf(file, "JUMPIFEQS .while_body_%d\n", label);
+                fprintf(file, "JUMP .while_end_%d\n", label);
+                fprintf(file, "LABEL .while_body_%d\n", label);
+                break;
+            case ADDS:
+                fprintf(file, "ADDS\n");
+                break;
+            case SUBS:
+                fprintf(file, "SUBS\n");
+                break;
+            case MULS:
+                fprintf(file, "MULS\n");
+                break;
+            case DIVS:
+                fprintf(file, "DIVS\n");
+                break;
+            case IDIVS:
+                fprintf(file, "IDIVS\n");
+                break;
+            case LTS:
+                fprintf(file, "LTS\n");
+                break;
+            case GTS:
+                fprintf(file, "GTS\n");
+                break;
+            case EQS:
+                fprintf(file, "EQS\n");
+                break;
+            case ANDS:
+                fprintf(file, "ANDS\n");
+                break;
+            case ORS:
+                fprintf(file, "ORS\n");
+                break;
+            case NOTS:
+                fprintf(file, "NOTS\n");
+                break;
+
     }
     return OK;
 }

@@ -76,7 +76,25 @@ typedef enum Operation {
     CALL_FUNC_ASSIGN,
     DEF_FUNC,
     RETURN,
-    CONCAT
+    CONCAT,
+
+
+    // STACK OPERATIONS
+        PUSHS,
+        IF,
+        WHILE,
+        ADDS,
+        SUBS,
+        MULS,
+        DIVS,
+        IDIVS,
+        LTS,
+        GTS,
+        EQS,
+        ANDS,
+        ORS,
+        NOTS,
+
 } Operation_t;
 
 // TODO
