@@ -48,7 +48,7 @@ T_type_t token_stack_pop(Token_stack_t *t_stack) {
         return TOKEN_EMPTY_STACK;
     }
     T_type_t result = t_stack->token_head.type;
-    Token_stack_t *tmp = t_stack->next_token;
+    Token_stack_t *tmp = t_stack;
     t_stack->token_head = t_stack->next_token->token_head;
     t_stack->next_token = t_stack->next_token->next_token;
     free(tmp);

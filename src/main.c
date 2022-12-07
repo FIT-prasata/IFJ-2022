@@ -26,10 +26,9 @@ int tmp_var_count = 1;
 int main(void) {
     int status = OK;
 
-    FILE *file = fopen("test.ifjcode", "w");
-    print_built_in(file);
-
-    fclose(file);
+    if ((status = parse()) != OK) {
+        error_display(status, 0);
+    }
 
     return 0;
 }
